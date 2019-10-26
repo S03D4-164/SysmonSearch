@@ -2516,11 +2516,6 @@ function getOptiion(lt_date, interval, type) {
     return str_gte + "～" + str_lt;
 }
 
-function padding(n, d, p) {
-    p = p || '0';
-    return (p.repeat(d) + n).slice(-d);
-};
-
 function getViewFormat(date, type) {
     if (type == 1) {
         return padding(date.getFullYear(), 4, "0") + "/" + padding(date.getMonth() + 1, 2, "0") + "/" + padding(date.getDate(), 2, "0") + "/00:00:00";
