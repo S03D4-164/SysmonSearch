@@ -1,83 +1,96 @@
 const CONFIG_PATH = '../../conf.js';
 import {conf as config} from '../../conf.js';
+import elasticsearch from 'elasticsearch';
 
 var Utils = require("./Utils");
+
+const Search = require("./logic/search");
+const makeQuery = require("./logic/make_query").make_query;
 
 module.exports = class Sysmon_Search_Logic {
 
     constructor(host, port) {
-        var elasticsearch = require('elasticsearch');
+        //var elasticsearch = require('elasticsearch');
         this.client = new elasticsearch.Client({
-            // log: 'trace',
+            log: 'trace',
             host: host + ':' + port
         });
     }
 
     // ----------------------------------------------
     // Common Function: Search Request
-    search(bodyObj, callback) {
-        this.client.search({
+    async search(bodyObj) {
+        console.log("search: " + JSON.stringify(bodyObj));
+        const result = await this.client.search({
             index: 'winlogbeat-*',
             // size: 1000,
             body: bodyObj
+        });
+        /*
         }, function(error, response) {
             if (!error) {
-                // console.log(response);
-                callback(response);
+                console.log(response);
+                return response;
             } else {
                 console.log(['error', 'elastic-translator'], error);
-                callback(null);
+                return;
             }
         });
+        */
+        return result;
     }
     // ----------------------------------------------
 
     // Common Function: Alert Search Request
-    search_alert(bodyObj, callback) {
-        this.client.search({
+    search_alert(bodyObj) {
+        const result = this.client.search({
             index: 'sysmon-search-alert-*',
             // size: 1000,
             body: bodyObj
         }, function(error, response) {
             if (!error) {
                 // console.log(response);
-                callback(response);
+                //callback(response);
+                return response;
             } else {
                 console.log(['error', 'elastic-translator'], error);
-                callback(null);
+                //callback(null);
+                return;
             }
         });
+        return result;
     }
     // ----------------------------------------------
 
     // Common Function: Statistical Search Request
-    search_statistical(bodyObj, callback) {
-        this.client.search({
+    search_statistical(bodyObj) {
+        const result = this.client.search({
             index: 'sysmon-search-statistics-*',
             // size: 1000,
             body: bodyObj
         }, function(error, response) {
             if (!error) {
                 // console.log(response);
-                callback(response);
+                return response;
             } else {
                 console.log(['error', 'elastic-translator'], error);
-                callback(null);
+                return;
             }
         });
+        return result;
     }
     // ----------------------------------------------
 
     // ----------------------------------------------
     // I/F Function: Get Host List
-    hosts(params, callback) {
+    async hosts(params) {
         var search_items_and_date_query = [];
-
+        console.log("params: " + JSON.stringify(params));
         if (typeof params !== "undefined" && params !== null && Object.keys(params).length !== 0) {
             if ("keyword" in params && typeof params.keyword !== "undefined" && params.keyword !== "") {
                 search_items_and_date_query.push({
                     "wildcard": {
-                        "computer_name.keyword": "*" + params['keyword'].toLowerCase() + "*"
+                        "winlog.computer_name.keyword": "*" + params['keyword'].toLowerCase() + "*"
                     }
                 });
             }
@@ -90,7 +103,7 @@ module.exports = class Sysmon_Search_Logic {
                     timestamp_range["gte"] = params.fm_start_date;
                 }
                 if ("fm_end_date" in params && typeof params.fm_end_date !== "undefined") {
-                    timestamp_range["lt"] = params.fm_end_date;
+                    //timestamp_range["lt"] = params.fm_end_date;
                 }
                 search_items_and_date_query.push({
                     "range": {
@@ -101,7 +114,7 @@ module.exports = class Sysmon_Search_Logic {
         }
 
         var searchObj = {
-            "size": 0,
+            //"size": 0,
             "query": {
                 "bool": {
                     "must": search_items_and_date_query
@@ -118,40 +131,40 @@ module.exports = class Sysmon_Search_Logic {
                         "computer_names": {
                             "terms": {
                                 "size": 1000,
-                                "field": "computer_name.keyword"
+                                "field": "winlog.computer_name.keyword"
                             }
                         }
                     }
                 }
             }
         };
-
-        function get_datas(el_result) {
-            var results = [];
-            var hits = el_result.aggregations.group_by.buckets;
-            for (var index in hits) {
-                var item = hits[index];
-                var tmp = {
-                    "date": item['key_as_string'],
-                    "result": item['computer_names']['buckets']
-                };
-                results.push(tmp);
-            }
-            callback(results);
-        }
-
+        /*
         const util = require('util');
         console.log('########------------ query -------------########');
         console.log(util.inspect(searchObj, {
             depth: null
         }));
-        this.search(searchObj, get_datas);
+        */
+        const el_result = await this.search(searchObj);
+        console.log("result: " + JSON.stringify(el_result))
+        var results = [];
+        //var hits = el_result.aggregations.group_by.buckets;
+        var hits =　el_result.aggregations?el_result.aggregations.group_by.buckets:[];
+        for (var index in hits) {
+            var item = hits[index];
+            var tmp = {
+                "date": item['key_as_string'],
+                "result": item['computer_names']['buckets']
+            };
+            results.push(tmp);
+        }
+        return results;
     }
     // ----------------------------------------------
 
     // ----------------------------------------------
     // I/F Function: Get Create Process
-    process_list(hostname, eventtype, date, searchObj, callback) {
+    async process_list(hostname, eventtype, date, searchObj) {
         if(searchObj==null){
             if (date.length === 23) {
                 var date_dict = Utils.get_range_datetime(date);
@@ -161,12 +174,12 @@ module.exports = class Sysmon_Search_Logic {
                         "bool": {
                             "must": [{
                                 "match": {
-                                    "computer_name.keyword": hostname,
+                                    "winlog.computer_name.keyword": hostname,
                                 }
                             },
                             {
                                 "terms": {
-                                    "event_id": [1, 11, 12, 13, 3, 8, 2, 7, 19, 20, 21],
+                                    "winlog.event_id": [1, 11, 12, 13, 3, 8, 2, 7, 19, 20, 21],
                                 }
                             },
                             {
@@ -179,7 +192,8 @@ module.exports = class Sysmon_Search_Logic {
                     "sort": [{
                         "@timestamp": "asc"
                     }],
-                    "_source": ["record_number", "event_data", "event_id"]
+                    //"_source": ["record_number", "event_data", "event_id"]
+                    "_source": ["winlog.record_id", "winlog.event_data", "winlog.event_id"]
                 };
             } else {
                 var event_id = [1];
@@ -213,12 +227,12 @@ module.exports = class Sysmon_Search_Logic {
                         "bool": {
                             "must": [{
                                     "match": {
-                                        "computer_name.keyword": hostname,
+                                        "winlog.computer_name.keyword": hostname,
                                     }
                                 },
                                 {
                                     "terms": {
-                                        "event_id": event_id,
+                                        "winlog.event_id": event_id,
                                     }
                                 },
                                 {
@@ -232,107 +246,130 @@ module.exports = class Sysmon_Search_Logic {
                     "sort": [{
                         "@timestamp": "asc"
                     }],
-                    "_source": ["record_number", "event_data", "event_id"]
+                    //"_source": ["record_number", "event_data", "event_id"]
+                    "_source": [
+                        "event",
+                        "process",
+                        "winlog",
+                        "network",
+                        "destination",
+                        "source",
+                        "file"
+                        //"winlog.record_id",
+                        //"winlog.event_data",
+                        //"winlog.event_id"
+                    ]
                 };
             }
         }
 
-        function get_datas(el_result) {
+        const el_result = await Search.search(searchObj);
+        if (el_result) {
             var hits = el_result.hits.hits;
 
             var results = [];
 
             for (var index in hits) {
                 var hit = hits[index]._source;
+                let data = hit.winlog.event_data;
                 // results.push( hit );
                 var tmp = {
-                    "number": hit.record_number,
-                    "image": hit.event_data.Image,
-                    "guid": hit.event_data.ProcessGuid,
-                    "date": hit.event_data.UtcTime,
+                    //"number": hit.record_number,
+                    "number": hit.winlog.record_id,
+                    //"image": data.Image,
+                    //"guid": data.ProcessGuid,
+                    "guid": hit.process.entity_id,
+                    //"date": data.UtcTime,
+                    "date": hit.event.created,
                     "_id": hits[index]._id
                 };
                 // results.push(hit.event_data);
-                tmp['type'] = Utils.eventid_to_decription(hit.event_id);
+                tmp['type'] = Utils.eventid_to_decription(hit.winlog.event_id);
                 switch (tmp['type']) {
                     case 'create_process':
-                        tmp['process'] = hit.event_data.ParentImage;
-                        tmp['disp'] = hit.event_data.CommandLine;
+                        //tmp['process'] = data.ParentImage;
+                        tmp['process'] = hit.process.parent.name;
+                        //tmp['disp'] = data.CommandLine;
+                        //tmp['disp'] = data.CommandLine;
+                        tmp['disp'] = hit.process.args;
                         tmp['info'] = {
-                            'CurrentDirectory': hit.event_data.CurrentDirectory,
-                            'CommandLine': hit.event_data.CommandLine,
-                            'Hashes': hit.event_data.Hashes,
-                            'ParentProcessGuid': hit.event_data.ParentProcessGuid,
-                            'ParentCommandLine': hit.event_data.ParentCommandLine,
-                            'ProcessGuid': hit.event_data.ProcessGuid
+                            'CurrentDirectory': data.CurrentDirectory,
+                            'CommandLine': data.CommandLine,
+                            'Hashes': data.Hashes,
+                            'ParentProcessGuid': data.ParentProcessGuid,
+                            'ParentCommandLine': data.ParentCommandLine,
+                            'ProcessGuid': data.ProcessGuid
                         };
                         break;
                     case 'create_file':
-                        tmp['process'] = hit.event_data.Image;
-                        tmp['disp'] = hit.event_data.TargetFilename;
+                        tmp['process'] = data.Image;
+                        tmp['disp'] = data.TargetFilename;
                         tmp['info'] = {
-                            'ProcessGuid': hit.event_data.ProcessGuid
+                            'ProcessGuid': data.ProcessGuid
                         };
                         break;
                     case 'registory':
-                        tmp['process'] = hit.event_data.Image;
-                        tmp['disp'] = hit.event_data.TargetObject;
+                        tmp['process'] = data.Image;
+                        tmp['disp'] = data.TargetObject;
                         tmp['info'] = {
-                            'EventType': hit.event_data.EventType,
-                            'ProcessGuid': hit.event_data.ProcessGuid
+                            'EventType': data.EventType,
+                            'ProcessGuid': data.ProcessGuid
                         };
                         break;
                     case 'net':
-                        tmp['process'] = hit.event_data.Image;
-                        tmp['disp'] = hit.event_data.Protocol + ':' + hit.event_data.DestinationIp + ':' + hit.event_data.DestinationPort;
-                        tmp['ip'] = hit.event_data.DestinationIp;
-                        tmp['port'] = hit.event_data.DestinationPort;
+                        //tmp['process'] = data.Image;
+                        tmp['process'] = hit.process.executable;
+                        //tmp['disp'] = data.Protocol + ':' + data.DestinationIp + ':' + data.DestinationPort;
+                        tmp['disp'] = hit.network.transport + ':' + hit.destination.ip + ':' + hit.destination.port;
+                        tmp['ip'] = hit.destination.ip;
+                        tmp['port'] = hit.destination.port;
                         tmp['info'] = {
-                            'SourceHostname': hit.event_data.SourceHostname,
-                            'ProcessGuid': hit.event_data.ProcessGuid,
-                            'SourceIsIpv6': hit.event_data.SourceIsIpv6,
-                            'SourceIp': hit.event_data.SourceIp,
-                            'DestinationHostname': hit.event_data.DestinationHostname
+                            'SourceHostname': hit.source.domain,
+                            'ProcessGuid': hit.process.entity_id,
+                            //'SourceIsIpv6': hit.data.SourceIsIpv6,
+                            'SourceIp': hit.source.ip,
+                            'DestinationHostname': hit.destination.domain
                         };
                         break;
                     case 'remote_thread':
-                        tmp['process'] = hit.event_data.SourceImage;
-                        tmp['disp'] = hit.event_data.TargetImage;
+                        tmp['process'] = data.SourceImage;
+                        tmp['disp'] = data.TargetImage;
                         tmp['info'] = {
-                            'SourceProcessGuid': hit.event_data.SourceProcessGuid,
-                            'StartAddress': hit.event_data.StartAddress,
-                            'TargetProcessGuid': hit.event_data.TargetProcessGuid
+                            'SourceProcessGuid': data.SourceProcessGuid,
+                            'StartAddress': data.StartAddress,
+                            'TargetProcessGuid': data.TargetProcessGuid
                         };
                         break;
                     case 'file_create_time':
-                        tmp['process'] = hit.event_data.Image;
-                        tmp['disp'] = hit.event_data.TargetFilename;
+                        tmp['process'] = hit.process.executable;
+                        //tmp['disp'] = data.TargetFilename;
+                        tmp['disp'] = hit.file.path;
                         tmp['info'] = {
-                            'CreationUtcTime': hit.event_data.CreationUtcTime,
-                            'PreviousCreationUtcTime': hit.event_data.PreviousCreationUtcTime
+                            'CreationUtcTime': data.CreationUtcTime,
+                            'PreviousCreationUtcTime': data.PreviousCreationUtcTime
                         };
                         break;
                     case 'image_loaded':
-                        tmp['process'] = hit.event_data.Image;
-                        tmp['disp'] = hit.event_data.ImageLoaded;
+                        tmp['process'] = data.Image;
+                        tmp['disp'] = data.ImageLoaded;
                         tmp['info'] = {
-                            'Hashes': hit.event_data.Hashes
+                            'Hashes': data.Hashes
                         };
                         break;
                     case 'wmi':
-                        if (hit.event_id == 19) {
-                            tmp['process'] = hit.event_data.Name+":"+hit.event_data.EventNamespace;
-                            tmp['disp'] = hit.event_data.Query;
-                        }else if(hit.event_id == 20){
-                            tmp['process'] = hit.event_data.Name;
-                            tmp['disp'] = hit.event_data.Destination;
-                        }else if(hit.event_id == 21){
-                            tmp['process'] = hit.event_data.Consumer;
-                            tmp['disp'] = hit.event_data.Filter;
+                        if (hit.winlog.event_id == 19) {
+                            tmp['process'] = data.Name+":"+ data.EventNamespace;
+                            tmp['disp'] =  data.Query;
+                        }else if(hit.winlog.event_id == 20){
+                            tmp['process'] =  data.Name;
+                            tmp['disp'] =  data.Destination;
+                        }else if(hit.winlog.event_id == 21){
+                            tmp['process'] = data.Consumer;
+                            tmp['disp'] = data.Filter;
                         }
 
                         tmp['info'] = {
-                            'User': hit.event_data.User
+                            'User': data.User
                         };
                         break;
                 }
@@ -340,15 +377,15 @@ module.exports = class Sysmon_Search_Logic {
             }
 
             // console.log( JSON.stringify(root, null, '\t') );
-            callback(results);
+            return results;
         }
-        this.search(searchObj, get_datas);
+        return;
     }
     // ----------------------------------------------
 
     // ----------------------------------------------
     // I/F Function: Get Process Chain
-    process(hostname, date, searchObj, callback) {
+    async process(hostname, date, searchObj, callback) {
         var parent = this;
         var searchObj2 = null;
         if(searchObj==null){
@@ -632,7 +669,7 @@ module.exports = class Sysmon_Search_Logic {
         this.process_list(hostname, "net", date, searchObj2, get_net_datas);
     }
 
-    process_start_end(hostname, date, start_time, end_time, searchObj, callback) {
+    async process_start_end(hostname, date, start_time, end_time, searchObj, callback) {
         var parent = this;
         var searchObj2 = null;
         if(searchObj==null){
@@ -919,10 +956,74 @@ module.exports = class Sysmon_Search_Logic {
 
     // ----------------------------------------------
     // I/F Function: Get Process Chain
-    process_overview(hostname, date, guid, callback) {
+    async process_overview(hostname, date, guid) {
         var parent = this;
 
-        function create_info(el_result) {
+        var searchObj = {
+            "size": 1000,
+            "query": {
+                "bool": {
+                    "must": [{
+                        "bool":{
+                            "must": [{
+                                "match": {
+                                    "event_id": 1
+                                }
+                            },
+                            {
+                                "match": {
+                                    "computer_name.keyword": hostname
+                                }
+                            }]
+                        }
+                    }
+                    ,{
+                        "bool": {
+                            "should": [{
+                                "bool": {
+                                    "must": [{
+                                        "match": {
+                                            "event_data.ProcessGuid.keyword": guid
+                                        }
+                                    }]
+                                 }},
+                                 {
+                                     "bool": {
+                                         "must": [{
+                                             "match": {
+                                                 "@timestamp": date
+                                             }
+                                         }]
+                                      }
+                                 }
+                            ]
+                        }
+                    }]
+                }
+            },
+            "sort": [{
+                "@timestamp": "asc"
+            }]
+        };
+
+        const el_result = await this.process(hostname, date, searchObj, create_info);
+
+        if (el_result) {
+
+            // TARGET Process Chain( root )
+            var guids = [];
+            var target_root = null;
+            for (var index in el_result) {
+                var process_tree = el_result[index];
+                target_root = search_target(process_tree);
+                if (target_root != null) {
+                    break;
+                }
+            }
+
+            // Child Process GUIDS
+            get_guid(target_root, guids);
+            sub_process_infos();
 
             function search_target(el_result) {
                 if (el_result.current != null && el_result.current.guid == guid) {
@@ -938,7 +1039,7 @@ module.exports = class Sysmon_Search_Logic {
                 return null;
             }
 
-            function get_guid(target) {
+            function get_guid(target, guids) {
                 if (target != null && target.current != null && target.current.guid != null) {
                     guids.push(target.current.guid);
                     for (var index in target.child) {
@@ -1151,79 +1252,22 @@ module.exports = class Sysmon_Search_Logic {
                     callback(target_root);
                 }
 
-                parent.search(searchObj, make_process_infos);
+                //parent.search(searchObj, make_process_infos);
+                const result = Search.search(searchObj);
+                make_process_infos(result);
             }
 
-            // TARGET Process Chain( root )
-            var guids = [];
-            var target_root = null;
-            for (var index in el_result) {
-                var process_tree = el_result[index];
-                target_root = search_target(process_tree);
-                if (target_root != null) {
-                    break;
-                }
-            }
 
-            // Child Process GUIDS
-            get_guid(target_root);
-            sub_process_infos();
         }
 
-        var searchObj = {
-                "size": 1000,
-                "query": {
-                    "bool": {
-                        "must": [{
-                            "bool":{
-                                "must": [{
-                                    "match": {
-                                        "event_id": 1
-                                    }
-                                },
-                                {
-                                    "match": {
-                                        "computer_name.keyword": hostname
-                                    }
-                                }]
-                            }
-                        }
-                        ,{
-                            "bool": {
-                                "should": [{
-                                    "bool": {
-                                        "must": [{
-                                            "match": {
-                                                "event_data.ProcessGuid.keyword": guid
-                                            }
-                                        }]
-                                     }},
-                                     {
-                                         "bool": {
-                                             "must": [{
-                                                 "match": {
-                                                     "@timestamp": date
-                                                 }
-                                             }]
-                                          }
-                                     }
-                                ]
-                            }
-                        }]
-                    }
-                },
-                "sort": [{
-                    "@timestamp": "asc"
-                }]
-            };
-
-        this.process(hostname, date, searchObj, create_info);
+        return;
+        
     }
     // ----------------------------------------------
 
     // ----------------------------------------------
     // I/F Function: Get Process Detail Info
-    process_detail(hostname, date, guid, callback) {
+    async process_detail(hostname, date, guid, callback) {
         var searchObj = {
             "size": 10000,
             "query": {
@@ -1355,8 +1399,23 @@ module.exports = class Sysmon_Search_Logic {
                         'Image': hit.event_data.Image,
                         'Details': hit.event_data.Details
                     };
-                } else if (hit.event_id == 3) {
+                } else if (hit.winlog.event_id == 3) {
+                    let data = hit.winlog.event_data;
                     tmp['type'] = 'net';
+                    tmp['process'] = data.Image;
+                    tmp['disp'] = data.Protocol + ':' + data.DestinationIp + ':' + data.DestinationPort;
+                    tmp['info'] = {
+                        'SourceHostname': data.SourceHostname,
+                        'ProcessGuid': data.ProcessGuid,
+                        'SourceIsIpv6': data.SourceIsIpv6,
+                        'SourceIp': data.SourceIp,
+                        'DestinationPort:': data.DestinationPort,
+                        'DestinationHostname:': data.DestinationHostname,
+                        'DestinationIp': data.DestinationIp,
+                        'DestinationIsIpv6': data.DestinationIsIpv6
+                    };
+
+                    /*
                     tmp['process'] = hit.event_data.Image;
                     tmp['disp'] = hit.event_data.Protocol + ':' + hit.event_data.DestinationIp + ':' + hit.event_data.DestinationPort;
                     tmp['info'] = {
@@ -1369,6 +1428,7 @@ module.exports = class Sysmon_Search_Logic {
                         'DestinationIp': hit.event_data.DestinationIp,
                         'DestinationIsIpv6': hit.event_data.DestinationIsIpv6
                     };
+                    */
                 } else if (hit.event_id == 8) {
                     tmp['type'] = 'remote_thread';
                     tmp['process'] = hit.event_data.SourceImage;
@@ -1435,14 +1495,14 @@ module.exports = class Sysmon_Search_Logic {
 
     // ----------------------------------------------
     // I/F Function: Get Event Histgram
-    events(data, callback) {
+    async events(data) {
         var searchObj = {
             "size": 0,
             "query": {
                 "bool": {
                     "must": [{
                         "match": {
-                            "computer_name.keyword": data.hostname
+                            "winlog.computer_name.keyword": data.hostname
                         }
                     }, {
                         "range": {
@@ -1461,7 +1521,7 @@ module.exports = class Sysmon_Search_Logic {
                     "aggs": {
                         "event_id": {
                             "terms": {
-                                "field": "event_id",
+                                "field": "winlog.event_id",
                                 "size" : 100000
                             }
                         }
@@ -1469,8 +1529,8 @@ module.exports = class Sysmon_Search_Logic {
                 }
             }
         };
-
-        function get_datas(el_result) {
+        const el_result = await Search.search(searchObj);
+        if (el_result){
             // event_id = 1: Create Process
             // event_id = 11: Create File
             // event_id = 12 or 13 or 14: Registory
@@ -1527,23 +1587,22 @@ module.exports = class Sysmon_Search_Logic {
                 };
                 results.push(tmp);
             }
-            callback(results);
+            return results;
         }
-
-        this.search(searchObj, get_datas);
+        return;
     }
     // ----------------------------------------------
 
     // ----------------------------------------------
     // I/F Function: Get Event
-    event(hostname, date, callback) {
+    async event(hostname, date) {
         var searchObj = {
             "size": 0,
             "query": {
                 "bool": {
                     "must": [{
                             "match": {
-                                "computer_name.keyword": hostname
+                                "winlog.computer_name.keyword": hostname
                             }
                         },
                         {
@@ -1564,7 +1623,7 @@ module.exports = class Sysmon_Search_Logic {
                     "aggs": {
                         "event_id": {
                             "terms": {
-                                "field": "event_id",
+                                "field": "winlog.event_id",
                                 "size" : 100000
                             }
                         }
@@ -1573,7 +1632,9 @@ module.exports = class Sysmon_Search_Logic {
             }
         };
 
-        function get_datas(el_result) {
+        const el_result = await Search.search(searchObj);
+
+        if (el_result) {
             // event_id = 1: Create Process
             // event_id = 11: Create File
             // event_id = 12 or 13 or 14: Registory
@@ -1631,15 +1692,15 @@ module.exports = class Sysmon_Search_Logic {
                 };
                 results.push(tmp);
             }
-            callback(results);
+            return results;
         }
-        this.search(searchObj, get_datas);
+        return;
     }
     // ----------------------------------------------
 
     // ----------------------------------------------
     // I/F Function: Get Dashboard
-    dashboard(data, callback) {
+    async dashboard(data) {
         var searchObj = {
             "size": 0,
             "query": {
@@ -1697,28 +1758,30 @@ module.exports = class Sysmon_Search_Logic {
            }
         };
 
-        function get_datas(el_result) {
-            var results = {};
-            var keys=["by_image_asc","by_image_desc","by_DestinationIp_asc","by_DestinationIp_desc","by_eventtype","by_DestinationPort"];
-            for (var key in keys) {
-            	if(el_result.aggregations != null && keys[key] in el_result["aggregations"]){
-            		results[keys[key]] = el_result["aggregations"][keys[key]]["buckets"];
-            	}else{
-            		results[keys[key]] = [];
-            	}
+        const el_result = this.search_statistical(searchObj);
 
+        var results = {};
+        var keys=["by_image_asc","by_image_desc","by_DestinationIp_asc","by_DestinationIp_desc","by_eventtype","by_DestinationPort"];
+        for (var key in keys) {
+            if(el_result.aggregations != null && keys[key] in el_result["aggregations"]){
+                results[keys[key]] = el_result["aggregations"][keys[key]]["buckets"];
+            }else{
+                results[keys[key]] = [];
             }
-            results["total"] = el_result["hits"]["total"];
-            callback(results);
+
         }
-        this.search_statistical(searchObj, get_datas);
+        if(el_result.hits!=null){
+            results["total"] = el_result["hits"]["total"];
+        }
+        return results;
+
     }
     // ----------------------------------------------
 
     // ----------------------------------------------
-    sm_search(params, callback) {
-
-        var search_items_and_date_query = this.make_query(params)
+    async sm_search(params) {
+        //var search_items_and_date_query = this.make_query(params)
+        var search_items_and_date_query = makeQuery(params);
 
         var sort_item = {};
         sort_item[params.sort_item] = params.sort_order;
@@ -1726,67 +1789,78 @@ module.exports = class Sysmon_Search_Logic {
         sort.push(sort_item);
 
         var searchObj = {
-            "size": 10000,
+            "size": 100,
             "query": {
                 "bool": {
                     "must": search_items_and_date_query
                 }
             },
-            "sort": sort,
-            "_source": ["record_number", "event_id", "level", "event_record_id", "computer_name", "user", "event_data", "@timestamp"]
+            //"sort": sort,
+            //"_source": ["record_number", "event_id", "level", "event_record_id", "computer_name", "user", "event_data", "@timestamp"]
+            "_source": ["destination", "event", "log", "process", "source", "winlog", "@timestamp"]
+
         };
 
+        /*
         const util = require('util');
         console.log('########------------ query -------------########');
         console.log(util.inspect(searchObj, {
             depth: null
         }));
+        */
 
-        function get_datas(el_result) {
-            var results = [];
-            var results_count = 0;
-            if (el_result !== null) {
-                results_count = el_result.hits.total;
-                var hits = el_result.hits.hits;
-                for (var index in hits) {
-                    var hit = hits[index]._source;
-                    var decription = Utils.eventid_to_decription(hit.event_id);
-                    var tmp = {
-                        "number": hit.record_number,
-                        "utc_time": hit.event_data.UtcTime,
-                        "event_id": hit.event_id,
-                        "level": hit.level,
-                        "computer_name": hit.computer_name,
-                        "user_name": hit.event_data.User,
-                        "image": hit.event_data.Image,
-                        "date": hit["@timestamp"],
-                        "process_guid": hit.event_data.ProcessGuid,
-                        "decription" : decription,
-                        "_id" : hits[index]._id
-                    };
+        const el_result = await Search.search(searchObj);
+        console.log(JSON.stringify(el_result));
+        var results = [];
+        var results_count = 0;
+        //if (el_result !== null) {
+        if ("hits" in el_result) {
+            results_count = el_result.hits.total;
+            var hits = el_result.hits.hits;
+            console.log(JSON.stringify(hits));
+            for (var index in hits) {
+                var hit = hits[index]._source;
+                var decription = Utils.eventid_to_decription(hit.event_id);
+                var tmp = {
+                    //"number": hit.record_number,
+                    "number": hit.winlog.record_id,
+                    //"utc_time": hit.event_data.UtcTime,
+                    "utc_time": hit.event.created,
+                    "event_id": hit.winlog.event_id,
+                    "level": hit.log.level,
+                    "computer_name": hit.winlog.computer_name,
+                    "user_name": hit.winlog.user.name,
+                    //"image": hit.event_data.Image,
+                    "image": hit.process?hit.process.executable:"",
+                    "date": hit["@timestamp"],
+                    //"process_guid": hit.event_data.ProcessGuid,
+                    //"process_guid": hit.process.entity_id,
+                    "decription" : decription,
+                    "_id" : hits[index]._id
+                };
 
-                    if(hit.event_id == 8){
-                        tmp["source_guid"]=hit.event_data.SourceProcessGuid;
-                    }
-
-                    results.push(tmp);
+                if(hit.event_id == 8){
+                    tmp["source_guid"]=hit.event_data.SourceProcessGuid;
                 }
-            }
 
-            callback({
-                "total": results_count,
-                "hits": results
-            });
+                results.push(tmp);
+            }
         }
 
-        this.search(searchObj, get_datas);
+        const res = {
+            "total": results_count,
+            "hits": results
+        };
+        return res;
+
     }
     //----------------------------------------------
 
     //----------------------------------------------
-    sm_unique_hosts(params, callback) {
+    async sm_unique_hosts(params) {
 
-        var search_items_and_date_query = this.make_query(params)
+        //var search_items_and_date_query = this.make_query(params)
+        var search_items_and_date_query = makeQuery(params);
 
         var uniqueHostObj = {
             "size": 0,
@@ -1798,22 +1872,25 @@ module.exports = class Sysmon_Search_Logic {
             "aggs": {
                 "unique_hosts": {
                     "terms": {
-                        "field": "computer_name.keyword"
+                        "field": "winlog.computer_name.keyword"
                     }
                 }
             }
         };
 
-        function get_datas(el_result) {
+        const el_result = await Search.search(uniqueHostObj);
+        console.log(JSON.stringify(el_result));
+        if (el_result) {
             var unique_hosts = el_result.aggregations.unique_hosts.buckets;
-            callback(unique_hosts);
+            return unique_hosts;
         }
-        this.search(uniqueHostObj, get_datas);
+        return;
     }
     //----------------------------------------------
 
     //----------------------------------------------
     make_query(params) {
+        console.log(JSON.stringify(params))
         var search_items_and_date_query = [];
         var search_items_and_eventid_querys = [];
         var event_id_list = [1, 11, 12, 13, 3, 8, 2, 7];
@@ -1915,7 +1992,7 @@ module.exports = class Sysmon_Search_Logic {
                             key = "event_data.DestinationPort.keyword";
                             search_items = this.set_wildcard_value(search_items, key, params, num);
                         } else if (params[form_name] == "3") { 
-                            key = "event_data.DestinationHostname.keyword";
+                            key = "winlog.event_data.DestinationHostname.keyword";
                             search_items = this.set_wildcard_value(search_items, key, params, num);
                         } else {
                             if (params.search_conjunction === 1) {
@@ -2015,7 +2092,7 @@ module.exports = class Sysmon_Search_Logic {
                     "bool": {
                         "must": [{
                                 "match": {
-                                    "event_id": event_id
+                                    "winlog.event_id": event_id
                                 }
                             },
                             search_items_query
@@ -2028,7 +2105,7 @@ module.exports = class Sysmon_Search_Logic {
         if (search_items_and_eventid_querys.length === 0 && search_form_exist_flg) {
             search_items_and_eventid_querys = [{
                 "match": {
-                    "event_id": 9999
+                    "winlog.event_id": 9999
                 }
             }];
         }
@@ -2093,7 +2170,7 @@ module.exports = class Sysmon_Search_Logic {
 
     // ----------------------------------------------
     // I/F Function: Get alert
-    alert_data(data, callback) {
+    alert_data(data) {
         var sort_item = {};
         sort_item[data.sort_item] = data.sort_order;
         var sort = [];
@@ -2135,13 +2212,15 @@ module.exports = class Sysmon_Search_Logic {
             "_source": ["record_number", "event_id", "level", "event_record_id", "computer_name", "user", "event_data", "@timestamp", "rule", "original_id"]
         };
 
-        function get_datas(el_result) {
+        const el_result = this.search_alert(searchObj);
 
-            var results = [];
-            var results_count = 0;
-            var unique_hosts = [];
-            var tabledata = [];
-            if (el_result !== null) {
+        var results = [];
+        var results_count = 0;
+        var unique_hosts = [];
+        var tabledata = [];
+        if (el_result !== null) {
+            if(el_result.hits != null){
+
                 results_count = el_result.hits.total;
                 var hits = el_result.hits.hits;
                 for (var index in hits) {
@@ -2169,22 +2248,20 @@ module.exports = class Sysmon_Search_Logic {
 
                     results.push(tmp);
                 }
-
-                if(el_result.aggregations != null){
-                    unique_hosts = el_result.aggregations.unique_hosts.buckets;
-                    tabledata = el_result.aggregations.tabledata.buckets;
-                }
             }
-
-            callback({
-                "total": results_count,
-                "hits": results,
-                "unique_hosts": unique_hosts,
-                "table_data" : tabledata
-            });
+            if(el_result.aggregations != null){
+                unique_hosts = el_result.aggregations.unique_hosts.buckets;
+                tabledata = el_result.aggregations.tabledata.buckets;
+            }
         }
 
-        this.search_alert(searchObj, get_datas);
+        const response = {
+            "total": results_count,
+            "hits": results,
+            "unique_hosts": unique_hosts,
+            "table_data" : tabledata
+        };
+        return response;
     }
 
     alert_host(data, callback) {
@@ -2266,7 +2343,7 @@ module.exports = class Sysmon_Search_Logic {
 
     // ----------------------------------------------
     // I/F Function: save rules for collecting alert information.
-    save_alert_rules(params, callback) {
+    async save_alert_rules(params) {
         const util = require('util');
         //console.log(util.inspect(params));
 
@@ -2287,12 +2364,12 @@ module.exports = class Sysmon_Search_Logic {
             };
             console.log(res);
 
-            callback(res);
+            return res;
 
         } catch (e) {
             console.error("#---------- save search criteria/fail ----------");
             console.error(util.inspect(e));
-            callback(e);
+            return e;
         }
 
 
@@ -2321,7 +2398,7 @@ module.exports = class Sysmon_Search_Logic {
     // ----------------------------------------------
 
     // ----------------------------------------------
-    get_alert_rule_file_list(params, callback) {
+    async get_alert_rule_file_list(params) {
         const fs = require('fs');
         const path = require('path');
         var self = this;
@@ -2330,25 +2407,26 @@ module.exports = class Sysmon_Search_Logic {
         if (!path.isAbsolute(savepath)) {
             savepath = path.join(conf_dir, savepath);
         }
-        fs.readdir(savepath, function(err, files){
+        console.log(`savepath: ${savepath}`);
+        const result = fs.readdir(savepath, function(err, files){
             if (err){
                 console.error("#---------- Acquisition of file list failed ----------");
                 console.log(err);
-                callback([]);
+                //callback([]);
                 return;
             }
             var fileList = files.filter(function(file){
                 return fs.statSync(self.create_fullpath(config.savepath,file)).isFile();
             })
 
-            callback(fileList);
+            return fileList;
         });
-
+        return result;
     }
     // ----------------------------------------------
 
     // ----------------------------------------------
-    delete_alert_rule_file(params, callback) {
+    async delete_alert_rule_file(params) {
         if(params.filename == null || params.filename == ""){
             return -1;
         }
@@ -2358,18 +2436,20 @@ module.exports = class Sysmon_Search_Logic {
         var basename = path.basename(params.filename);
         var filepath = this.create_fullpath(config.savepath, basename);
 
-        fs.unlink(filepath, function(err, files){
+        const result = await fs.unlink(filepath, function(err, files){
             if (err){
                 console.error("#---------- Failed to delete rule file ----------");
                 console.log(err);
-                callback(-1);
-                return;
+                //callback(-1);
+                return -1;
             }
-            callback(1);
+            //callback(1);
+            return 1;
         });
-
+        return result;
     }
     // ----------------------------------------------
+
     create_fullpath(savepath, filename) {
         const path = require('path');
         var conf_dir = path.join(__dirname, path.dirname(CONFIG_PATH));
@@ -2380,5 +2460,4 @@ module.exports = class Sysmon_Search_Logic {
             return path.join(conf_dir, savepath, filename);
         }
     };
-
 }

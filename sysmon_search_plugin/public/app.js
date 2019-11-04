@@ -175,55 +175,55 @@ uiModules
                     "group": 0,
                     "x": item.date,
                     "y": item.result.create_process,
-                    "label": "create_process"
+                    "label": {"content":"create_process"}
                 };
                 var g2 = {
                     "group": 1,
                     "x": item.date,
                     "y": item.result.create_file,
-                    "label": "create_file"
+                    "label": {"content":"create_file"}
                 };
                 var g3 = {
                     "group": 2,
                     "x": item.date,
                     "y": item.result.registory,
-                    "label": "registory"
+                    "label": {"content":"registory"}
                 };
                 var g4 = {
                     "group": 3,
                     "x": item.date,
                     "y": item.result.net,
-                    "label": "net"
+                    "label": {"content":"net"}
                 };
                 var g5 = {
                     "group": 4,
                     "x": item.date,
                     "y": item.result.remote_thread,
-                    "label": "remote_thread"
+                    "label": {"content":"remote_thread"}
                 };
                 var g6 = {
                     "group": 5,
                     "x": item.date,
                     "y": item.result.file_create_time,
-                    "label": "file_create_time"
+                    "label": {"content":"file_create_time"}
                 };
                 var g7 = {
                     "group": 6,
                     "x": item.date,
                     "y": item.result.image_loaded,
-                    "label": "image_loaded"
+                    "label": {"content":"image_loaded"}
                 };
                 var g8 = {
                     "group": 7,
                     "x": item.date,
                     "y": item.result.wmi,
-                    "label": "wmi"
+                    "label": {"content":"wmi"}
                 };
                 var g9 = {
                     "group": 8,
                     "x": item.date,
                     "y": item.result.other,
-                    "label": "other"
+                    "label": {"content":"other"}
                 };
                 items.push(g1);
                 items.push(g2);
@@ -235,7 +235,6 @@ uiModules
                 items.push(g8);
                 items.push(g9);
             }
-            // console.log( items );
 
             var container = document.getElementById('visualization');
             var groups = new vis_graph.DataSet();
@@ -287,9 +286,7 @@ uiModules
                 dataAxis: {
                     icons: true
                 },
-                //legend: {
-                //    enabled: true
-                //},
+                legend: {right: {position: 'top-left'}},
                 start: getViewFormat(getPastDate(date1, 1, "day"), 2),
                 end: getViewFormat(date2, 2),
                 orientation: 'top',
@@ -381,7 +378,9 @@ uiModules
                 return category_name;
             }
 
-            graph2d.on("click", function(params) {});
+            graph2d.on("click", function(params) {
+                console.log(params);
+            });
             graph2d.on("doubleClick", function(event) {
                 var click_date = event.time;
                 var click_date_str = getViewFormat(click_date, "2");
@@ -529,7 +528,7 @@ uiModules
                     "wmi": item.result.wmi,
                     "other": item.result.other
                 };
-                pie_chart('#piechart', freqData, false, 300);
+                pie_chart('#piechart', freqData, true, 300);
             }
         });
     })
@@ -1501,7 +1500,7 @@ uiModules
         var data = {};
         data.query = getDateQuery($scope.period);
         this.event_id = '▼';
-        data.sort_item = 'event_id';
+        data.sort_item = 'winlog.event_id';
         data.sort_order = 'asc';
         search(data);
 
@@ -1721,7 +1720,7 @@ uiModules
                 keywords = {};
             }
 
-            keywords.sort_item = 'event_id';
+            keywords.sort_item = 'winlog.event_id';
             keywords.sort_order = 'asc';
 
             var tmp = {};
@@ -1731,13 +1730,13 @@ uiModules
             search_keyword = tmp;
 
             $http.post('../api/sysmon-search-plugin/sm_search', keywords).then((response) => {
+
                 this.search_data = response.data.hits;
-                this.total = response.data.total;
+                this.total = `${response.data.total.relation} ${response.data.total.value}`;
                 orderMarkSet(this, keywords.sort_item, keywords.sort_order);
 
                 $http.post('../api/sysmon-search-plugin/sm_unique_hosts', keywords).then((response) => {
                     this.unique_host_count = response.data.length;
-                    console.log(response.data);
                 });
             });
         };

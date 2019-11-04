@@ -81,7 +81,7 @@ body, html {
 </td>
 </tr>
 </table>
-<div ng-init="keywords = {sort_item: 'event_id', sort_order: 'asc'}"></div>
+<div ng-init="keywords = {sort_item: 'winlog.event_id', sort_order: 'asc'}"></div>
     <input type="hidden" name="sort_item" ng-model="keywords.sort_item">
     <input type="hidden" name="sort_order" ng-model="keywords.sort_order">
 </div>
@@ -110,12 +110,12 @@ body, html {
     <table class="table resultTable">
       <thead>
         <tr>
-            <th><a ng-click="ctrl.sort(period, keywords, 'event_data.UtcTime.keyword')">UtcTime{{ctrl.utc_time}}</a></th>
-            <th><a ng-click="ctrl.sort(period, keywords, 'event_id')">EventId{{ctrl.event_id}}</a></th>
-            <th><a ng-click="ctrl.sort(period, keywords, 'level.keyword')">Level{{ctrl.level}}</a></th>
-            <th><a ng-click="ctrl.sort(period, keywords, 'computer_name.keyword')">Computer{{ctrl.computer_name}}</a></th>
-            <th><a ng-click="ctrl.sort(period, keywords, 'event_data.User.keyword')">UserName{{ctrl.user_name}}</a></th>
-            <th><a ng-click="ctrl.sort(period, keywords, 'event_data.Image.keyword')">Image{{ctrl.image}}</a></th>
+            <th><a ng-click="ctrl.sort(period, keywords, 'winlog.event_data.UtcTime.keyword')">UtcTime{{ctrl.utc_time}}</a></th>
+            <th><a ng-click="ctrl.sort(period, keywords, 'winlog.event_id')">EventId{{ctrl.event_id}}</a></th>
+            <th><a ng-click="ctrl.sort(period, keywords, 'log.level.keyword')">Level{{ctrl.level}}</a></th>
+            <th><a ng-click="ctrl.sort(period, keywords, 'winlog.computer_name.keyword')">Computer{{ctrl.computer_name}}</a></th>
+            <th><a ng-click="ctrl.sort(period, keywords, 'winlog.event_data.User.keyword')">UserName{{ctrl.user_name}}</a></th>
+            <th><a ng-click="ctrl.sort(period, keywords, 'winlog.event_data.Image.keyword')">Image{{ctrl.image}}</a></th>
             <th><a ng-click="ctrl.sort(period, keywords, 'rule.file_name.keyword')">RuleName{{ctrl.rulename}}</a></th>
         </tr>
       </thead>
