@@ -18,7 +18,7 @@ def rule_file_open():
 
         return rule_files
     except Exception as e:
-        print "rule file open error. message=[%s]" % (e.message)
+        print("rule file open error. message=[%s]" % (e.message))
         sys.exit(1)
 
 def make_query(detection_rule):
@@ -251,12 +251,13 @@ def str_escape(param):
 def search(client, query, get_size, search_after):
     query["size"] = get_size
     query["sort"] = [{"_id":"asc"}]
-    query["_source"] = {"includes" : ["@timestamp", "event_id", "computer_name", "level", "record_number", "event_data"]}
+    #query["_source"] = {"includes" : ["@timestamp", "event_id", "computer_name", "level", "record_number", "event_data"]}
+    query["_source"] = {"includes" : ["@timestamp", "winlog.event_id", "winlog.computer_name", "log.level", "record_number", "winlog.event_data"]}
 
     if search_after != None:
         query["search_after"] = search_after
 
-    print "### SEARCH query=[%s] ######" % (json.dumps(query))
+    print("### SEARCH query=[%s] ######" % (json.dumps(query)))
     response = client.search(
         index = setting.INDEX_NAME_ORG + "-*",
         body = query
@@ -265,7 +266,7 @@ def search(client, query, get_size, search_after):
     return response
 
 def registration(data, rule):
-    print "##### STORE #####"
+    print("##### STORE #####")
 
     actions = []
     for hit in data['hits']['hits']:
@@ -339,27 +340,28 @@ def registration(data, rule):
             actions.append({'_index': new_index_name, '_type': 'doc', '_source': new_obj})
 
         except Exception as e:
-            print "failed in the save of data. index=[%s] data=[%s] message=[%s]" % (new_index_name, json.dumps(new_obj), e.message)
+            print("failed in the save of data. index=[%s] data=[%s] message=[%s]" % (new_index_name, json.dumps(new_obj), e.message))
             sys.exit(1)
 
     helpers.bulk(client, actions)
 
 
-print "##### collection alert data START #####"
+print("##### collection alert data START #####")
 
-client = Elasticsearch([setting.ELASTICSEARCH_SERVER],http_auth=('elastic','changeme'),port=9200);
+#client = Elasticsearch([setting.ELASTICSEARCH_SERVER],http_auth=('elastic','changeme'),port=9200);
+client = Elasticsearch([setting.ELASTICSEARCH_SERVER],port=9200);
 
 rule_files = rule_file_open()
 
 try :
     for file_name in rule_files:
-        print "### Rule file [%s] ######" % (file_name)
+        print("### Rule file [%s] ######" % (file_name))
 
         query = make_query(rule_files[file_name])
 
         total = search(client, query, 0, None)
-        total_size = total['hits']['total']
-        print "### Total size [%s] ######" % (total_size)
+        total_size = total['hits']['total']['value']
+        print("### Total size [%s] ######" % (total_size))
 
         if total_size > setting.MAX_GET_SIZE:
             roop_count = 0
@@ -378,7 +380,7 @@ try :
             insert_ids = registration(response, rule_files[file_name])
 
 except Exception as e:
-    print "Failed to search or register data. message=[%s]" % (e.message)
+    print("Failed to search or register data. message=[%s]" % (e.message))
     sys.exit(1)
 
-print "##### collection alert data END #####"
+print("##### collection alert data END #####")
