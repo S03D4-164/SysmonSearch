@@ -1829,7 +1829,7 @@ module.exports = class Sysmon_Search_Logic {
                     "event_id": hit.winlog.event_id,
                     "level": hit.log.level,
                     "computer_name": hit.winlog.computer_name,
-                    "user_name": hit.winlog.user.name,
+                    "user_name": hit.winlog.user?hit.winlog.user.name:"",
                     //"image": hit.event_data.Image,
                     "image": hit.process?hit.process.executable:"",
                     "date": hit["@timestamp"],
@@ -2299,14 +2299,16 @@ module.exports = class Sysmon_Search_Logic {
 
     // ----------------------------------------------
     // I/F Function: get search keywords from STIX/IoC analyze server using upload file.
-    import_search_keywords(params, callback) {
-        var request = require('request');
+    //import_search_keywords(params, callback) {
+    async import_search_keywords(params) {
 
-//        var url = 'http://localhost:56020' + params.part_url;
+        var request = require('request');
+        console.log(params);
+        //var url = 'http://localhost:56020' + params.part_url;
         var url = 'http://' + config.import_server_url + ':' + config.import_server_port + params.part_url;
         var formData = {
             file: {
-                value: new Buffer(params.contents),
+                value: new Buffer.from(params.contents),
                 options: {
                     filename: params.filename,
                     contentType: params.contenttype
@@ -2320,14 +2322,15 @@ module.exports = class Sysmon_Search_Logic {
         const req_str = sprintf('{ url: \'%1$s\', formData: { file: { value: <...>, options: { filename: \'%2$s\', contentType: \'%3$s\' }  } } }', url, params.filename, params.contenttype);
         console.log(req_str);
 
-        request.post({
+        var result = request.post({
             url: url,
             formData: formData
         }, function(error, response) {
             console.log("#---------- response from STIX/IoC analyze server ----------");
             if (error) {
                 console.error(util.inspect(error));
-                callback(error);
+                //callback(error);
+                return;
             } else {
                 var res = {
                     'status': response.statusCode,
@@ -2335,9 +2338,11 @@ module.exports = class Sysmon_Search_Logic {
                     'data': response.body
                 };
                 console.log(res);
-                callback(res);
+                //callback(res);
+                return res;
             }
         });
+        return result;
     }
     // ----------------------------------------------
 

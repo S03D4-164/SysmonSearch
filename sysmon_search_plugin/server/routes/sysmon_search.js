@@ -161,19 +161,22 @@ export default function (server) {
   server.route({
       path: '/api/sysmon-search-plugin/import_search_keywords',
       method: 'POST',
-      handler(request, reply) {
-          function callback(result) {
+      async handler(request) {
+        var params = request.payload;
+        const result = await sysmon_search_obj.import_search_keywords(params);
+        if (result) {
               const util = require('util');
               if (util.isError(result)) {
                   const Boom = require('boom');
                   var error = Boom.badRequest(util.inspect(result)); // 400
-                  reply(error);
+                  //reply(error);
+                  return error;
               } else {
-                  reply(result);
+                  //reply(result);
+                  return result;
               }
-          }
-          var params = request.payload;
-          sysmon_search_obj.import_search_keywords(params, callback);
+        }
+        return;
       }
   });
 

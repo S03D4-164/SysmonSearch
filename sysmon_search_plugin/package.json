@@ -19,6 +19,7 @@
   "dependencies": {
     "boom": "^7.3.0",
     "elasticsearch": "^16.4.0",
+    "request": "^2.88.0",
     "sprintf-js": "^1.1.2"
   }
 }

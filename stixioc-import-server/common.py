@@ -312,7 +312,11 @@ def get_search_items(stix_package):
     pkg = stix_package
 
     if type(stix_package) == STIXPackage:
-        pkg = stix.parseString(stix_package.to_xml())
+        xml = stix_package.to_xml(encoding=None)
+        print(xml)
+        #pkg = stix.parseString(stix_package.to_xml())
+        pkg = stix.parseString(xml)
+
 
     patterns = []
 
