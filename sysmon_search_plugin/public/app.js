@@ -2,7 +2,6 @@ import moment from 'moment';
 import {
     uiModules
 } from 'ui/modules';
-import uiRoutes from 'ui/routes';
 import {conf as config} from '../conf.js';
 
 // -------------------------------------------------------
@@ -15,23 +14,9 @@ import './dist/vis-network.min.css';
 import './dist/vis-timeline-graph2d.min.css';
 
 import './css/common.css';
-// import './dist/d3.v3.min.js';
+//import './dist/d3.v3.min.js';
 import './dist/visual.css';
 import './dist/jquery-3.3.1.min.js';
-// -------------------------------------------------------
-
-// -------------------------------------------------------
-// Sample HTML
-import hostsHTML from './templates/hosts.html';
-import eventHTML from './templates/event.html';
-import host_statisticHTML from './templates/host_statistic.html';
-import process_listHTML from './templates/process_list.html';
-import PTreeHTML from './templates/process_tree.html';
-import POverviewHTML from './templates/overview.html';
-import PDetailHTML from './templates/detail.html';
-import alertHTML from './templates/alert.html';
-import searchHTML from './templates/search.html';
-import dashboardHTML from './templates/dashboard.html';
 // -------------------------------------------------------
 
 // -------------------------------------------------------
@@ -40,92 +25,62 @@ var gLocal_en = require( "./assets/i18n/locale-en.json" );
 var gLangData = gLocal_en;
 // -------------------------------------------------------
 
-uiRoutes.enable();
-uiRoutes
-    .when('/', {
-        template: hostsHTML,
-        controller: 'hostsController',
-        controllerAs: 'ctrl'
-    })
-    .when('/hosts', {
-        template: hostsHTML,
-        controller: 'hostsController',
-        controllerAs: 'ctrl'
-    })
-    .when('/host_statistic/:hostname/:date', {
-        template: host_statisticHTML,
-        controller: 'host_statisticController',
-        controllerAs: 'ctrl'
-    })
-    .when('/event/:hostname/:date', {
-        template: eventHTML,
-        controller: 'eventController',
-        controllerAs: 'ctrl'
-    })
-    .when('/process_list/:hostname/:eventtype/:date/:_id', {
-        template: process_listHTML,
-        controller: 'process_listController',
-        controllerAs: 'ctrl'
-    })
-    .when('/process/:hostname/:date/:guid?', {
-        template: PTreeHTML,
-        controller: 'processController',
-        controllerAs: 'ctrl'
-    })
-    .when('/process_overview/:hostname/:date/:guid', {
-        template: POverviewHTML,
-        controller: 'process_overviewController',
-        controllerAs: 'ctrl'
-    })
-    .when('/process_detail/:hostname/:date/:guid/:_id', {
-        template: PDetailHTML,
-        controller: 'process_detailController',
-        controllerAs: 'ctrl'
-    })
-    .when('/alert', {
-        template: alertHTML,
-        controller: 'alertController',
-        controllerAs: 'ctrl'
-    })
-    .when('/search', {
-        template: searchHTML,
-        controller: 'searchController',
-        controllerAs: 'ctrl'
-    })
-    .when('/dashboard', {
-        template: dashboardHTML,
-        controller: 'dashboardController',
-        controllerAs: 'ctrl'
-    })
+import uiRoutes from './routes'
 
 // -------------------------------------------------------
 //
+
 uiModules
     .get('app/sysmon_search_visual/hosts', [])
     .controller('hostsController', function($scope, $route, $http, $interval) {
         // Set Language Data
         $scope.lang = gLangData;
 
+        function formatDate2(date) {
+            var d = ("0" + date.getDate()).slice(-2);
+            var m = ("0" + (date.getMonth() + 1)).slice(-2);
+            var y = date.getFullYear();
+            return y + '-' + m + '-' + d
+            // + 'T00:00:00Z';
+        }
+
+        function default_date_range(keywords) {
+            var st_dt = new Date();
+            st_dt = getPastDate(st_dt,1,"month")
+            keywords.fm_start_date = formatDate2(st_dt) + 'T00:00:00Z';
+            keywords.fm_end_date = formatDate2(new Date()) + 'T23:59:59Z';
+            return keywords;
+        }
         this.keywords = default_date_range({});
-        $http.post('../api/sysmon-search-plugin/hosts', this.keywords).then((response) => {
+
+        $http.post('../api/sysmon-search-plugin/hosts', this.keywords)
+        .then((response) => {
             this.daily_hosts = response.data;
         });
 
         this.onkeyup = function(keywords) {
-
             if (typeof keywords !== "undefined") {
-                if (("start_date" in keywords === false || typeof keywords.start_date === "undefined" || keywords.start_date === null) &&
-                    ("end_date" in keywords === false || typeof keywords.end_date === "undefined" || keywords.end_date === null)) {
+                if (("start_date" in keywords === false
+                      || typeof keywords.start_date === "undefined"
+                      || keywords.start_date === null
+                    ) && (
+                     "end_date" in keywords === false
+                      || typeof keywords.end_date === "undefined"
+                      || keywords.end_date === null)) {
 
                     keywords = default_date_range(keywords);
 
                 } else {
-                    if ("start_date" in keywords && typeof keywords.start_date !== "undefined" && keywords.start_date !== null) {
+                    if ("start_date" in keywords
+                         && typeof keywords.start_date !== "undefined"
+                         && keywords.start_date !== null) {
                         keywords.fm_start_date = formatDate2(new Date(keywords.start_date));
                     } else {
                         delete keywords["fm_start_date"];
                     }
-                    if ("end_date" in keywords && typeof keywords.end_date !== "undefined" && keywords.end_date !== null) {
+                    if ("end_date" in keywords
+                         && typeof keywords.end_date !== "undefined"
+                         && keywords.end_date !== null) {
                         var dt = new Date(keywords.end_date);
                         dt.setDate(dt.getDate() + 1);
                         keywords.fm_end_date = formatDate2(dt);
@@ -136,20 +91,12 @@ uiModules
             } else {
                 keywords = default_date_range({});
             }
-
-            $http.post('../api/sysmon-search-plugin/hosts', keywords).then((response) => {
+            $http.post('../api/sysmon-search-plugin/hosts', keywords)
+            .then((response) => {
                 this.daily_hosts = response.data;
             });
         };
     })
-
-function default_date_range(keywords) {
-    var st_dt = new Date();
-    getPastDate(st_dt,1,"month")
-    keywords.fm_start_date = formatDate2(st_dt);
-    keywords.fm_end_date = formatDate2(new Date());
-    return keywords;
-}
 
 uiModules
     .get('app/sysmon_search_visual/host_statistic', [])
@@ -159,14 +106,40 @@ uiModules
 
         var data = {};
         data.hostname = $route.current.params.hostname;
+
+        function getFutureDate(date, interval, type) {
+            if (type == "month") {
+                var month = date.getMonth();
+                date.setMonth(date.getMonth() + interval);
+                var diff = date.getMonth() - month;
+                if (diff < 0) diff = diff + 12;
+                if (diff != interval){
+                    date.setDate(1);
+                    date.setDate(date.getDate() - 1);
+                }
+            } else {
+                date.setDate(date.getDate() + interval);
+            }
+            return date;
+        }
+
+        function getDateBeggining(date) {
+            date.setDate(1);
+            return date;
+        }
+
         var date = $route.current.params.date;
         var year = Number(date.substring(0, 4));
         var month = Number(date.substring(5, 7)) - 1;
         var day = Number(date.substring(8, 10));
         var date1 = getDateBeggining(new Date(year, month, day));
-        var date2 = getDateBeggining(getFutureDate(new Date(year, month, day), 1, "month"));
+        var date2 = getDateBeggining(
+            getFutureDate(new Date(year, month, day), 1, "month")
+        );
         data.period = getDateQueryFromDate(date1, date2);
-        $http.post('../api/sysmon-search-plugin/events', data).then((response) => {
+
+        $http.post('../api/sysmon-search-plugin/events', data)
+        .then((response) => {
             this.hostname = $route.current.params.hostname;
             var items = [];
             for (var index in response.data) {
@@ -1549,6 +1522,7 @@ uiModules
                     var file_list = response.data;
                     var rules_arr = [];
                     var rules_list = {};
+                    console.log(rules)
                     for (var i = 0; i < rules.length; i++) {
                         var rule_str;
                         var rule_str_f;
@@ -1812,12 +1786,12 @@ uiModules
                             contenttype: contenttype,
                             part_url: url
                         };
-                        //console.log("params:", params);
+                        console.log("params:", params);
 
                         $http.post("../api/sysmon-search-plugin/import_search_keywords", params)
                             .then(function successCallback(response) {
                                 const util = require('util');
-//                                console.log(util.inspect(response));
+                                console.log(util.inspect(response));
                                 function is_value_exist(dict, key) {
                                     return (key in dict && dict.key !== "undefined" && dict.key !== null);
                                 };
@@ -2417,12 +2391,6 @@ function formatDate(date, time) {
     return y + '-' + m + '-' + d + 'T' + time + ':00Z';
 }
 
-function formatDate2(date) {
-    var d = ("0" + date.getDate()).slice(-2);
-    var m = ("0" + (date.getMonth() + 1)).slice(-2);
-    var y = date.getFullYear();
-    return y + '-' + m + '-' + d + 'T00:00:00Z';
-}
 
 function get_range_datetime(date) {
     var date_str = date.substr(0, 10)+"T"+date.substr(11, 12)+"Z";
@@ -2547,23 +2515,6 @@ function getPastDate(date, interval, type) {
     return date;
 }
 
-function getFutureDate(date, interval, type) {
-    if (type == "month") {
-        var month = date.getMonth();
-        date.setMonth(date.getMonth() + interval);
-        var diff = date.getMonth()-month;
-        if(diff<0){
-            diff = diff + 12;
-        }
-        if(diff!=interval){
-            date.setDate(1);
-            date.setDate(date.getDate() - 1);
-        }
-    } else {
-        date.setDate(date.getDate() + interval);
-    }
-    return date;
-}
 
 function getDateQuery(str) {
     var query = {};
@@ -2581,10 +2532,6 @@ function getDateQueryFromDate(date1, date2) {
     return query;
 }
 
-function getDateBeggining(date) {
-    date.setDate(1);
-    return date;
-}
 
 function insertStr(str, index, insert) {
     return str.slice(0, index) + insert + str.slice(index, str.length);
@@ -2603,6 +2550,7 @@ function new_line(str){
 
     return str;
 }
+
 
 
 // -------------------------------------------------------

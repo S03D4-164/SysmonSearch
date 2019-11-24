@@ -1,8 +1,15 @@
-import {conf as config} from '../../conf.js';
+import {conf} from '../../conf.js';
+import elasticsearch from 'elasticsearch';
+
+const client = new elasticsearch.Client({
+  //log: 'trace',
+  host: conf.elasticsearch_url + ':' + conf.elasticsearch_port
+});
+
 export default function (server) {
 
-  const Sysmon_Search_Logic = require('./Sysmon_Search_Logic');
-  var sysmon_search_obj = new Sysmon_Search_Logic(config.elasticsearch_url, config.elasticsearch_port);
+  //const Sysmon_Search_Logic = require('./Sysmon_Search_Logic');
+  //var sysmon_search_obj = new Sysmon_Search_Logic(conf.elasticsearch_url, conf.elasticsearch_port);
 
   server.route({
     path: '/api/sysmon-search-plugin/hosts',
@@ -10,7 +17,9 @@ export default function (server) {
     async handler(req) {
       var params = req.payload;
       console.log("hosts params: " + JSON.stringify(params));
-      const result = await sysmon_search_obj.hosts(params);
+      const searchHosts = require('./search/hosts');
+      const result = await searchHosts(client, params);
+      //const result = await sysmon_search_obj.hosts(params);
       console.log("hosts result: " + JSON.stringify(result));
       return result;
     }
@@ -22,12 +31,15 @@ export default function (server) {
     async handler(req) {
       var params = req.payload;
       console.log("events params: " + JSON.stringify(params));
-      const result = await sysmon_search_obj.events(params);
+      const searchEvents = require('./search/events');
+      const result = await searchEvents(client, params);
+      //const result = await sysmon_search_obj.events(params);
       console.log("events result: " + JSON.stringify(result));
       return result;
     }
   });
 
+/*
   server.route({
     path: '/api/sysmon-search-plugin/event/{host}/{date}',
     method: 'GET',
@@ -203,6 +215,7 @@ export default function (server) {
       method: 'GET',
       async handler(req) {
           var params = req.params;
+          console.log(`get_alert params: ${params}`);
           const result = await sysmon_search_obj.get_alert_rule_file_list(params);
           console.log(`get_alert result: ${result}`);
           return result?result:{};
@@ -219,6 +232,6 @@ export default function (server) {
         return result;
     }
   });
+*/
 
 }
-
