@@ -1,25 +1,23 @@
 async function events(client, hostname, date) {
   var timestamp = {
-    "range" : {
-      "@timestamp": date
-     }
+    "range" : {"@timestamp": date}
   }
   if (typeof date === "string"){
     timestamp = {
-      "match" : {
-        "@timestamp": date
-       }
+      "match" : {"@timestamp": date}
     }
   }
   var searchObj = {
     "size": 0,
     "query": {
       "bool": {
-        "must": [{
-          "match": {
-              "winlog.computer_name.keyword": hostname
-            }
-          }, 
+        "must": [
+          {
+            "match": {"winlog.computer_name.keyword": hostname}
+          },
+          {
+            "match": {"winlog.channel.keyword": "Microsoft-Windows-Sysmon/Operational"}
+          },
           timestamp
         ]
       }

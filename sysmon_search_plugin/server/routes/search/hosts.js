@@ -2,7 +2,9 @@ async function searchHosts(client, params) {
 
   console.log("params: " + JSON.stringify(params));
 
-  var search_items_and_date_query = [];
+  var search_items_and_date_query = [{
+    "match": {"winlog.channel.keyword": "Microsoft-Windows-Sysmon/Operational",}
+  }];
   if (typeof params !== "undefined"
       && params !== null
       && Object.keys(params).length !== 0)
