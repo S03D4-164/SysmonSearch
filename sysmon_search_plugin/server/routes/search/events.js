@@ -1,18 +1,27 @@
-async function events(client, data) {
-  console.log(data);
+async function events(client, hostname, date) {
+  var timestamp = {
+    "range" : {
+      "@timestamp": date
+     }
+  }
+  if (typeof date === "string"){
+    timestamp = {
+      "match" : {
+        "@timestamp": date
+       }
+    }
+  }
   var searchObj = {
     "size": 0,
     "query": {
       "bool": {
         "must": [{
           "match": {
-            "winlog.computer_name.keyword": data.hostname
-          }
-        }, {
-          "range": {
-            "@timestamp": data.period
-          }
-        }]
+              "winlog.computer_name.keyword": hostname
+            }
+          }, 
+          timestamp
+        ]
       }
     },
     "aggs": {
@@ -103,4 +112,4 @@ async function events(client, data) {
         return;
 }
 
-module.exports = events
+module.exports = events;

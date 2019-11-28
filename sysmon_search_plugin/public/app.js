@@ -17,6 +17,7 @@ import './css/common.css';
 //import './dist/d3.v3.min.js';
 import './dist/visual.css';
 import './dist/jquery-3.3.1.min.js';
+
 // -------------------------------------------------------
 
 // -------------------------------------------------------
@@ -137,116 +138,108 @@ uiModules
             getFutureDate(new Date(year, month, day), 1, "month")
         );
         data.period = getDateQueryFromDate(date1, date2);
-
+        var category = [
+            "create_process",
+            "create_file",
+            "registory",
+            "net",
+            "remote_thread",
+            "file_create_time",
+            "image_loaded",
+            "wmi",
+            "other"
+        ];
         $http.post('../api/sysmon-search-plugin/events', data)
         .then((response) => {
             this.hostname = $route.current.params.hostname;
+
+            var container = document.getElementById('visualization');
+
             var items = [];
             for (var index in response.data) {
                 var item = response.data[index];
-                var g1 = {
+                items.push({
                     "group": 0,
                     "x": item.date,
                     "y": item.result.create_process,
-                    "label": {"content":"create_process"}
-                };
-                var g2 = {
+                    "label": {
+                        "content":category[0],
+                        "yOffset":20
+                    }
+                },{
                     "group": 1,
                     "x": item.date,
                     "y": item.result.create_file,
-                    "label": {"content":"create_file"}
-                };
-                var g3 = {
+                    "label": {
+                        "content":category[1],
+                        "yOffset":20
+                    }
+                },{
                     "group": 2,
                     "x": item.date,
                     "y": item.result.registory,
-                    "label": {"content":"registory"}
-                };
-                var g4 = {
+                    "label": {
+                        "content":category[2],
+                        "yOffset":20
+                    }
+                },{
                     "group": 3,
                     "x": item.date,
                     "y": item.result.net,
-                    "label": {"content":"net"}
-                };
-                var g5 = {
+                    "label": {
+                        "content":category[3],
+                        "yOffset":20
+                    }
+                },{
                     "group": 4,
                     "x": item.date,
                     "y": item.result.remote_thread,
-                    "label": {"content":"remote_thread"}
-                };
-                var g6 = {
+                    "label": {
+                        "content":category[4],
+                        "yOffset":20
+                    }
+                },{
                     "group": 5,
                     "x": item.date,
                     "y": item.result.file_create_time,
-                    "label": {"content":"file_create_time"}
-                };
-                var g7 = {
+                    "label": {
+                        "content":category[5],
+                        "yOffset":20
+                    }
+                },{
                     "group": 6,
                     "x": item.date,
                     "y": item.result.image_loaded,
-                    "label": {"content":"image_loaded"}
-                };
-                var g8 = {
+                    "label": {
+                        "content":category[6],
+                        "yOffset":20
+                    }
+                },{
                     "group": 7,
                     "x": item.date,
                     "y": item.result.wmi,
-                    "label": {"content":"wmi"}
-                };
-                var g9 = {
+                    "label": {
+                        "content":category[7],
+                        "yOffset":20
+                    }
+                },{
                     "group": 8,
                     "x": item.date,
                     "y": item.result.other,
-                    "label": {"content":"other"}
-                };
-                items.push(g1);
-                items.push(g2);
-                items.push(g3);
-                items.push(g4);
-                items.push(g5);
-                items.push(g6);
-                items.push(g7);
-                items.push(g8);
-                items.push(g9);
+                    "label": {
+                        "content":category[8],
+                        "yOffset":20
+                    }
+                });
             }
 
-            var container = document.getElementById('visualization');
             var groups = new vis_graph.DataSet();
-            groups.add({
-                id: 0,
-                content: "create process"
-            })
-            groups.add({
-                id: 1,
-                content: "file access"
-            })
-            groups.add({
-                id: 2,
-                content: "registory access"
-            })
-            groups.add({
-                id: 3,
-                content: "network access"
-            })
-            groups.add({
-                id: 4,
-                content: "remote thread"
-            })
-            groups.add({
-                id: 5,
-                content: "file create time"
-            })
-            groups.add({
-                id: 6,
-                content: "image loaded"
-            })
-            groups.add({
-                id: 7,
-                content: "wmi"
-            })
-            groups.add({
-                id: 8,
-                content: "other"
-            })
+            for (var index in category){
+                groups.add({
+                    id: index,
+                    content: category[index]
+                })
+            }
 
             var options = {
                 style: 'bar',
@@ -255,55 +248,25 @@ uiModules
                     width: 40,
                     align: 'center'
                 }, // align: left, center, right
-                drawPoints: false,
+                drawPoints: function renderer(item, group, graph2d){
+                    if(item.y<10){
+                      return false;
+                    }
+                    return {
+                      style: "square"
+                    }
+                },
                 dataAxis: {
-                    icons: true
+                    icons: false
                 },
                 legend: {right: {position: 'top-left'}},
                 start: getViewFormat(getPastDate(date1, 1, "day"), 2),
                 end: getViewFormat(date2, 2),
                 orientation: 'top',
-                moveable: false,
                 zoomable: false
             };
 
             var graph2d = new vis_graph.Graph2d(container, items, groups, options);
-
-            function get_category_name_from_groupId(groupId) {
-                var category = '';
-                switch (groupId) {
-                    case 0:
-                        category = 'create_process';
-                        break;
-                    case 1:
-                        category = 'create_file';
-                        break;
-                    case 2:
-                        category = 'registory';
-                        break;
-                    case 3:
-                        category = 'net';
-                        break;
-                    case 4:
-                        category = 'remote_thread';
-                        break;
-                    case 5:
-                        category = 'file_create_time';
-                        break;
-                    case 6:
-                        category = 'image_loaded';
-                        break;
-                    case 7:
-                        category = 'wmi';
-                        break;
-                        // case 8:
-                        // category = 'other';
-                        // break;
-                    default:
-                        break;
-                }
-                return category;
-            }
 
             function get_category_name(date_str, event) {
                 var y = event.value[0];
@@ -346,13 +309,13 @@ uiModules
                 }
                 var category_name = '';
                 if (groupId != -1) {
-                    category_name = get_category_name_from_groupId(groupId);
+                    category_name = category[groupId];
                 }
                 return category_name;
             }
 
             graph2d.on("click", function(params) {
-                console.log(params);
+                //console.log(params);
             });
             graph2d.on("doubleClick", function(event) {
                 var click_date = event.time;
@@ -363,7 +326,7 @@ uiModules
                 var category = get_category_name(click_date_str, event);
                 if (category == '') return;
                 var url = 'sysmon_search_visual#/process_list/' + $route.current.params.hostname + '/' + category + '/' + click_date_str + '/0';
-                console.log(url);
+                //console.log(url);
                 window.open(url, "_blank");
             });
         });
@@ -380,7 +343,9 @@ uiModules
             return true;
         }
 
-        var url = '../api/sysmon-search-plugin/event/' + $route.current.params.hostname + '/' + $route.current.params.date;
+        var params = $route.current.params;
+        //var url = '../api/sysmon-search-plugin/event/' + $route.current.params.hostname + '/' + $route.current.params.date;
+        var url = '../api/sysmon-search-plugin/event/' + params.hostname + '/' + params.date;
         $http.get(url).then((response) => {
             this.hostname = $route.current.params.hostname;
             this.date = $route.current.params.date;
@@ -511,7 +476,9 @@ uiModules
     .controller('process_listController', function($scope, $route, $http, $interval) {
         // Set Language Data
         $scope.lang = gLangData;
-        var url = '../api/sysmon-search-plugin/process_list/' + $route.current.params.hostname + '/' + $route.current.params.eventtype + '/' + $route.current.params.date;
+        var params = $route.current.params;
+        //var url = '../api/sysmon-search-plugin/process_list/' + $route.current.params.hostname + '/' + $route.current.params.eventtype + '/' + $route.current.params.date;
+        var url = '../api/sysmon-search-plugin/process_list/' + params.hostname + '/' + params.eventtype + '/' + params.date;
         var localdata;
         $http.get(url).then((response) => {
             this.hostname = $route.current.params.hostname;

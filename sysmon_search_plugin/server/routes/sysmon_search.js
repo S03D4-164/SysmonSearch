@@ -32,21 +32,22 @@ export default function (server) {
       var params = req.payload;
       console.log("events params: " + JSON.stringify(params));
       const searchEvents = require('./search/events');
-      const result = await searchEvents(client, params);
+      const result = await searchEvents(client, params.hostname, params.period);
       //const result = await sysmon_search_obj.events(params);
       console.log("events result: " + JSON.stringify(result));
       return result;
     }
   });
 
-/*
   server.route({
     path: '/api/sysmon-search-plugin/event/{host}/{date}',
     method: 'GET',
     async handler(req) {
       var params = req.params;
       console.log("event params: " + JSON.stringify(params));
-      const result = await sysmon_search_obj.event(params.host, params.date);
+      const searchEvents = require('./search/events');
+      const result = await searchEvents(client, params.host, params.date);
+      //const result = await sysmon_search_obj.event(params.host, params.date);
       console.log("event result: " + JSON.stringify(result));
       return result;
     }
@@ -58,13 +59,15 @@ export default function (server) {
     async handler(req) {
       var params = req.params;
       console.log("event params: " + JSON.stringify(params));
-      const result = await sysmon_search_obj.process_list(params.host, params.eventtype, params.date, null);
+      const searchProcessList = require('./search/process_list');
+      const result = await searchProcessList(client, params.host, params.eventtype, params.date, null);
+      //const result = await sysmon_search_obj.process_list(params.host, params.eventtype, params.date, null);
       console.log("event result: " + JSON.stringify(result));
       return result;
-
     }
   });
 
+/*
   server.route({
     path: '/api/sysmon-search-plugin/process/{host}/{date}',
     method: 'GET',
