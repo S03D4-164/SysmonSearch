@@ -17,6 +17,7 @@ import './css/common.css';
 //import './dist/d3.v3.min.js';
 import './dist/visual.css';
 import './dist/jquery-3.3.1.min.js';
+import create_network from './js/network';
 
 // -------------------------------------------------------
 
@@ -344,7 +345,6 @@ uiModules
         }
 
         var params = $route.current.params;
-        //var url = '../api/sysmon-search-plugin/event/' + $route.current.params.hostname + '/' + $route.current.params.date;
         var url = '../api/sysmon-search-plugin/event/' + params.hostname + '/' + params.date;
         $http.get(url).then((response) => {
             this.hostname = $route.current.params.hostname;
@@ -450,6 +450,7 @@ uiModules
 
             this.data = items;
             if (item && item.result) {
+                // if create_process, show correlation link
                 if (item.result.create_process != 0) {
                     this.btnflg = true;
                 } else {
@@ -477,7 +478,6 @@ uiModules
         // Set Language Data
         $scope.lang = gLangData;
         var params = $route.current.params;
-        //var url = '../api/sysmon-search-plugin/process_list/' + $route.current.params.hostname + '/' + $route.current.params.eventtype + '/' + $route.current.params.date;
         var url = '../api/sysmon-search-plugin/process_list/' + params.hostname + '/' + params.eventtype + '/' + params.date;
         var localdata;
         $http.get(url).then((response) => {
@@ -536,6 +536,7 @@ uiModules
         // Set Language Data
         $scope.lang = gLangData;
 
+        var params = $route.current.params;
         $scope.submit = function() {
             var start_str = $route.current.params.date+"T00:00:00";
             var end_str = $route.current.params.date+"T23:59:59";
@@ -551,7 +552,8 @@ uiModules
             var start_utc = start_data_obj.getTime();
             var end_utc = end_data_obj.getTime();
 			
-            var url = '../api/sysmon-search-plugin/process/' + $route.current.params.hostname + '/' + $route.current.params.date;
+            //var url = '../api/sysmon-search-plugin/process/' + $route.current.params.hostname + '/' + $route.current.params.date;
+            var url = '../api/sysmon-search-plugin/process/' + params.hostname + '/' + params.date;
             url += '?';
             url += 'start_time='+start_utc;
             url += '&';
@@ -565,7 +567,8 @@ uiModules
         var url = '../api/sysmon-search-plugin/process/' + $route.current.params.hostname + '/' + $route.current.params.date;
         var localdata;
         $http.get(url).then((response) => {
-            this.hostname = $route.current.params.hostname;
+            //this.hostname = $route.current.params.hostname;
+            this.hostname = params.hostname;
 
             if ($route.current.params.date.length === 23) {
                 var range_datetime = get_range_datetime($route.current.params.date);
@@ -579,7 +582,8 @@ uiModules
             create_network(top, null, null, true);
         });
 
-        function create_network(tops, keyword, hash, firstflg) {
+        //function create_network(tops, keyword, hash, firstflg) {
+        function old_create_network(tops, keyword, hash, firstflg) {
             function sub_create_network(top, keyword, hash) {
                 function add_child_info(cur) {
                     function splitByLength(str, length) {

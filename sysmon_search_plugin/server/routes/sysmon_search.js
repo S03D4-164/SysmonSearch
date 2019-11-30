@@ -58,16 +58,15 @@ export default function (server) {
     method: 'GET',
     async handler(req) {
       var params = req.params;
-      console.log("event params: " + JSON.stringify(params));
+      console.log("process_list params: " + JSON.stringify(params));
       const searchProcessList = require('./search/process_list');
       const result = await searchProcessList(client, params.host, params.eventtype, params.date, null);
       //const result = await sysmon_search_obj.process_list(params.host, params.eventtype, params.date, null);
-      console.log("event result: " + JSON.stringify(result));
+      console.log("process_list result: " + JSON.stringify(result));
       return result;
     }
   });
 
-/*
   server.route({
     path: '/api/sysmon-search-plugin/process/{host}/{date}',
     method: 'GET',
@@ -75,15 +74,19 @@ export default function (server) {
       var params = req.params;
       var query = req.query;
       if ((query.start_time == null) || (query.end_time == null)) {
-        const result = await sysmon_search_obj.process(params.host, params.date, null);
+        const searchProcess = require('./search/process');
+        const result = await searchProcess(client, params.host, params.date, null);
+        //const result = await sysmon_search_obj.process(params.host, params.date, null);
         return result;
       } else {
-        const result = await sysmon_search_obj.process_start_end(params.host, params.date, query.start_time, query.end_time, null);
-        return result;
+        //const result = await sysmon_search_obj.process_start_end(params.host, params.date, query.start_time, query.end_time, null);
+        //return result;
+        return;
       }
     }
   });
 
+/*
   server.route({
     path: '/api/sysmon-search-plugin/process_overview/{host}/{date}/{guid}',
     method: 'GET',

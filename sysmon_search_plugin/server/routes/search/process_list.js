@@ -1,6 +1,6 @@
 const Utils = require('./Utils');
 
-function getEventIdFromType(type){
+async function getEventIdFromType(type){
   if (type === 'create_process') return [1];
   else if (type === 'create_file') return [11];
   else if (type === 'registory') return [12,13,14];
@@ -37,14 +37,15 @@ async function processList(client, hostname, eventtype, date, searchObj) {
       };
     } else {
       //var event_id = [1];
-      var event_id = getEventIdFromType(eventtype);
+      const event_id = await getEventIdFromType(eventtype);
       var query = {"bool": {
           "must": [{
             "match": {"winlog.computer_name.keyword": hostname,}
            },{
             "match": {"winlog.channel.keyword": "Microsoft-Windows-Sysmon/Operational",}
            },{
-            "terms": {"event.code": event_id,}
+            //"terms": {"event.code": event_id,}
+            "terms": {"winlog.event_id": event_id,}
            },{
             "match": {"@timestamp": date}
            }]
@@ -72,12 +73,13 @@ async function processList(client, hostname, eventtype, date, searchObj) {
     }
   }
 
+  console.log("search: " + JSON.stringify(searchObj));
   const el_result = await client.search({
-    index: 'winlogbeat-*',                                                                                           
+    index: 'winlogbeat-*',
     // size: 1000,
     body: searchObj
   });
-
+  console.log("el_result: " + JSON.stringify(el_result))
   if (el_result) {
     var hits = el_result.hits.hits;
 
@@ -85,7 +87,7 @@ async function processList(client, hostname, eventtype, date, searchObj) {
 
     for (var index in hits) {
       var hit = hits[index]._source;
-      console.log(hit);
+      console.log("hit: " + hit);
       let data = hit.winlog.event_data;
       // results.push( hit );
       var tmp = {
@@ -130,21 +132,21 @@ async function processList(client, hostname, eventtype, date, searchObj) {
                             'ProcessGuid': data.ProcessGuid
                         };
                         break;
-                    case 'net':
-                        //tmp['process'] = data.Image;
-                        tmp['process'] = hit.process.executable;
-                        //tmp['disp'] = data.Protocol + ':' + data.DestinationIp + ':' + data.DestinationPort;
-                        tmp['disp'] = hit.network.transport + ':' + hit.destination.ip + ':' + hit.destination.port;
-                        tmp['ip'] = hit.destination.ip;
-                        tmp['port'] = hit.destination.port;
-                        tmp['info'] = {
-                            'SourceHostname': hit.source.domain,
-                            'ProcessGuid': hit.process.entity_id,
-                            //'SourceIsIpv6': hit.data.SourceIsIpv6,
-                            'SourceIp': hit.source.ip,
-                            'DestinationHostname': hit.destination.domain
-                        };
-                        break;
+        case 'net':
+          //tmp['process'] = data.Image;
+          tmp['process'] = hit.process.executable;
+          //tmp['disp'] = data.Protocol + ':' + data.DestinationIp + ':' + data.DestinationPort;
+          tmp['disp'] = hit.network.transport + ':' + hit.destination.ip + ':' + hit.destination.port;
+          tmp['ip'] = hit.destination.ip;
+          tmp['port'] = hit.destination.port;
+          tmp['info'] = {
+            'SourceHostname': hit.source.domain,
+            'ProcessGuid': hit.process.entity_id,
+            //'SourceIsIpv6': hit.data.SourceIsIpv6,
+            'SourceIp': hit.source.ip,
+            'DestinationHostname': hit.destination.domain
+          };
+          break;
                     case 'remote_thread':
                         tmp['process'] = data.SourceImage;
                         tmp['disp'] = data.TargetImage;
@@ -186,14 +188,15 @@ async function processList(client, hostname, eventtype, date, searchObj) {
                             'User': data.User
                         };
                         break;
-                }
-                results.push(tmp);
-            }
-
-            // console.log( JSON.stringify(root, null, '\t') );
-            return results;
-        }
-        return;
+      }
+      results.push(tmp);
     }
+
+    // console.log( JSON.stringify(root, null, '\t') );
+    console.log("process_list results: " + results)
+    return results;
+  }
+  return;
+}
 
 module.exports = processList;
