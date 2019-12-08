@@ -13,10 +13,10 @@ async function events(client, hostname, date) {
       "bool": {
         "must": [
           {
-            "match": {"winlog.computer_name.keyword": hostname}
+            "match": {"winlog.computer_name": hostname}
           },
           {
-            "match": {"winlog.channel.keyword": "Microsoft-Windows-Sysmon/Operational"}
+            "match": {"winlog.channel": "Microsoft-Windows-Sysmon/Operational"}
           },
           timestamp
         ]
@@ -49,65 +49,97 @@ async function events(client, hostname, date) {
 
   if (el_result){
     console.log(el_result);
-            // event_id = 1: Create Process
-            // event_id = 11: Create File
-            // event_id = 12 or 13 or 14: Registory
-            // event_id = 3: Net Access
-            // event_id = 8: RemoteThread
-            var results = [];
-            var hits = el_result.aggregations.group_by.buckets;
-            for (var index in hits) {
-                var item = hits[index];
-                var create_process = 0;
-                var create_file = 0;
-                var registory = 0;
-                var net_access = 0;
-                var remote_thread = 0;
-                var file_create_time = 0;
-                var image_loaded = 0;
-                var wmi = 0;
-                var other = 0;
-                for (var i in item['event_id']['buckets']) {
-                    var event = item['event_id']['buckets'][i];
-                    if (event['key'] == 1) {
-                        create_process += event['doc_count'];
-                    } else if (event['key'] == 11) {
-                        create_file += event['doc_count'];
-                    } else if ((event['key'] == 12) || (event['key'] == 13)) {
-                        registory += event['doc_count'];
-                    } else if (event['key'] == 3) {
-                        net_access += event['doc_count'];
-                    } else if (event['key'] == 8) {
-                        remote_thread += event['doc_count'];
-                    } else if (event['key'] == 2) {
-                        file_create_time += event['doc_count'];
-                    } else if (event['key'] == 7) {
-                        image_loaded += event['doc_count'];
-                    } else if (event['key'] == 19 || event['key'] == 20 || event['key'] == 21) {
-                        wmi += event['doc_count'];
-                    } else {
-                        other += event['doc_count'];;
-                    }
-                }
-                var tmp = {
-                    "date": item['key_as_string'],
-                    "result": {
-                        "create_process": create_process,
-                        "create_file": create_file,
-                        "registory": registory,
-                        "net": net_access,
-                        "remote_thread": remote_thread,
-                        "file_create_time": file_create_time,
-                        "image_loaded": image_loaded,
-                        "wmi": wmi,
-                        "other": other
-                    }
-                };
-                results.push(tmp);
-            }
-            return results;
+    //var results = [];
+    var hits = el_result.aggregations.group_by.buckets;
+    var category = [
+           "create_process",
+           "file_create_time",
+           "net",
+           "process_terminated",
+           "driver_loaded",
+           "image_loaded",
+           "remote_thread",
+           "raw_access_read",
+           "process_access",
+           "create_file",
+           "registory",
+           "pipe",
+           "wmi",
+           "dns",
+           "error",
+           "other" 
+    ];
+    var results = {
+      "items":[],
+      "chart_items":[],
+      "groups":category,
+    };
+    for (var index in hits) {
+      var item = hits[index];
+      var cnt = {};
+      for(var i in category){
+        cnt[category[i]] = 0;
+      }
+      for (var i in item['event_id']['buckets']) {
+        var event = item['event_id']['buckets'][i];
+
+        if (event['key'] == 1) {
+          cnt["create_process"] += event['doc_count'];
+        } else if (event['key'] == 2) {
+          cnt["file_create_time"] += event['doc_count'];
+        } else if (event['key'] == 3) {
+          cnt["net_access"] += event['doc_count'];
+        } else if (event['key'] == 5) {
+          cnt["process_terminated"] += event['doc_count'];
+        } else if (event['key'] == 6) {
+          cnt["driver_loaded"] += event['doc_count'];
+        } else if (event['key'] == 7) {
+          cnt["image_loaded"] += event['doc_count'];
+        } else if (event['key'] == 8) {
+          cnt["remote_thread"] += event['doc_count'];
+        } else if (event['key'] == 9) {
+          cnt["raw_access_read"] += event['doc_count'];
+        } else if (event['key'] == 10) {
+          cnt["process_access"] += event['doc_count'];
+        } else if (event['key'] == 11) {
+          cnt["create_file"] += event['doc_count'];
+        } else if (event['key'] == 12 || event['key'] == 13 || event['key' == 14]) {
+          cnt["registory"] += event['doc_count'];
+        } else if (event['key'] == 17 || event['key'] == 18) {
+          cnt["pipe"] += event['doc_count'];
+        } else if (event['key'] == 19 || event['key'] == 20 || event['key'] == 21) {
+          cnt["wmi"] += event['doc_count'];
+        } else if (event['key'] == 22) {
+          cnt["dns"] += event['doc_count'];
+        } else if (event['key'] == 255) {
+          cnt["error"] += event['doc_count'];
+        } else {
+          cnt["other"] += event['doc_count'];
         }
-        return;
+
+      }
+      if (typeof date === "string"){
+        var data = {"count":cnt};
+        return data;
+      }
+
+      for (let [key, value] of Object.entries(cnt)) {
+        var tmp = {
+          "group": key,
+          "x":item['key_as_string'],
+          "y": value,
+          "label":{
+            "content":key,
+            "yOffset":20
+          }
+        };
+        results["items"].push(tmp);
+      }
+
+    }
+    return results;
+  }
+  return;
 }
 
 module.exports = events;

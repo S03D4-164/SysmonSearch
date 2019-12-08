@@ -1,9 +1,14 @@
+const yaml = require('js-yaml');
+const fs   = require('fs');
+
 async function searchHosts(client, params) {
+  //var doc = yaml.safeLoad(fs.readFileSync(__dirname + '/winlogbeat-modules-enabled.yml', 'utf8'));
+  //console.log(doc["logsources"]["windows-sysmon"]["conditions"]);
 
   console.log("params: " + JSON.stringify(params));
-
   var search_items_and_date_query = [{
-    "match": {"winlog.channel.keyword": "Microsoft-Windows-Sysmon/Operational",}
+    //"match": {"winlog.channel.keyword": "Microsoft-Windows-Sysmon/Operational",}
+    "match": {"winlog.channel": "Microsoft-Windows-Sysmon/Operational",}
   }];
   if (typeof params !== "undefined"
       && params !== null
@@ -15,7 +20,8 @@ async function searchHosts(client, params) {
     {
       search_items_and_date_query.push({
       "wildcard": {
-          "winlog.computer_name.keyword": "*" + params['keyword'].toLowerCase() + "*"
+          //"winlog.computer_name.keyword": "*" + params['keyword'].toLowerCase() + "*"
+          "winlog.computer_name": "*" + params['keyword'].toLowerCase() + "*"
         }
       });
     }
@@ -62,7 +68,8 @@ async function searchHosts(client, params) {
           "computer_names": {
             "terms": {
               "size": 1000,
-              "field": "winlog.computer_name.keyword"
+              //"field": "winlog.computer_name.keyword"
+              "field": "winlog.computer_name"
             }
           }
         }
@@ -75,7 +82,7 @@ async function searchHosts(client, params) {
     // size: 1000,
     body: searchObj
   });
-  console.log("result: " + JSON.stringify(el_result))
+  //console.log("result: " + JSON.stringify(el_result))
 
   var results = [];
   //var hits = el_result.aggregations.group_by.buckets;
