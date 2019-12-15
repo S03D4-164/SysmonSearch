@@ -180,107 +180,114 @@ export default function (server) {
     }
   });
 
-/*
   server.route({
     path: '/api/sysmon-search-plugin/sm_unique_hosts',
     method: 'POST',
     async handler(req) {
       var params = req.payload;
       console.log("sm_unique_hosts params: " +JSON.stringify(params));
-      const result = await sysmon_search_obj.sm_unique_hosts(params);
+      const smUniqueHosts = require('./search/sm_unique_hosts');
+      const result = await smUniqueHosts(sysmon_search, params);
+      //const result = await sysmon_search_obj.sm_unique_hosts(params);
       console.log("sm_unique_hosts: " + JSON.stringify(result));
       return result;
-
     }
   });
 
   server.route({
-	    path: '/api/sysmon-search-plugin/alert_data',
-	    method: 'POST',
-	    async handler(req) {
-	      var params = req.payload;
-        console.log("alert_data params: " + JSON.stringify(params));
-        const result = await sysmon_search_obj.alert_data(params);
-        console.log("alert_data result: " + JSON.stringify(result));
-        return result;
-	    }
-	  });
+    path: '/api/sysmon-search-plugin/alert_data',
+    method: 'POST',
+    async handler(req) {
+      var params = req.payload;
+      console.log("alert_data params: " + JSON.stringify(params));
+      const alertData = require('./search/alert_data');
+      const result = await alertData(sysmon_search, params);
+      //const result = await sysmon_search_obj.alert_data(params);
+      console.log("alert_data result: " + JSON.stringify(result));
+      return result;
+    }
+  });
 
   server.route({
-	    path: '/api/sysmon-search-plugin/alert_host',
-	    method: 'POST',
-	    async handler(req) {
-	      var params = req.payload;
-        console.log("alert_host params: " + JSON.stringify(params));
-        const result = await sysmon_search_obj.alert_host(params);
-        console.log("alert_host result: " + JSON.stringify(result));
-        return result;
-
-	    }
-	  });
+    path: '/api/sysmon-search-plugin/alert_host',
+    method: 'POST',
+    async handler(req) {
+      var params = req.payload;
+      console.log("alert_host params: " + JSON.stringify(params));
+      const alertHost = require('./search/alert_host');
+      const result = await alertHost(params);
+      //const result = await sysmon_search_obj.alert_host(params);
+      console.log("alert_host result: " + JSON.stringify(result));
+      return result;
+    }
+  });
 
   server.route({
-      path: '/api/sysmon-search-plugin/import_search_keywords',
-      method: 'POST',
-      async handler(request) {
-        var params = request.payload;
-        const result = await sysmon_search_obj.import_search_keywords(params);
-        if (result) {
-              const util = require('util');
-              if (util.isError(result)) {
-                  const Boom = require('boom');
-                  var error = Boom.badRequest(util.inspect(result)); // 400
-                  //reply(error);
-                  return error;
-              } else {
-                  //reply(result);
-                  return result;
-              }
+    path: '/api/sysmon-search-plugin/import_search_keywords',
+    method: 'POST',
+    async handler(request) {
+      var params = request.payload;
+      const importSearch = require('./search/import_search');
+      const result = await importSearch(params);
+      //const result = await sysmon_search_obj.import_search_keywords(params);
+      if (result) {
+        const util = require('util');
+        if (util.isError(result)) {
+          const Boom = require('boom');
+          var error = Boom.badRequest(util.inspect(result)); // 400
+          return error;
+        } else {
+          return result;
         }
-        return;
       }
-  });
-
-  server.route({
-      path: '/api/sysmon-search-plugin/save_alert_rules',
-      method: 'POST',
-      handler(request) {
-          var params = request.payload;
-          const result = sysmon_search_obj.save_alert_rules(params);
-          const util = require('util');
-          if (util.isError(result)) {
-              const Boom = require('boom');
-              var error = Boom.serverUnavailable(util.inspect(result)); // 503
-              return error;
-          } else {
-              return result;
-          }
-
-        }
-  });
-
-  server.route({
-      path: '/api/sysmon-search-plugin/get_alert_rule_file_list',
-      method: 'GET',
-      async handler(req) {
-          var params = req.params;
-          console.log(`get_alert params: ${params}`);
-          const result = await sysmon_search_obj.get_alert_rule_file_list(params);
-          console.log(`get_alert result: ${result}`);
-          return result?result:{};
-     }
-  });
-
-  server.route({
-      path: '/api/sysmon-search-plugin/delete_alert_rule_file',
-      method: 'POST',
-      async handler(req) {
-        var params = req.payload;
-        const result = await sysmon_search_obj.delete_alert_rule_file(params);
-        console.log("delete_alert result: "+ JSON.stringify(result));
-        return result;
+      return;
     }
   });
-*/
+
+  server.route({
+    path: '/api/sysmon-search-plugin/save_alert_rules',
+    method: 'POST',
+    handler(request) {
+      var params = request.payload;
+      const {saveAlert} = require('./search/alert_rule');
+      const result = saveAlert(params);
+      //const result = sysmon_search_obj.save_alert_rules(params);
+      const util = require('util');
+      if (util.isError(result)) {
+        const Boom = require('boom');
+        var error = Boom.serverUnavailable(util.inspect(result)); // 503
+        return error;
+      } else {
+        return result;
+      }
+    }
+  });
+
+  server.route({
+    path: '/api/sysmon-search-plugin/get_alert_rule_file_list',
+    method: 'GET',
+    async handler(req) {
+      var params = req.params;
+      console.log(`get_alert params: ${params}`);
+      const {getAlert} = require('./search/alert_rule');
+      const result = await getAlert(params);
+      //const result = await sysmon_search_obj.get_alert_rule_file_list(params);
+      console.log("get_alert result: " + JSON.stringify(result));
+      return result?result:{};
+    }
+  });
+
+  server.route({
+    path: '/api/sysmon-search-plugin/delete_alert_rule_file',
+    method: 'POST',
+    handler(req) {
+      var params = req.payload;
+      const {deleteAlert} = require('./search/alert_rule');
+      const result = deleteAlert(params);
+      //const result = await sysmon_search_obj.delete_alert_rule_file(params);
+      console.log("delete_alert result: "+ JSON.stringify(result));
+      return result;
+    }
+  });
 
 }

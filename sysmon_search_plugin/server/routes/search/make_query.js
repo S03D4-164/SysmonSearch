@@ -1,5 +1,4 @@
 const Utils = require('./Utils');
-const makeQuery = require('./make_query');
 
 function set_wildcard_value(search_items, key, params, num) {
   var match = {};
@@ -23,8 +22,7 @@ function str_escape(str) {
     });
 }
 
-
-async function makeQueryOld(params, map) {
+async function makeQuery(params, map) {
   console.log("make query params: " +JSON.stringify(params));
   var search_items_and_date_query = [];
   var search_items_and_eventid_querys = [];
@@ -255,64 +253,4 @@ async function makeQueryOld(params, map) {
   return search_items_and_date_query;
 }
 
-async function smSearch(sysmon, params) {
-  const search_items_and_date_query = await makeQuery(params, sysmon.map);
-
-  var sort_item = {};
-  sort_item[params.sort_item] = params.sort_order;
-  var sort = [];
-  sort.push(sort_item);
-
-  var searchObj = {
-    "size": 10000,
-    "query": {
-      "bool": {"must": search_items_and_date_query}
-    },
-    "sort": sort,
-    //"_source": ["record_number", "event_id", "level", "event_record_id", "computer_name", "user", "event_data", "@timestamp"]
-    "_source": ["winlog", "log", "@timestamp"]
-  };
-
-  const el_result = await sysmon.client.search({
-    //index: 'winlogbeat-*',
-    index: sysmon.map["defaultindex"],
-    // size: 1000,
-    body: searchObj
-  });
-  //console.log(JSON.stringify(el_result));
-
-  var results = [];
-  var results_count = 0;
-  //if (el_result !== null) {
-  if ("hits" in el_result) {
-    results_count = el_result.hits.total;
-    var hits = el_result.hits.hits;
-    //console.log(JSON.stringify(hits));
-    for (let index in hits) {
-      var hit = hits[index]._source;
-      var description = Utils.eventid_to_type(hit.winlog.event_id);
-      var tmp = {
-        //"number": hit.record_number,
-        "number": hit.winlog.record_id,
-        "utc_time": hit.winlog.event_data.UtcTime,
-        "event_id": hit.winlog.event_id,
-        "level": hit.log.level,
-        "computer_name": hit.winlog.computer_name,
-        "user_name": hit.winlog.user?hit.winlog.user.name:"",
-        "image": hit.winlog.event_data.Image,
-        "date": hit["@timestamp"],
-        "process_guid": hit.winlog.event_data.ProcessGuid,
-        "description" : description,
-        "_id" : hits[index]._id
-      };
-      if(hit.event_id == 8)tmp["source_guid"] = hit.winlog.event_data.SourceProcessGuid;
-      results.push(tmp);
-    }
-  }
-  //console.log(results);
-  const res = {"total": results_count, "hits": results};
-  
-  return res;
-}
-
-module.exports = smSearch;
+module.exports = makeQuery;;

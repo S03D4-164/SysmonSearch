@@ -32,6 +32,7 @@ import uiRoutes from './routes'
 // -------------------------------------------------------
 //
 
+// event list
 uiModules
     .get('app/sysmon_search_visual/hosts', [])
     .controller('hostsController', function($scope, $route, $http, $interval) {
@@ -100,6 +101,7 @@ uiModules
         };
     })
 
+// 2d graph
 uiModules
     .get('app/sysmon_search_visual/host_statistic', [])
     .controller('host_statisticController', function($scope, $route, $http, $interval) {
@@ -192,14 +194,12 @@ uiModules
                 var bar_items = [];
                 var bar_height = 0;
                 var ids = linegraph.itemsData.getIds();
-console.log(ids);
+                console.log(ids);
                 for (var i = 0; i < ids.length; i++) {
                     var height = 0;
                     var item = linegraph.itemsData._getItem(ids[i]);
+                    if (item.x !== date_str) continue;
 
-                    if (item.x !== date_str) {
-                        continue;
-                    }
                     bar_height = bar_height + item.y;
                     bar_items.push({
                         height: item.y,
@@ -211,10 +211,9 @@ console.log(ids);
                 var groupId = -1;
                 for (var i = 0; i < bar_items.length; i++) {
                     var item = bar_items[i];
-console.log(item);
-                    if (item.height == 0) {
-                        continue;
-                    }
+                    console.log(item);
+                    if (item.height == 0) continue;
+                    
                     var cur_bottom = cur_top - item.height;
 
                     if (cur_bottom <= bar_height - y && bar_height - y <= cur_top) {
@@ -252,6 +251,7 @@ console.log(item);
         });
     })
 
+// pie chart
 uiModules
     .get('app/sysmon_search_visual/event', [])
     .controller('eventController', function($scope, $route, $http, $interval) {
@@ -292,6 +292,7 @@ uiModules
         });
     })
 
+// process list
 uiModules
     .get('app/sysmon_search_visual/process_list', [])
     .controller('process_listController', function($scope, $route, $http, $interval) {
@@ -341,11 +342,8 @@ uiModules
         };
 
         this.isTarget = function(id){
-            if($route.current.params._id == id){
-                return true;
-            }else{
-                return false;
-            }
+            if ($route.current.params._id == id) return true;
+            else return false;
         }
 
     })
@@ -1268,7 +1266,8 @@ uiModules
         search(data);
 
         function search(data) {
-            $http.post('../api/sysmon-search-plugin/alert_data', data).then((response) => {
+            $http.post('../api/sysmon-search-plugin/alert_data', data)
+            .then((response) => {
                 var tabledatas = [];
                 var tabledata_r = response.data.table_data;
                 var search_data = response.data.hits;
@@ -1308,11 +1307,12 @@ uiModules
                     }
                 }
 
-                $http.get('../api/sysmon-search-plugin/get_alert_rule_file_list').then((response) => {
+                $http.get('../api/sysmon-search-plugin/get_alert_rule_file_list')
+                .then((response) => {
                     var file_list = response.data;
                     var rules_arr = [];
                     var rules_list = {};
-                    console.log(rules)
+                    
                     for (var i = 0; i < rules.length; i++) {
                         var rule_str;
                         var rule_str_f;
@@ -1430,84 +1430,90 @@ uiModules
     })
 
 uiModules
-    .get('app/sysmon_search_visual/search', [])
-
-    .directive('fileModel', function() {
-        return {
-            restrict: 'A',
-            link: function(scope, element, attrs) {
-                element.bind('change', function() {
-                    scope.ctrl.import_stixioc(element[0].files[0]);
-                    $("#file-import").val("");
-                });
-            }
-        };
-    })
-
-    .controller('searchController', function($compile, $scope, $route, $http, $interval) {
-        // Set Language Data
-        $scope.lang = gLangData;
-
-        $scope.conjunctionList = [{
-                "id": 1,
-                "name": "AND"
-            },
-            {
-                "id": 2,
-                "name": "OR"
-            }
-        ];
-        var form_count = 2;
-        // $scope["keywords.search_conjunction"] = $scope.conjunctionList[0].id;
-
-        var search_keyword = null;
-
-        this.search = function(keywords) {
-            if (typeof keywords !== "undefined") {
-                if ("start_date" in keywords && typeof keywords.start_date !== "undefined" && keywords.start_date !== null &&
-                    $("input[name='start_time']").val() !== "undefined" && $("input[name='start_time']").val() !== null && $("input[name='start_time']").val() !== "") {
-
-//                    keywords.fm_start_date = formatDate(new Date(keywords.start_date), new Date(keywords.start_time));
-                    keywords.fm_start_date = formatDate(new Date(keywords.start_date), $("input[name='start_time']").val());
-                } else {
-                    delete keywords["fm_start_date"];
-                }
-                if ("end_date" in keywords && typeof keywords.end_date !== "undefined" && keywords.end_date !== null &&
-                    $("input[name='end_time']").val() !== "undefined" && $("input[name='end_time']").val() !== null && $("input[name='end_time']").val() !== "") {
-
-//                    keywords.fm_end_date = formatDate(new Date(keywords.end_date), new Date(keywords.end_time));
-                    keywords.fm_end_date = formatDate(new Date(keywords.end_date), $("input[name='end_time']").val());
-                } else {
-                    delete keywords["fm_end_date"];
-                }
-            } else {
-                keywords = {};
-            }
-
-            keywords.sort_item = 'winlog.event_id';
-            keywords.sort_order = 'asc';
-
-            var tmp = {};
-            for(var key in keywords){
-                tmp[key] = keywords[key];
-            }
-            search_keyword = tmp;
-
-            $http.post('../api/sysmon-search-plugin/sm_search', keywords).then((response) => {
-
-                this.search_data = response.data.hits;
-                this.total = `${response.data.total.relation} ${response.data.total.value}`;
-                orderMarkSet(this, keywords.sort_item, keywords.sort_order);
-
-                $http.post('../api/sysmon-search-plugin/sm_unique_hosts', keywords).then((response) => {
-                    this.unique_host_count = response.data.length;
-                });
+.get('app/sysmon_search_visual/search', [])
+.directive('fileModel', function() {
+    return {
+        restrict: 'A',
+        link: function(scope, element, attrs) {
+            element.bind('change', function() {
+                scope.ctrl.import_stixioc(element[0].files[0]);
+                $("#file-import").val("");
             });
-        };
+        }
+    };
+})
+.controller('searchController', function($compile, $scope, $route, $http, $interval) {
+    // Set Language Data
+    $scope.lang = gLangData;
 
-        this.import = function() {
-            $("#file-import").click();
-        };
+    $scope.conjunctionList = [
+        {"id": 1, "name": "AND"},
+        {"id": 2, "name": "OR"}
+    ];
+    var form_count = 2;
+    // $scope["keywords.search_conjunction"] = $scope.conjunctionList[0].id;
+
+    var search_keyword = null;
+
+    this.search = function(keywords) {
+        if (typeof keywords !== "undefined") {
+            if ("start_date" in keywords
+                && typeof keywords.start_date !== "undefined"
+                && keywords.start_date !== null
+                && $("input[name='start_time']").val() !== "undefined"
+                && $("input[name='start_time']").val() !== null
+                && $("input[name='start_time']").val() !== "")
+            {
+              //keywords.fm_start_date = formatDate(new Date(keywords.start_date), new Date(keywords.start_time));
+              keywords.fm_start_date = formatDate(
+                new Date(keywords.start_date), $("input[name='start_time']").val()
+              );
+            } else {
+              delete keywords["fm_start_date"];
+            }
+            if ("end_date" in keywords
+              && typeof keywords.end_date !== "undefined"
+              && keywords.end_date !== null
+              && $("input[name='end_time']").val() !== "undefined"
+              && $("input[name='end_time']").val() !== null
+              && $("input[name='end_time']").val() !== "")
+            {
+              //keywords.fm_end_date = formatDate(new Date(keywords.end_date), new Date(keywords.end_time));
+              keywords.fm_end_date = formatDate(
+                new Date(keywords.end_date), $("input[name='end_time']").val()
+              );
+            } else {
+              delete keywords["fm_end_date"];
+            }
+        } else {
+          keywords = {};
+        }
+
+        keywords.sort_item = 'winlog.event_id';
+        keywords.sort_order = 'asc';
+
+        var tmp = {};
+        for(var key in keywords){
+            tmp[key] = keywords[key];
+        }
+        search_keyword = tmp;
+
+        $http.post('../api/sysmon-search-plugin/sm_search', keywords)
+        .then((response) => {
+            this.search_data = response.data.hits;
+            this.total = `${response.data.total.relation} ${response.data.total.value}`;
+            orderMarkSet(this, keywords.sort_item, keywords.sort_order);
+
+            $http.post('../api/sysmon-search-plugin/sm_unique_hosts', keywords)
+            .then((response) => {
+                this.unique_host_count = response.data.length;
+            });
+        });
+    };
+
+    this.import = function() {
+        $("#file-import").click();
+    };
 
         this.import_stixioc = function(file) {
             const msg_confirm_import = $scope.lang["SEARCH_MSG_CONFIRM_IMPORT"];
