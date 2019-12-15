@@ -50,7 +50,7 @@ uiModules
             var st_dt = new Date();
             st_dt = getPastDate(st_dt,1,"month")
             keywords.fm_start_date = formatDate2(st_dt) + 'T00:00:00Z';
-            keywords.fm_end_date = formatDate2(new Date()) + 'T23:59:59Z';
+            keywords.fm_end_date = formatDate2(new Date()) + 'T00:00:00Z';
             return keywords;
         }
         this.keywords = default_date_range({});
@@ -106,8 +106,10 @@ uiModules
         // Set Language Data
         $scope.lang = gLangData;
 
+        var hostname = $route.current.params.hostname;
+
         var data = {};
-        data.hostname = $route.current.params.hostname;
+        data.hostname = hostname;
 
         function getFutureDate(date, interval, type) {
             if (type == "month") {
@@ -139,106 +141,21 @@ uiModules
             getFutureDate(new Date(year, month, day), 1, "month")
         );
         data.period = getDateQueryFromDate(date1, date2);
-        var category = [
-            "create_process",
-            "create_file",
-            "registory",
-            "net",
-            "remote_thread",
-            "file_create_time",
-            "image_loaded",
-            "wmi",
-            "other"
-        ];
         $http.post('../api/sysmon-search-plugin/events', data)
         .then((response) => {
-            this.hostname = $route.current.params.hostname;
+            //this.hostname = $route.current.params.hostname;
+            this.hostname = hostname;
 
             var container = document.getElementById('visualization');
 
-            var items = [];
-            for (var index in response.data) {
-                var item = response.data[index];
-                items.push({
-                    "group": 0,
-                    "x": item.date,
-                    "y": item.result.create_process,
-                    "label": {
-                        "content":category[0],
-                        "yOffset":20
-                    }
-                },{
-                    "group": 1,
-                    "x": item.date,
-                    "y": item.result.create_file,
-                    "label": {
-                        "content":category[1],
-                        "yOffset":20
-                    }
-                },{
-                    "group": 2,
-                    "x": item.date,
-                    "y": item.result.registory,
-                    "label": {
-                        "content":category[2],
-                        "yOffset":20
-                    }
-                },{
-                    "group": 3,
-                    "x": item.date,
-                    "y": item.result.net,
-                    "label": {
-                        "content":category[3],
-                        "yOffset":20
-                    }
-                },{
-                    "group": 4,
-                    "x": item.date,
-                    "y": item.result.remote_thread,
-                    "label": {
-                        "content":category[4],
-                        "yOffset":20
-                    }
-                },{
-                    "group": 5,
-                    "x": item.date,
-                    "y": item.result.file_create_time,
-                    "label": {
-                        "content":category[5],
-                        "yOffset":20
-                    }
-                },{
-                    "group": 6,
-                    "x": item.date,
-                    "y": item.result.image_loaded,
-                    "label": {
-                        "content":category[6],
-                        "yOffset":20
-                    }
-                },{
-                    "group": 7,
-                    "x": item.date,
-                    "y": item.result.wmi,
-                    "label": {
-                        "content":category[7],
-                        "yOffset":20
-                    }
-                },{
-                    "group": 8,
-                    "x": item.date,
-                    "y": item.result.other,
-                    "label": {
-                        "content":category[8],
-                        "yOffset":20
-                    }
-                });
-            }
+            var items = response.data["items"];
 
+            var category = response.data["groups"];
             var groups = new vis_graph.DataSet();
             for (var index in category){
                 groups.add({
-                    id: index,
-                    content: category[index]
+                    id: category[index],
+                    content: category[index],
                 })
             }
 
@@ -253,14 +170,12 @@ uiModules
                     if(item.y<10){
                       return false;
                     }
-                    return {
-                      style: "square"
-                    }
+                    //return {
+                    //  style: "square"
+                    //}
                 },
-                dataAxis: {
-                    icons: false
-                },
-                legend: {right: {position: 'top-left'}},
+                dataAxis: {icons: false},
+                legend: {right: {position: 'top-right'}},
                 start: getViewFormat(getPastDate(date1, 1, "day"), 2),
                 end: getViewFormat(date2, 2),
                 orientation: 'top',
@@ -277,7 +192,7 @@ uiModules
                 var bar_items = [];
                 var bar_height = 0;
                 var ids = linegraph.itemsData.getIds();
-
+console.log(ids);
                 for (var i = 0; i < ids.length; i++) {
                     var height = 0;
                     var item = linegraph.itemsData._getItem(ids[i]);
@@ -296,6 +211,7 @@ uiModules
                 var groupId = -1;
                 for (var i = 0; i < bar_items.length; i++) {
                     var item = bar_items[i];
+console.log(item);
                     if (item.height == 0) {
                         continue;
                     }
@@ -310,13 +226,14 @@ uiModules
                 }
                 var category_name = '';
                 if (groupId != -1) {
-                    category_name = category[groupId];
+                    //category_name = category[groupId];
+                    category_name = groupId;
                 }
                 return category_name;
             }
 
             graph2d.on("click", function(params) {
-                //console.log(params);
+                console.log(params);
             });
             graph2d.on("doubleClick", function(event) {
                 var click_date = event.time;
@@ -326,10 +243,12 @@ uiModules
 
                 var category = get_category_name(click_date_str, event);
                 if (category == '') return;
-                var url = 'sysmon_search_visual#/process_list/' + $route.current.params.hostname + '/' + category + '/' + click_date_str + '/0';
+                //var url = 'sysmon_search_visual#/process_list/' + $route.current.params.hostname + '/' + category + '/' + click_date_str + '/0';
+                var url = 'sysmon_search_visual#/process_list/' + hostname + '/' + category + '/' + click_date_str + '/0';
                 //console.log(url);
                 window.open(url, "_blank");
             });
+
         });
     })
 
@@ -350,123 +269,24 @@ uiModules
             this.hostname = $route.current.params.hostname;
             this.date = $route.current.params.date;
             var items = [];
-            for (var index in response.data) {
-                var item = response.data[index];
-                // console.log( item );
-                var g1 = {
-                    "type": "create_process",
-                    "value": item.result.create_process
-                };
-                var g2 = {
-                    "type": "create_file",
-                    "value": item.result.create_file
-                };
-                var g3 = {
-                    "type": "registory",
-                    "value": item.result.registory
-                };
-                var g4 = {
-                    "type": "net",
-                    "value": item.result.net
-                };
-                var g5 = {
-                    "type": "remote_thread",
-                    "value": item.result.remote_thread
-                };
-                var g6 = {
-                    "type": "file_create_time",
-                    "value": item.result.file_create_time
-                };
-                var g7 = {
-                    "type": "image_loaded",
-                    "value": item.result.image_loaded
-                };
-                var g8 = {
-                    "type": "wmi",
-                    "value": item.result.wmi
-                };
-                var g9 = {
-                    "type": "other",
-                    "value": item.result.other
-                };
-                items.push(g1);
-                items.push(g2);
-                items.push(g3);
-                items.push(g4);
-                items.push(g5);
-                items.push(g6);
-                items.push(g7);
-                items.push(g8);
-                items.push(g9);
+            var item = response.data["count"];
+            for (let [key, value] of Object.entries(item)) {
+              items.push({
+                "type":key,
+                "value":value,
+              });
             }
-
-            if (response.data.length == 0) {
-                var g1 = {
-                    "type": "create_process",
-                    "value": 0
-                };
-                var g2 = {
-                    "type": "create_file",
-                    "value": 0
-                };
-                var g3 = {
-                    "type": "registory",
-                    "value": 0
-                };
-                var g4 = {
-                    "type": "net",
-                    "value": 0
-                };
-                var g5 = {
-                    "type": "remote_thread",
-                    "value": 0
-                };
-                var g6 = {
-                    "type": "file_create_time",
-                    "value": 0
-                };
-                var g7 = {
-                    "type": "image_loaded",
-                    "value": 0
-                };
-                var g8 = {
-                    "type": "wmi",
-                    "value": 0
-                };
-                var g9 = {
-                    "type": "other",
-                    "value": 0
-                };
-                items.push(g1);
-                items.push(g2);
-                items.push(g3);
-                items.push(g4);
-                items.push(g5);
-                items.push(g6);
-                items.push(g7);
-                items.push(g8);
-                items.push(g9);
-            }
-
             this.data = items;
-            if (item && item.result) {
+            //if (item && item.result) {
+            if (item) {
                 // if create_process, show correlation link
-                if (item.result.create_process != 0) {
+                //if (item.result.create_process != 0) {
+                if (item["create_process"] != 0) {
                     this.btnflg = true;
                 } else {
                     this.btnflg = false;
                 }
-                var freqData = {
-                    "create_process": item.result.create_process,
-                    "create_file": item.result.create_file,
-                    "registory": item.result.registory,
-                    "net": item.result.net,
-                    "remote_thread": item.result.remote_thread,
-                    "file_create_time": item.result.file_create_time,
-                    "image_loaded": item.result.image_loaded,
-                    "wmi": item.result.wmi,
-                    "other": item.result.other
-                };
+                var freqData = item;
                 pie_chart('#piechart', freqData, true, 300);
             }
         });
@@ -481,13 +301,13 @@ uiModules
         var url = '../api/sysmon-search-plugin/process_list/' + params.hostname + '/' + params.eventtype + '/' + params.date;
         var localdata;
         $http.get(url).then((response) => {
-            this.hostname = $route.current.params.hostname;
+            this.hostname = params.hostname;
 
-            if ($route.current.params.date.length === 23) {
-                var range_datetime = get_range_datetime($route.current.params.date);
+            if (params.date.length === 23) {
+                var range_datetime = get_range_datetime(params.date);
                 this.date = range_datetime["start_date"] + "～" + range_datetime["end_date"];
             } else {
-                this.date = $route.current.params.date;
+                this.date = params.date;
             }
 
             this.data = response.data;
@@ -845,14 +665,13 @@ uiModules
         // Set Language Data
         $scope.lang = gLangData;
 
-        var url = '../api/sysmon-search-plugin/process_overview/' + $route.current.params.hostname + '/' + $route.current.params.date + '/' + $route.current.params.guid;
-        console.log(url);
+        var params = $route.current.params;
+        var url = '../api/sysmon-search-plugin/process_overview/' + params.hostname + '/' + params.date + '/' + params.guid;
 
         var localdata;
-
         $http.get(url).then((response) => {
-            this.hostname = $route.current.params.hostname;
-            this.date = $route.current.params.date;
+            this.hostname = params.hostname;
+            this.date = params.date;
             var top = response.data;
             localdata = response.data;
             if(top && top != ""){
@@ -2168,10 +1987,12 @@ function pie_chart(id, fData, legFlg, r) {
             return d.type;
         });
 
+        /*
         tr.append("td").attr("class", 'legendFreq')
             .text(function(d) {
                 return d3.format(",")(d.freq);
             });
+        */
 
         tr.append("td").attr("class", 'legendPerc')
             .text(function(d) {

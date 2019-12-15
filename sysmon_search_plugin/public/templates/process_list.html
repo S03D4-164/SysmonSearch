@@ -62,6 +62,7 @@
 <table class="table">
   <thead>
     <tr>
+      <th>record_id</th>
       <th>{{ lang["PROCESS_TABLE_DATE"] }}</th>
       <th>{{ lang["PROCESS_TABLE_TYPE"] }}</th>
       <th>{{ lang["PROCESS_TABLE_SOURCE"] }}</th>
@@ -70,6 +71,7 @@
   </thead>
   <tbody>
     <tr ng-repeat="day_data in ctrl.data" class="{{ ctrl.isTarget(day_data._id) ? 'emphasis' : ''}}">
+      <td title="number" >{{day_data.number}}</td>
       <td title="{{lang.DATA_NAME_UTCTIME}}" >{{day_data.date}}</td>
       <td title="{{lang.DATA_NAME_EVENTTYPE}}" >{{day_data.type}}</td>
       <td title="{{lang.DATA_NAME_PROCESS}}" >{{day_data.process}}</td>

@@ -1,5 +1,5 @@
 var Utils = {
-    eventid_to_decription: function(event_id) {
+    eventid_to_type: function(event_id) {
         var result = "";
         switch (event_id) {
             case 1:
@@ -10,10 +10,11 @@ var Utils = {
                 break;
             case 12:
             case 13:
-                result = "registory";
+            case 14:
+                result = "registry";
                 break;
             case 3:
-                result = "net";
+                result = "net_access";
                 break;
             case 8:
                 result = "remote_thread";
