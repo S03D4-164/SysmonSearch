@@ -1261,7 +1261,7 @@ uiModules
         var data = {};
         data.query = getDateQuery($scope.period);
         this.event_id = '▼';
-        data.sort_item = 'winlog.event_id';
+        data.sort_item = 'event_id';
         data.sort_order = 'asc';
         search(data);
 

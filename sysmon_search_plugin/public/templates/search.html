@@ -128,12 +128,12 @@ table.noBorder_tbl th {
     <table class="table">
       <thead>
         <tr>
-            <th><a ng-click="ctrl.sort('event_data.UtcTime.keyword')">UtcTime{{ctrl.utc_time}}</a></th>
-            <th><a ng-click="ctrl.sort('event_id')">EventId{{ctrl.event_id}}</a></th>
-            <th><a ng-click="ctrl.sort('level.keyword')">Level{{ctrl.level}}</a></th>
-            <th><a ng-click="ctrl.sort('computer_name.keyword')">Computer{{ctrl.computer_name}}</a></th>
-            <th><a ng-click="ctrl.sort('event_data.User.keyword')">UserName{{ctrl.user_name}}</a></th>
-            <th><a ng-click="ctrl.sort('event_data.Image.keyword')">Image{{ctrl.image}}</a></th>
+            <th><a ng-click="ctrl.sort('winlog.event_data.UtcTime')">UtcTime{{ctrl.utc_time}}</a></th>
+            <th><a ng-click="ctrl.sort('winlog.event_id')">EventId{{ctrl.event_id}}</a></th>
+            <th><a ng-click="ctrl.sort('log.level')">Level{{ctrl.level}}</a></th>
+            <th><a ng-click="ctrl.sort('winlog.computer_name')">Computer{{ctrl.computer_name}}</a></th>
+            <th><a ng-click="ctrl.sort('winlog.event_data.User')">UserName{{ctrl.user_name}}</a></th>
+            <th><a ng-click="ctrl.sort('winlog.event_data.Image')">Image{{ctrl.image}}</a></th>
         </tr>
       </thead>
       <tbody>

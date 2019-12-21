@@ -1,6 +1,5 @@
 const util = require('util');
 const sprintf = require('sprintf-js').sprintf;
-const fs = require('fs').promises;
 const path = require('path');
 
 const CONFIG_PATH = '../../../conf.js';
@@ -42,6 +41,7 @@ const saveAlert = function (params) {
   var fullpath = create_fullpath(config.savepath, filename);
   console.log(fullpath);
   try {
+    const fs = require('fs');
     fs.writeFileSync(fullpath, JSON.stringify(params, null, 2));
     console.log("#---------- save search criteria/success ----------");
     var res = {
@@ -61,8 +61,8 @@ const getAlert = async function (params) {
   var conf_dir = path.join(__dirname, path.dirname(CONFIG_PATH));
   var savepath = config.savepath;
   if (!path.isAbsolute(savepath)) savepath = path.join(conf_dir, savepath);
-     
   console.log(`savepath: ${savepath}`);
+  const fs = require('fs').promises;
   const result = await fs.readdir(savepath, async function(err, files){
     if (err){
       console.error("#---------- Acquisition of file list failed ----------");
@@ -84,6 +84,7 @@ const deleteAlert = function (params) {
   const basename = path.basename(params.filename);
   const filepath = create_fullpath(config.savepath, basename);
 
+  const fs = require('fs');
   const result = fs.unlink(filepath, function(err, files){
     if (err){
       console.error("#---------- Failed to delete rule file ----------");
