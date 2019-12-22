@@ -1,6 +1,6 @@
 const request = require('request-promise');
-const CONFIG_PATH = '../../conf.js';
-import {conf as config} from '../../conf.js';
+const CONFIG_PATH = '../../../conf.js';
+import {conf as config} from '../../../conf.js';
 const util = require('util');
 const sprintf = require('sprintf-js').sprintf;
 

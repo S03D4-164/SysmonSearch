@@ -99,8 +99,6 @@ export default function (server) {
     }
   });
 
-/*
-
   // correlation
   server.route({
     path: '/api/sysmon-search-plugin/process/{host}/{date}',
@@ -136,7 +134,7 @@ export default function (server) {
       return result;
     }
   });
-
+/*
   server.route({
     path: '/api/sysmon-search-plugin/process_detail/{host}/{date}/{guid}',
     method: 'GET',
@@ -145,11 +143,10 @@ export default function (server) {
       console.log("process detail params: " + JSON.stringify(params));
       const result = await sysmon_search_obj.process_detail(params.host, params.date, params.guid);
       console.log("process detail result: " + JSON.stringify(result));
-      return result;
-
-      
+      return result;    
     }
   });
+*/
 
   server.route({
     path: '/api/sysmon-search-plugin/dashboard',
@@ -158,14 +155,13 @@ export default function (server) {
       var params = req.payload;
       console.log("dashboard params: " + JSON.stringify(params));
       const dashboard = require('./search/dashboard');
-      const result = await dashboard(client, params);
+      const result = await dashboard(sysmon_search, params);
       //const result = await sysmon_search_obj.dashboard(params);
       console.log("dashboard result: " + JSON.stringify(result));
       return result;
     }
   });
 
-*/
   server.route({
     path: '/api/sysmon-search-plugin/sm_search',
     method: 'POST',

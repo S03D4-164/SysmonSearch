@@ -36,10 +36,17 @@ async function alertData(sysmon, data) {
         }
       }
     },
-    //"sort": sort,
-    //"_source": [
-    //  "record_number", "event_id", "level", "event_record_id", "computer_name", "user", "event_data", "@timestamp", "rule", "original_id"
-    //]
+    "sort": sort,
+    "_source": [
+      "record_number",
+      "event_id",
+      "level",
+      "computer_name",
+      "event_data",
+      "@timestamp",
+      "rule",
+      "original_id"
+    ]
   };
 
   //const el_result = this.search_alert(searchObj);
@@ -49,7 +56,9 @@ async function alertData(sysmon, data) {
     // size: 1000,
     body: searchObj
   });
-  console.log(JSON.stringify(searchObj) + " => " + JSON.stringify(el_result));
+  //console.log(JSON.stringify(searchObj) + " => " + JSON.stringify(el_result));
+  console.log(JSON.stringify(searchObj));
+
   var results = [];
   var results_count = 0;
   var unique_hosts = [];
@@ -72,7 +81,7 @@ async function alertData(sysmon, data) {
           "date": hit["@timestamp"],
           "rule": hit.rule,
           "process_guid": hit.event_data.ProcessGuid,
-          "decription": description,
+          "description": description,
           "rule_name": hit.rule[0].file_name,
           "_id" : hit.original_id
         };

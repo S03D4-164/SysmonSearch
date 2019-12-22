@@ -95,7 +95,7 @@ body, html {
 <table class="table">
       <thead>
         <tr>
-            <th>Rule Name</th>
+            <th></th>
             <th>{{ lang["RESULTBOX_NUMBER_OF_RECORDS"] }}</th>
             <th>{{ lang["RESULTBOX_UNIQUE_HOSTS"] }}</th>
         </tr>
@@ -113,7 +113,7 @@ body, html {
 <div class="resultButton">result</div>
     <table class="table resultTable">
       <thead>
-        <tr><!-- sort sysmon-search-alert -->>
+        <tr><!-- sort sysmon-search-alert -->
             <th><a ng-click="ctrl.sort(period, keywords, 'event_data.UtcTime.keyword')">UtcTime{{ctrl.utc_time}}</a></th>
             <th><a ng-click="ctrl.sort(period, keywords, 'event_id')">EventId{{ctrl.event_id}}</a></th>
             <th><a ng-click="ctrl.sort(period, keywords, 'level.keyword')">Level{{ctrl.level}}</a></th>

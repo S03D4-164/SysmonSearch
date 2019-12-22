@@ -9,6 +9,11 @@ from datetime import datetime
 from elasticsearch import Elasticsearch
 from elasticsearch import helpers
 
+import yaml
+fields = {}
+with open('../winlogbeat.yml') as file:
+    yml = yaml.safe_load(file)
+    fields = yml["fieldmappings"]
 
 def check_date(date):
     try:
@@ -20,9 +25,8 @@ def check_date(date):
 def search(client, index_name_org, get_size, search_after):
     print("### SEARCH index=[%s] size=[%d] search_after=[%s]" % (index_name_org, get_size, search_after))
     sys.stdout.flush()
-    query = {
-        "_source": {
-            "includes": [
+    """
+    source = [
                 "@timestamp",
                 "winlog.event_id",
                 "log.level",
@@ -32,7 +36,20 @@ def search(client, index_name_org, get_size, search_after):
                 "winlog.event_data.Image",
                 "winlog.event_data.EventType"
             ]
-        },
+    """
+    source = [
+                "@timestamp",
+                fields["EventID"],
+                "log.level",
+                fields["DestinationIp"],
+                fields["DestinationIsIpv6"],
+                fields["DestinationPort"],
+                fields["Image"],
+                fields["EventType"]
+            ]
+    print(source)
+    query = {
+        #"_source": {"includes": source},
         "size": get_size,
         "query": {
             "match_all": {}
@@ -107,33 +124,36 @@ def registration(response, index_name_new, date_utc_str):
 #            continue
 
     #     obj = hit.to_dict()
-        obj= hit["_source"]
-        #print(obj)
-        try :
+        #try :
+        if hit:
+            obj = hit["_source"]
+            winlog = obj["winlog"]
+            data = winlog["event_data"]
+
             exclude_flg = False
 
             if obj['winlog']['event_id'] not in [1, 3, 12, 13]:
                 exclude_flg= True
 
             #if exclude_flg == False and obj.has_key("event_data"):
-            if exclude_flg == False and "event_data" in obj:
-              if obj['event_data'].has_key("DestinationIp"):
+            if exclude_flg == False and "event_data" in obj['winlog']:
+              if obj['winlog']['event_data'].has_key("DestinationIp"):
                 for value in setting.EXCLUDED_IPADDRESS:
-                    if obj['event_data']['DestinationIp'].startswith(value):
+                    if obj['winlog']['event_data']['DestinationIp'].startswith(value):
                         exclude_flg= True
 
             #if exclude_flg == False and obj.has_key("event_data") and obj['event_data'].has_key("DestinationIpv6"):
-            if exclude_flg == False and "event_data" in obj:
-              if obj['event_data'].has_key("DestinationIpv6"):
+            if exclude_flg == False and "event_data" in obj['winlog']:
+              if obj['winlog']['event_data'].has_key("DestinationIpv6"):
                 for value in setting.EXCLUDED_IPADDRESS:
-                    if obj['event_data']['DestinationIpv6'].startswith(value):
+                    if obj['winlog']['event_data']['DestinationIpv6'].startswith(value):
                         exclude_flg= True
 
             #if exclude_flg == False and obj.has_key("event_data") and obj['event_data'].has_key("Image"):
-            if exclude_flg == False and "event_data" in obj:
-              if obj['event_data'].has_key("Image"):
+            if exclude_flg == False and "event_data" in obj['winlog']:
+              if obj['winlog']['event_data'].has_key("Image"):
                 for value in setting.EXCLUDED_PROCESS:
-                    if obj['event_data']['Image'].startswith(value):
+                    if obj['winlog']['event_data']['Image'].startswith(value):
                         exclude_flg= True
 
             if exclude_flg:
@@ -149,24 +169,35 @@ def registration(response, index_name_new, date_utc_str):
             #if obj.has_key("@timestamp"): new_obj['@timestamp'] = obj['@timestamp']
             if "@timestamp" in obj: new_obj['@timestamp'] = obj['@timestamp']
             #if obj.has_key("event_data"):
-            if "event_data" in obj:
+            if "event_data" in obj["winlog"]:
                 #if obj['event_data'].has_key("DestinationIp"): new_obj['statistics_data']['DestinationIp'] = obj['event_data']['DestinationIp']
-                if "DestinationIp" in obj['event_data']: new_obj['statistics_data']['DestinationIp'] = obj['event_data']['DestinationIp']
-                if "DestinatinoPort" in obj['event_data']: new_obj['statistics_data']['DestinationPort'] = obj['event_data']['DestinationPort']
-                if "Image" in obj['event_data']: new_obj['statistics_data']['Image'] = obj['event_data']['Image']
-                if "EventType" in obj['event_data']: new_obj['statistics_data']['EventType'] = obj['event_data']['EventType']
-            if "event_id" in obj: new_obj['statistics_data']['event_id'] = obj['event_id']
-            if "level" in obj: new_obj['statistics_data']['level'] = obj['level']
-
+                if "DestinationIp" in data:
+                    new_obj['statistics_data']['DestinationIp'] = data["DestinationIp"]
+                if "DestinationPort" in data:
+                    new_obj['statistics_data']['DestinationPort'] = data['DestinationPort']
+                if "Image" in data: 
+                    new_obj['statistics_data']['Image'] = data['Image']
+                if "EventType" in data:
+                    new_obj['statistics_data']['EventType'] = data['EventType']
+            if "event_id" in winlog:
+                new_obj['statistics_data']['event_id'] = winlog['event_id']
+            if "level" in obj["log"]:
+                new_obj['statistics_data']['level'] = obj['log']['level']
 #             client.index( index=index_name_new, doc_type="wineventlog", body=new_obj )
-            actions.append({'_id': new_obj['original_id'], '_index': index_name_new, '_type': 'doc', '_source': new_obj})
+            print(winlog)
+            print(new_obj)
+            actions.append({
+                '_id': new_obj['original_id'],
+                '_index': index_name_new,
+                '_type': 'doc',
+                '_source': new_obj
+                })
 
-        except Exception as e:
-            print("failed in the save of data. index=[%s] data=[%s] message=[%s]" % (index_name_new, json.dumps(new_obj), e.message))
-            sys.exit(1)
+        #except Exception as e:
+        #    print("failed in the save of data. index=[%s] data=[%s] message=[%s]" % (index_name_new, json.dumps(new_obj), e.message))
+        #    sys.exit(1)
 
     helpers.bulk(client, actions)
-
 
 print("##### collection statistical data START #####")
 sys.stdout.flush()
@@ -188,7 +219,6 @@ sys.stdout.flush()
 #client = Elasticsearch([setting.ELASTICSEARCH_SERVER],http_auth=('elastic','changeme'),port=9200);
 client = Elasticsearch([setting.ELASTICSEARCH_SERVER],port=9200);
 
-
 date_utc_str = datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%fZ")
 
 index_name_org = setting.INDEX_NAME_ORG + "-" + date_str + "-*"
@@ -201,7 +231,8 @@ if client.indices.exists(index=index_name_org):
     sys.stdout.flush()
     client.indices.create(index=index_name_new, ignore=400)
 
-    try :
+    #try :
+    if index_name_org:
         print("### GET TOTAL SIZE [%s]" % (index_name_org))
         start = time.time()
         sys.stdout.flush()
@@ -245,8 +276,9 @@ if client.indices.exists(index=index_name_org):
         print("### TOTAL SIZE SEC [%d]" % (get_total_size_time))
         print("### SEARCH TOTAL SEC [%d] AVE(%f)" % (search_time, float(search_time)/float(i+1)))
         print("### REGIST TOTAL SEC [%d] AVE(%f)" % (regist_time, float(regist_time)/float(i+1)))
-    except Exception as e:
-        print("failed in the search of data. index=[%s] message=[%s]" % (index_name_org, e.message))
-        sys.exit(1)
+
+    #except Exception as e:
+    #    print("failed in the search of data. index=[%s] message=[%s]" % (index_name_org, e.message))
+    #    sys.exit(1)
 
 print("##### collection statistical data END #####")
