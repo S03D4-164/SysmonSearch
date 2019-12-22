@@ -33,13 +33,16 @@
     cursor: pointer;
 	}
   </style>
-    <script src="../plugins/sysmon_search_visual/dist/d3.v3.min.js"> </script>
+
+  <script src="../plugins/sysmon_search_visual/dist/d3.v3.min.js"> </script>
 </head>
+
 <body>
+
 <div ng-cloak>
-<div id="header">
-<h1 class="h1_logo">SysmonSearch</h1>
-</div>
+
+<div id="header"><h1 class="h1_logo">SysmonSearch</h1></div>
+
 <div class="global_Nav">
 <ul id="menu" class="clearfix">
   <li>
@@ -55,13 +58,15 @@
     <a href="sysmon_search_visual#/">{{ lang["TAB_EVENT_LIST"] }}</a>
   </li>
 </ul>
-</div>
+</div><!--/global_Nav-->
+
 <div class="main">
 <h2>{{ lang["PCR_H2"] }}</h2>
 <h2>{{ lang["TARGET_HOSTNAME"] }}:{{ctrl.hostname}}</h2>
 <h2>{{ lang["TARGET_DATE"] }}:{{ctrl.date}}</h2>
 
 <div class="search_Box">
+
 <div class="search_Box_Ttl">
 <img src="../plugins/sysmon_search_visual/images/search_icon.png" alt="{{lang.ALT_SEARCHICON}}" width="21" height="20" />
 <label>{{ lang["SEARCHBOX_SEARCH"] }}:</label>
@@ -89,23 +94,25 @@
     </tr>
   </tbody>
 </table>
-
-
 <label>
   <input name="keyword" ng-model="keyword" type="text" placeholder="{{lang.SEARCHBOX_PLACEHOLDER_KEYWORD}}" class="search_keyword" ng-keyup="$event.keyCode == 13 ? ctrl.onkeyup(keyword,hash) : null">
 </label>
 <label>
   <input name="hash" ng-model="hash" type="text" placeholder="{{lang.SEARCHBOX_PLACEHOLDER_HASH}}" class="search_hash" ng-keyup="$event.keyCode == 13 ? ctrl.onkeyup(keyword,hash) : null">
 </label>
-</div>
-</div>
+</div><!--/search_Box_main-->
+</div><!--/search_Box-->
+
 <div class="message">{{ctrl.message}}</div>
+
 <div id="mynetwork"></div>
-<div class="vis-network" style="position: relative; overflow: hidden; touch-action: pan-y; -moz-user-select: none; width: 100%; height: 100%;" tabindex="900">
-</div>
+
+<div class="vis-network" style="position: relative; overflow: hidden; touch-action: pan-y; -moz-user-select: none; width: 100%; height: 100%;" tabindex="900"></div>
+
 <p><textarea rows="10" cols="100" id="text" class="detail" readonly placeholder="{{lang.TEXTAREA_PLACEHOLDER}}">
 </textarea></p>
-</div>
-</div>
+
+</div><!--/main-->
+</div><!--ng-cloak-->
 </body>
 </html>

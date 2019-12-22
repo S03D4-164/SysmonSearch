@@ -17,6 +17,7 @@ async function processList(sysmon, hostname, eventtype, date, searchObj) {
   host[sysmon.computer_name] = hostname;
   var event_id = {};
   var source = [
+    "@timestamp",
     sysmon.map["RecordID"],
     sysmon.map["EventData"],
     sysmon.map["EventID"]
@@ -25,66 +26,60 @@ async function processList(sysmon, hostname, eventtype, date, searchObj) {
     if (date.length === 23) {
       event_id[sysmon.event_id] = [1, 11, 12, 13, 3, 8, 2, 7, 19, 20, 21];
       var date_dict = Utils.get_range_datetime(date);
-      var query = {"bool": {
-          "must": [{
-            "match": host
-            //{"winlog.computer_name": hostname,}
-          },{
-            "match": sysmon.channel
-            //{"winlog.channel": "Microsoft-Windows-Sysmon/Operational",}
-          },{
-            "terms": event_id
-            //{"winlog.event_id": [1, 11, 12, 13, 3, 8, 2, 7, 19, 20, 21],}
-          },{
-            "range": {"@timestamp": {
-              "gte": date_dict["start_date"], "lte": date_dict["end_date"]
-            }}
-          }]
+      var query = {
+        "bool": {
+          "must": [
+            {"match": host},
+            {"match": sysmon.channel},
+            {
+              "terms": event_id
+              //{"winlog.event_id": [1, 11, 12, 13, 3, 8, 2, 7, 19, 20, 21],}
+            },{
+              "range": {
+                "@timestamp": {
+                  "gte": date_dict["start_date"], 
+                  "lte": date_dict["end_date"]
+                }
+              }
+            }
+          ]
         }
       };
       searchObj = {
         "size": 10000,
         "query": query,
         "sort": [{"@timestamp": "asc"}],
-        //"_source": ["record_number", "event_data", "event_id"]
         "_source": source
       };
-    } else {
+    } else if(eventtype){
       //const event_id = await getEventIdFromType(eventtype);
+      // pass eventid is better?
       event_id[sysmon.event_id] = await getEventIdFromType(eventtype);
-      var query = {"bool": {
-          "must": [{
-            "match": host
-            //{"winlog.computer_name": hostname,}
-           },{
-            "match": sysmon.channel
-            //{"winlog.channel": "Microsoft-Windows-Sysmon/Operational",}
-           },{
-            //"terms": {"event.code": event_id,}
-            "terms": event_id
-            //{"winlog.event_id": event_id,}
-           },{
-            "match": {"@timestamp": date}
-           }]
+      var query = {
+        "bool": {
+          "must": [
+            {"match": host},
+            {"match": sysmon.channel},
+            {"terms": event_id},
+            {"match": {"@timestamp": date}}
+          ]
         }
       }
       searchObj = {
         "size": 10000,
         "query": query,
         "sort": [{"@timestamp": "asc"}],
-        //"_source": ["record_number", "event_data", "event_id"]
         "_source": source,
       };
     }
   }
 
-  console.log("search: " + JSON.stringify(searchObj));
   const el_result = await sysmon.client.search({
     index: sysmon.index,
-    //'winlogbeat-*',
     //size: 1000,
     body: searchObj
   });
+  console.log("process list search: " + JSON.stringify(searchObj));
   //console.log("el_result: " + JSON.stringify(el_result))
   if (el_result) {
     var hits = el_result.hits.hits;
@@ -94,11 +89,11 @@ async function processList(sysmon, hostname, eventtype, date, searchObj) {
     for (var index in hits) {
       var hit = hits[index]._source;
       //console.log("hit: " + JSON.stringify(hit));
-      let data = hit.winlog.event_data;
+      let winlog = hit.winlog;
+      let data = winlog.event_data;
       // results.push( hit );
       var tmp = {
-        //"number": hit.record_number,
-        "number": hit.winlog.record_id,
+        "number": winlog.record_id,
         "image": data.Image,
         "guid": data.ProcessGuid,
         "date": data.UtcTime,
@@ -106,7 +101,7 @@ async function processList(sysmon, hostname, eventtype, date, searchObj) {
       };
       // results.push(hit.event_data);
       //tmp['type'] = Utils.eventid_to_decription(hit.winlog.event_id);
-      tmp['type'] = Utils.eventid_to_type(hit.winlog.event_id);
+      tmp['type'] = Utils.eventid_to_type(winlog.event_id);
       //console.log(tmp);
       switch (tmp['type']) {
         case 'create_process':
@@ -194,7 +189,7 @@ async function processList(sysmon, hostname, eventtype, date, searchObj) {
     }
 
     // console.log( JSON.stringify(root, null, '\t') );
-    //console.log("process_list results: " + JSON.stringify(results))
+    console.log("[process list results] " + JSON.stringify(results))
     return results;
   }
   return;
