@@ -17,7 +17,7 @@ import './css/common.css';
 //import './dist/d3.v3.min.js';
 import './dist/visual.css';
 import './dist/jquery-3.3.1.min.js';
-import create_network from './js/network';
+//import create_network from './js/network';
 
 // -------------------------------------------------------
 
@@ -401,7 +401,7 @@ uiModules
         });
 
         //function create_network(tops, keyword, hash, firstflg) {
-        function old_create_network(tops, keyword, hash, firstflg) {
+        function create_network(tops, keyword, hash, firstflg) {
             function sub_create_network(top, keyword, hash) {
                 function add_child_info(cur) {
                     function splitByLength(str, length) {
@@ -592,7 +592,7 @@ uiModules
                                 }
                             }
                             $("#text").val(str);
-                            alert(alert_str);
+                            //alert(alert_str);
                         }
                     }
                 });
@@ -670,6 +670,7 @@ uiModules
         $http.get(url).then((response) => {
             this.hostname = params.hostname;
             this.date = params.date;
+            this.guid = params.guid;
             var top = response.data;
             localdata = response.data;
             if(top && top != ""){
@@ -1121,7 +1122,7 @@ uiModules
                             }
                         }
                         $("#text").val(str);
-                        alert(alert_str);
+                        //alert(alert_str);
                     }
                 }
             });
@@ -1135,7 +1136,9 @@ uiModules
                     if(node._id != null){
                         _id = node._id;
                     }
-                    var url = 'sysmon_search_visual#/process_detail/' + $route.current.params.hostname + '/' + $route.current.params.date + '/' + node.guid + '/' + _id;
+                    var params = $route.current.params;
+                    //var url = 'sysmon_search_visual#/process_detail/' + $route.current.params.hostname + '/' + $route.current.params.date + '/' + node.guid + '/' + _id;
+                    var url = 'sysmon_search_visual#/process_detail/' + params.hostname + '/' + params.date + '/' + node.guid + '/' + _id;
                     window.open(url, "_blank");
                 }
             });
@@ -1916,8 +1919,6 @@ uiModules
             data.query = getDateQuery($scope.period);
             make_chart(data);
         };
-
-
 
     })
 

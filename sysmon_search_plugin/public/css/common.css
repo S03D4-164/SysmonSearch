@@ -146,7 +146,7 @@ body, html {
 	-o-border-radius: 4px;/* for opera */
 }
 .search_Box {
-	width: 100%;
+	/*width: 100%;*/
 	margin-bottom: 30px;
 }
 .search_Box_Ttl {
