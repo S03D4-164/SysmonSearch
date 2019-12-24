@@ -8,21 +8,15 @@ async function events(sysmon, hostname, date) {
     }
   }
   var host = {};
-  var computer = sysmon.map["ComputerName"];
-  host[computer] = hostname;
+  //var computer = sysmon.map["ComputerName"];
+  host[sysmon.computer_name] = hostname;
   var searchObj = {
     "size": 0,
     "query": {
       "bool": {
         "must": [
-          {
-            "match": host
-            //{"winlog.computer_name": hostname}
-          },
-          {
-            //"match": {"winlog.channel": "Microsoft-Windows-Sysmon/Operational"}
-            "match": sysmon.channel
-          },
+          {"match": host},
+          {"match": sysmon.channel},
           timestamp
         ]
       }
@@ -37,8 +31,8 @@ async function events(sysmon, hostname, date) {
          "aggs": {
            "event_id": {
              "terms": {
-               //"field": "winlog.event_id",
-               "field": sysmon.map["EventID"],
+               //"field": sysmon.map["EventID"],
+               "field": sysmon.event_id,
                "size" : 100000
              }
            }
@@ -48,8 +42,7 @@ async function events(sysmon, hostname, date) {
   };
 
   const el_result = await sysmon.client.search({
-    //index: 'winlogbeat-*',
-    index: sysmon.map["defaultindex"],
+    index: sysmon.index,
     // size: 1000,
     body: searchObj
   });

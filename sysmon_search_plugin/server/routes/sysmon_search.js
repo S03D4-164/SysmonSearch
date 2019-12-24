@@ -3,13 +3,6 @@ import elasticsearch from 'elasticsearch';
 const yaml = require('js-yaml');
 const fs   = require('fs');
 
-/*
-const client = new elasticsearch.Client({
-  //log: 'trace',
-  host: conf.elasticsearch_url + ':' + conf.elasticsearch_port
-});
-*/
-
 class SysmonSearch {
   constructor(host, port) {
     this.client = new elasticsearch.Client({
@@ -31,9 +24,6 @@ class SysmonSearch {
 var sysmon_search = new SysmonSearch(conf.elasticsearch_url, conf.elasticsearch_port);
 
 export default function (server) {
-
-  //const Sysmon_Search_Logic = require('./Sysmon_Search_Logic');
-  //var sysmon_search_obj = new Sysmon_Search_Logic(conf.elasticsearch_url, conf.elasticsearch_port);
 
   // Event List
   server.route({
@@ -130,23 +120,24 @@ export default function (server) {
       const searchProcessOverview = require('./search/process_overview');
       const result = await searchProcessOverview(sysmon_search, params.host, params.date, params.guid);
       //const result = await sysmon_search_obj.process_overview(params.host, params.date, params.guid);
-      console.log("process overview result: " + JSON.stringify(result));
+      console.log("process overview result: " + JSON.stringify(result, null, 2));
       return result;
     }
   });
-/*
+
   server.route({
     path: '/api/sysmon-search-plugin/process_detail/{host}/{date}/{guid}',
     method: 'GET',
     async handler(req) {
       var params = req.params;
       console.log("process detail params: " + JSON.stringify(params));
-      const result = await sysmon_search_obj.process_detail(params.host, params.date, params.guid);
+      const searchProcessDetail = require('./search/process_detail');
+      const result = await searchProcessDetail(sysmon_search, params.host, params.date, params.guid);
+      //const result = await sysmon_search_obj.process_detail(params.host, params.date, params.guid);
       console.log("process detail result: " + JSON.stringify(result));
       return result;    
     }
   });
-*/
 
   server.route({
     path: '/api/sysmon-search-plugin/dashboard',
