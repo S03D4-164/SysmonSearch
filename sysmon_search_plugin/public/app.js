@@ -266,8 +266,8 @@ uiModules
         var params = $route.current.params;
         var url = '../api/sysmon-search-plugin/event/' + params.hostname + '/' + params.date;
         $http.get(url).then((response) => {
-            this.hostname = $route.current.params.hostname;
-            this.date = $route.current.params.date;
+            this.hostname = params.hostname;
+            this.date = params.date;
             var items = [];
             var item = response.data["count"];
             for (let [key, value] of Object.entries(item)) {
@@ -279,13 +279,9 @@ uiModules
             this.data = items;
             //if (item && item.result) {
             if (item) {
-                // if create_process, show correlation link
-                //if (item.result.create_process != 0) {
-                if (item["create_process"] != 0) {
-                    this.btnflg = true;
-                } else {
-                    this.btnflg = false;
-                }
+                // if create_process exists, show correlation link
+                if (item["create_process"] != 0) this.btnflg = true;
+                else  this.btnflg = false;
                 var freqData = item;
                 pie_chart('#piechart', freqData, true, 300);
             }
@@ -1922,13 +1918,16 @@ uiModules
 
     })
 
-function crear_graph(id) {
-    d3.select(id).selectAll("svg").remove();
-    d3.select(id).selectAll("table").remove();
-}
+//function clear_graph(id) {
+//    d3.select(id).selectAll("svg").remove();
+//    d3.select(id).selectAll("table").remove();
+//}
 
 function make_histset(id, desc_data_p, asc_data_p, count, labelkey, valuekey, process_flg, lang) {
-    crear_graph(id);
+    //clear_graph(id);
+    d3.select(id).selectAll("svg").remove();
+    d3.select(id).selectAll("table").remove();
+
     var desc_data = getViewData(desc_data_p,count,labelkey,valuekey);
     var asc_data = getViewData(asc_data_p,count,labelkey,valuekey);
     var max_desc = d3.max(desc_data, function(d) {
@@ -1943,7 +1942,9 @@ function make_histset(id, desc_data_p, asc_data_p, count, labelkey, valuekey, pr
 
 function pie_chart(id, fData, legFlg, r) {
     function segColor(c) {
-        var color = ["#87CEFA", "#FFDEAD", "#7B68EE", "#8FBC8F", "#FF3366", "#33FFFF","#666699","#00FA9A","#FF00FF"];
+        var color = [
+            "#87CEFA", "#FFDEAD", "#7B68EE", "#8FBC8F", "#FF3366", "#33FFFF","#666699","#00FA9A","#FF00FF"
+        ];
         var pointer = c % 9;
         return color[pointer];
     }
@@ -1960,9 +1961,11 @@ function pie_chart(id, fData, legFlg, r) {
             .attr("width", pieDim.w).attr("height", pieDim.h).append("g")
             .attr("transform", "translate(" + pieDim.w / 2 + "," + pieDim.h / 2 + ")");
 
-        var arc = d3.svg.arc().outerRadius(pieDim.r - 10).innerRadius(0);
+        //var arc = d3.svg.arc().outerRadius(pieDim.r - 10).innerRadius(0);
+        var arc = d3.arc().outerRadius(pieDim.r - 10).innerRadius(0);
 
-        var pie = d3.layout.pie().sort(null).value(function(d) {
+        //var pie = d3.layout.pie().sort(null).value(function(d) {
+        var pie = d3.pie().sort(null).value(function(d) {
             return d.freq;
         });
 
@@ -2007,7 +2010,7 @@ function pie_chart(id, fData, legFlg, r) {
             });
 
         function getLegend(d, aD) {
-            return d3.format("%")(d.freq / d3.sum(aD.map(function(v) {
+            return d3.format(".0%")(d.freq / d3.sum(aD.map(function(v) {
                 return v.freq;
             })));
         }
@@ -2025,12 +2028,13 @@ function pie_chart(id, fData, legFlg, r) {
         };
     });
 
-    crear_graph(id);
+    //clear_graph(id);
+    d3.select(id).selectAll("svg").remove();
+    d3.select(id).selectAll("table").remove();
 
     var pC = pieChart(tF);
-    if (legFlg) {
-        var leg = legend(tF);
-    }
+    if (legFlg) var leg = legend(tF);
+
 }
 
 function histoGram(id, fD, max, title, process_flg) {

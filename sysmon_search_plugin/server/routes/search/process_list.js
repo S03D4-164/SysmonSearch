@@ -79,7 +79,7 @@ async function processList(sysmon, hostname, eventtype, date, searchObj) {
     //size: 1000,
     body: searchObj
   });
-  console.log("process list search: " + JSON.stringify(searchObj));
+  console.log("[process list search] " + JSON.stringify(searchObj));
   //console.log("el_result: " + JSON.stringify(el_result))
   if (el_result) {
     var hits = el_result.hits.hits;
@@ -188,7 +188,6 @@ async function processList(sysmon, hostname, eventtype, date, searchObj) {
       results.push(tmp);
     }
 
-    // console.log( JSON.stringify(root, null, '\t') );
     console.log("[process list results] " + JSON.stringify(results))
     return results;
   }

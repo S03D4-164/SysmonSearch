@@ -7,16 +7,20 @@
         body, html {
             font-family: sans-serif;
         }
-
+        table th,td {
+	         padding: 10px;
+      	}
     </style>
-    <script src="../plugins/sysmon_search_visual/dist/d3.v3.min.js"> </script>
-</head>
+    <!--script src="../plugins/sysmon_search_visual/dist/d3.v3.min.js"> </script-->
+    <script src="../plugins/sysmon_search_visual/dist/d3.v5.min.js"> </script>
+
+  </head>
 
 <body>
 <div ng-cloak>
-<div id="header">
+<!--div id="header">
 <h1 class="h1_logo">SysmonSearch</h1>
-</div>
+</div-->
 <div class="global_Nav">
 <ul id="menu" class="clearfix">
   <li>
@@ -34,9 +38,10 @@
 </ul>
 </div>
 
-<h2>{{ lang["EVENTSUMMARY_H2"] }}</h2>
-<h2>{{ lang["TARGET_HOSTNAME"] }}:{{ctrl.hostname}}</h2>
-<h2>{{ lang["TARGET_DATE"] }}:{{ctrl.date}}</h2>
+<table>
+  <tr><th>{{ lang["EVENTSUMMARY_H2"] }}</th><td></td><th>{{ lang["TARGET_HOSTNAME"] }}</th><td>{{ctrl.hostname}}</td><th>{{ lang["TARGET_DATE"] }}</th><td>{{ctrl.date}}</td></tr>
+</table>
+
 <br />
 
 <div style="float:left;" id='piechart'></div>

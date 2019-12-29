@@ -1,12 +1,12 @@
 const process = require('./process');
 
 async function add_process_info(target, info_array) {
-  console.log("[add process info] " + JSON.stringify(target))
+  console.log("[add process info] " + JSON.stringify(target, null, 2))
   if(target){
     if (target.current != null && target.current.guid != null && target.current.guid in info_array) {
       target.current['infos'] = info_array[target.current.guid];
     }
-    console.log("[target child] " + JSON.stringify(target.child))
+    console.log("[target child] " + JSON.stringify(target.child, null, 2))
     for (var index in target.child) {
       var item = target.child[index];
       if(item) target = await add_process_info(item, info_array);
@@ -196,7 +196,7 @@ async function sub_process_infos(sysmon, hostname, date, guid) {
     },
     "sort": [{"@timestamp": "asc"}]
   };
-  console.log("search sub process: " + JSON.stringify(searchObj))
+  console.log("[search sub process] " + JSON.stringify(searchObj))
   const el_result = await sysmon.client.search({
     index: sysmon.index,
     // size: 1000,
@@ -265,7 +265,7 @@ async function process_overview(sysmon, hostname, date, guid) {
     "size": 1000, "query": query, "sort": [{"@timestamp": "asc"}]
   };
   const el_result = await process(sysmon, hostname, date, searchObj);
-  console.log("search process overview: " + JSON.stringify(searchObj));
+  console.log("[search process overview] " + JSON.stringify(searchObj));
 
   //return create_info(proc_result);
 
@@ -282,7 +282,7 @@ async function process_overview(sysmon, hostname, date, guid) {
   // Child Process GUIDS
   guids = await get_guid(target_root, guids);
   console.log("[guids] " + guids)
-  console.log("[target root] " + JSON.stringify(target_root))
+  console.log("[target root] " + JSON.stringify(target_root, null, 2))
 
   const search_result = await sub_process_infos(sysmon, hostname, date, guid);
   const proc_info = await make_process_infos(search_result, target_root);

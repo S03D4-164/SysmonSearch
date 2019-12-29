@@ -5,13 +5,13 @@
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
   <style type="text/css">
-  /*
+  
     #mynetwork {
-      width: 1200px;
-      height: 800px;
+      width: 640px;
+      height: 480px;
       border: 1px solid lightgray;
     }
-    */
+    
 	table th,td {
 	  padding: 10px;
 	}
@@ -63,12 +63,15 @@
 </div><!--/global_Nav-->
 
 <div class="main">
+
+<div style="float:left;width:40%">
+
   <!--
 <h2>{{ lang["PCR_H2"] }}</h2>
 <h2>{{ lang["TARGET_HOSTNAME"] }}:{{ctrl.hostname}}</h2>
 <h2>{{ lang["TARGET_DATE"] }}:{{ctrl.date}}</h2>
   -->
-<div style="float:left;">
+<div >
     <h2>{{ lang["PCR_H2"] }} </h2>
   <table>
     <tr><th>GUID</th><td>{{ctrl.guid}}</td></tr>
@@ -77,7 +80,7 @@
   </table> 
 </div>
 
-<div style="float:left;" class="search_Box">
+<div class="search_Box">
 
 <div class="search_Box_Ttl">
 <img src="../plugins/sysmon_search_visual/images/search_icon.png" alt="{{lang.ALT_SEARCHICON}}" width="21" height="20" />
@@ -94,6 +97,7 @@
       <td>
         <input name="start_date" ng-model="keywords.start_date" type="date" placeholder="{{lang.EVENT_DETECTIONBOX_AFTER}}" ng-keyup="$event.keyCode == 13 ? ctrl.onkeyup(keywords) : null">
       </td>
+    </tr><tr>
       <th>
         <span style="font-weight: bold;">{{ lang["EVENT_DETECTIONBOX_BEFORE"] }}</span>
       </th>
@@ -117,8 +121,7 @@
 
 <div class="message">{{ctrl.message}}</div>
 
-<div style="float:left;">
-    <p><textarea style="width:450px;" rows="10" cols="100" id="text" class="detail" readonly placeholder="{{lang.TEXTAREA_PLACEHOLDER}}">
+    <p><textarea style="width:100%;" rows="10" cols="100" id="text" class="detail" readonly placeholder="{{lang.TEXTAREA_PLACEHOLDER}}">
     </textarea></p>
 </div>
     

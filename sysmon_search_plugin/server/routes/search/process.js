@@ -92,7 +92,7 @@ async function get_datas(process_list) {
     'parent': null,
     'child': []// store root
   };
-  console.log("[system root] " + JSON.stringify(system_root))
+  console.log("[system root] " + JSON.stringify(system_root, null, 2))
   var process_tree = [];
   //process_tree.push(system_root); <- why?
 
@@ -107,7 +107,7 @@ async function get_datas(process_list) {
       'parent': null,
       'child': []
     }
-    console.log("[find root process result] " + JSON.stringify(root))
+    console.log("[find root process result] " + JSON.stringify(root, null, 2))
 
     root = await make_process_tree(root, process_array, p_process_array);
     system_root.child.push( root );
