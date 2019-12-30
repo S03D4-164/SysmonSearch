@@ -15,7 +15,7 @@ async function sm_unique_hosts(sysmon, params) {
       }
     }
   };
-  console.log(uniqueHostObj)
+  console.log("[search unique host] " + JSON.stringify(uniqueHostObj, null, 2))
   const el_result = await sysmon.client.search({
     //index: 'winlogbeat-*',                                                                                           
     index: sysmon.map["defaultindex"],
@@ -23,7 +23,7 @@ async function sm_unique_hosts(sysmon, params) {
     body: uniqueHostObj
   });
 
-  console.log(JSON.stringify(el_result));
+  //console.log(JSON.stringify(el_result));
   if (el_result) {
     var unique_hosts = el_result.aggregations.unique_hosts.buckets;
     return unique_hosts;

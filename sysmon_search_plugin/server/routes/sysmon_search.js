@@ -162,7 +162,7 @@ export default function (server) {
       //const result = await sysmon_search_obj.sm_search(params);
       const smSearch = require('./search/sm_search');
       const result = await smSearch(sysmon_search, params);
-      console.log("sm_search result: " + JSON.stringify(result));
+      //console.log("sm_search result: " + JSON.stringify(result));
       return result;
     }
   });

@@ -1797,7 +1797,8 @@ uiModules
 
                 $http.post('../api/sysmon-search-plugin/sm_search', keywords).then((response) => {
                     this.search_data = response.data.hits;
-                    this.total = response.data.total;
+                    //this.total = response.data.total;
+                    this.total = `${response.data.total.relation} ${response.data.total.value}`;
                     orderMarkSet(this, keywords.sort_item, keywords.sort_order);
                 });
             }

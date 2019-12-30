@@ -2,31 +2,30 @@
 <html>
 <head>
 	<title>Event List</title>
-
-    <style type="text/css">
+    <style>
         body, html {
             font-family: sans-serif;
         }
+        table.noBorder_tbl th,td {
+          padding: 10px;
+        }
+        table.noBorder_tbl th {
+          vertical-align: top;
+        }
+        .conditions_w373 {
+          width: 373px;
+        }
+        .button {
+          margin: 10px
+        }
     </style>
-
-<style>
-table.noBorder_tbl th,td {
-	padding: 10px;
-}
-table.noBorder_tbl th {
-	vertical-align: top;
-}
-.conditions_w373 {
-	width: 373px;
-}
-</style>
-<script src="../plugins/sysmon_search_visual/dist/d3.v3.min.js"> </script>
+    <script src="../plugins/sysmon_search_visual/dist/d3.v3.min.js"> </script>
 </head>
 <body>
 <div ng-cloak>
-<div id="header">
+<!--div id="header">
 <h1 class="h1_logo">SysmonSearch</h1>
-</div>
+</div-->
 <div class="global_Nav">
 <ul id="menu" class="clearfix">
   <li>
@@ -44,12 +43,15 @@ table.noBorder_tbl th {
 </ul>
 </div>
 <div class="main">
-<div class="ttlBox01 clearfix">
+
+<!--div class="ttlBox01 clearfix">
 <h2 class="flt_l">{{ lang["SEARCH_H2"] }}</h2>
-</div>
+</div-->
+
 <div class="detectionBox">
-<div class="db_ttl">{{ lang["SEARCH_CRITERIA_SEARCH_FIELD"] }}</div>
-    <div class="db_main clearfix">
+<!--div class="db_ttl">{{ lang["SEARCH_CRITERIA_SEARCH_FIELD"] }}</div-->
+<div class="db_ttl">Search</div>
+<div class="db_main clearfix">
     <table class="noBorder_tbl flt_l clearfix">
       <tbody>
         <tr>
@@ -96,10 +98,10 @@ table.noBorder_tbl th {
       </tbody>
     </table>
     <div class="flt_r">
-        <div class="button" ng-click="ctrl.import()">{{ lang["SEARCH_CRITERIA_IMPORT_BUTTON"] }}</div>
+        <div class="button flt_l" ng-click="ctrl.search(keywords)">{{ lang["SEARCH_CRITERIA_SEARCH_BUTTON"] }}</div>
+        <div class="button flt_l" ng-click="ctrl.save_rules(keywords)">{{ lang["SEARCH_CRITERIA_SAVE_RULE＿BUTTON1"] }} {{ lang["SEARCH_CRITERIA_SAVE_RULE＿BUTTON2"] }}</div>
+        <div class="button flt_l" ng-click="ctrl.import()">{{ lang["SEARCH_CRITERIA_IMPORT_BUTTON"] }}</div>
         <input type="file" id="file-import" style="display:none" file-model="file" />
-        <div class="button" ng-click="ctrl.save_rules(keywords)">{{ lang["SEARCH_CRITERIA_SAVE_RULE＿BUTTON1"] }}<br />{{ lang["SEARCH_CRITERIA_SAVE_RULE＿BUTTON2"] }}</div>
-        <div class="button" ng-click="ctrl.search(keywords)">{{ lang["SEARCH_CRITERIA_SEARCH_BUTTON"] }}</div>
     </div>
 
     <div ng-init="keywords = {sort_item: 'event_id', sort_order: 'asc'}"></div>
