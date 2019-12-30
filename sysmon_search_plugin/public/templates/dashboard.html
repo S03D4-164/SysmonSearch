@@ -28,7 +28,7 @@
             border-bottom : solid;
             border-right : solid;
             border-color: #D9D9D9;
-            width: 58%;
+            width: 70%;
             height: 270px;
             overflow: auto;
          }
@@ -37,7 +37,7 @@
             float: left;
             border-bottom : solid;
             border-color: #D9D9D9;
-            width: 40%;
+            width: 25%;
             height: 270px;
             overflow: auto;
          }
@@ -58,20 +58,20 @@
             float: right;
          }
          .total{
-         	width: 10%;
-         	float: right;
+         	width: 100%;
          	font-weight: bold;
-         	margin-right : 50px;
+         	margin-bottom : 10px;
          }
     </style>
-    <script src="../plugins/sysmon_search_visual/dist/d3.v3.min.js"> </script>
+    <script src="../plugins/sysmon_search_visual/dist/d3.v5.min.js"> </script>
 </head>
 
 <body>
 <div ng-cloak>
-<div id="header">
+
+<!--div id="header">
 <h1 class="h1_logo">SysmonSearch</h1>
-</div>
+</div-->
 
 <div class="global_Nav">
 <ul id="menu" class="clearfix">
@@ -91,18 +91,26 @@
 </div>
 
 <div class="main">
+
 <div class="ttlBox01 clearfix">
-<h2 class="flt_l">{{ lang["STATISTICS_H2"] }}</h2>
-<div class="period flt_r">
+<h2 class="">{{ lang["STATISTICS_H2"] }}</h2>
+
+
+<div class="period">
+
 <div class="select-period">
 	<select ng-model="period" ng-change="ctrl.onChange()"
             ng-options="period for period in period_list"></select>
-</div>
-</div>
-</div>
-<div class="dashboad_total">
-<span class="total">{{ lang["STATISTICS_TOTAL"] }}：{{ctrl.total}}</span>
-</div>
+</div><!--/select-period-->
+
+</div><!--/period-->
+
+<!--div class="dashboad_total"-->
+<div class="total">
+    <span >{{ lang["STATISTICS_TOTAL"] }}：{{ctrl.total}}</span>
+    </div><!--/dashboard_total-->
+
+</div><!--/ttlBox01-->
 
 <div class="boxA">
  <div class="box1">{{ lang["STATISTICS_DESTINATION_ADDRESS"] }}<div id='bar1'></div></div>

@@ -131,9 +131,9 @@ async function processDetail(sysmon, hostname, date, guid) {
   var host = {};
   host[sysmon.computer_name] = hostname;
   var pguid = {};
-  pguid[sysmon.map["ProcessGuId"]] = guid;
+  pguid[sysmon.map["ProcessGuid"]] = guid;
   var spguid = {};
-  spguid[sysmon.map["SourceProcessGuId"]] = guid;
+  spguid[sysmon.map["SourceProcessGuid"]] = guid;
   var event_ids = [11, 12, 13, 3, 2, 7, 19, 20, 21];
 
   var searchObj = {
@@ -188,7 +188,10 @@ async function processDetail(sysmon, hostname, date, guid) {
     // size: 1000,
     body: searchObj
   });
+
   const data = await get_datas(el_result);
+  console.log(JSON.stringify(searchObj, null, 2) + " -> " + JSON.stringify(el_result));
+
   return data;
 }
 

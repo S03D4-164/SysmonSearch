@@ -9,6 +9,9 @@ import {conf as config} from '../conf.js';
 import 'ui/autoload/styles';
 import './less/main.less';
 import * as vis_network from './dist/vis-network.min.js';
+//const vis_network = require('vis-network')
+//const vis_network = require('vis')
+
 import * as vis_graph from './dist/vis-timeline-graph2d.min.js';
 import './dist/vis-network.min.css';
 import './dist/vis-timeline-graph2d.min.css';
@@ -145,7 +148,6 @@ uiModules
         data.period = getDateQueryFromDate(date1, date2);
         $http.post('../api/sysmon-search-plugin/events', data)
         .then((response) => {
-            //this.hostname = $route.current.params.hostname;
             this.hostname = hostname;
 
             var container = document.getElementById('visualization');
@@ -166,7 +168,7 @@ uiModules
                 stack: true,
                 barChart: {
                     width: 40,
-                    align: 'center'
+                    align: 'center',
                 }, // align: left, center, right
                 drawPoints: function renderer(item, group, graph2d){
                     if(item.y<10){
@@ -177,7 +179,7 @@ uiModules
                     //}
                 },
                 dataAxis: {icons: false},
-                legend: {right: {position: 'top-right'}},
+                legend: {enabled:true},
                 start: getViewFormat(getPastDate(date1, 1, "day"), 2),
                 end: getViewFormat(date2, 2),
                 orientation: 'top',
@@ -1059,6 +1061,10 @@ uiModules
                         direction: 'LR',
                         sortMethod: 'directed'
                     }
+                },
+                interaction: {
+                    navigationButtons: true,
+                    keyboard: true
                 }
             };
             // console.log( data );
@@ -2038,17 +2044,16 @@ function pie_chart(id, fData, legFlg, r) {
 }
 
 function histoGram(id, fD, max, title, process_flg) {
-    if (max < 10) {
-        max = 10;
-    }
+    if (max < 10) max = 10;
+
     var hG = {},
         hGDim = {
             t: 20,
-            r: 150,
+            r: 200,
             b: 20,
             l: 0
         };
-    hGDim.w = 320 - hGDim.l - hGDim.r,
+    hGDim.w = 200//320 - hGDim.l - hGDim.r,
         hGDim.h = 220 - hGDim.t - hGDim.b;
 
     var hGsvg = d3.select(id).append("svg")
@@ -2056,20 +2061,28 @@ function histoGram(id, fD, max, title, process_flg) {
         .attr("height", hGDim.h + hGDim.t + hGDim.b).append("g")
         .attr("transform", "translate(" + hGDim.l + "," + hGDim.t + ")");
 
-    var x = d3.scale.linear().range([0, hGDim.w])
+    //var x = d3.scale.linear().range([0, hGDim.w])
+    var x = d3.scaleLinear().range([0, hGDim.w])
         .domain([0, max]);
 
     hGsvg.append("g").attr("class", "x axis")
         .attr("transform", "translate(" + hGDim.r + "," + hGDim.h + ")")
-        .call(d3.svg.axis().scale(x).orient("bottom").ticks(4));
+        .call(d3.axisBottom(x).tickSizeInner(4))
+        .style("font-size", 9);
+        //.call(d3.svg.axis().scale(x).orient("bottom").ticks(4));
 
-    var y = d3.scale.ordinal().rangeRoundBands([0, hGDim.h], 0.1)
+    //var y = d3.scale.ordinal().rangeRoundBands([0, hGDim.h], 0.1)
+    var y = d3.scaleBand().rangeRound([0, hGDim.h])
+        .padding(0.1)
         .domain(fD.map(function(d) {
             return d[0];
         }));
 
     var bars = hGsvg.selectAll(".bar").data(fD).enter()
         .append("g").attr("class", "bar");
+
+    //var yBand = y.rangeBand();
+    var yBand = y.bandwidth();
 
     bars.append("rect")
         .attr("x", function(d) {
@@ -2078,7 +2091,7 @@ function histoGram(id, fD, max, title, process_flg) {
         .attr("y", function(d) {
             return y(d[0]);
         })
-        .attr("height", y.rangeBand())
+        .attr("height", yBand)
         .attr("width", function(d) {
             return x(d[1]);
         })
@@ -2097,11 +2110,12 @@ function histoGram(id, fD, max, title, process_flg) {
             }
         })
         .attr("y", function(d) {
-            return y(d[0]) + y.rangeBand() / 2;
+            return y(d[0]) + yBand// / 2;
         })
         .attr("x", function(d) {
             return 10;
         })
+        .style("font-size", 11)
         .attr("text-anchor", "left");
 
     bars.append("text").text(title)
