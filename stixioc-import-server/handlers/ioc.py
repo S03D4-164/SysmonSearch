@@ -59,7 +59,8 @@ class IoCConvertHandler(BaseConvertHandler):
             self.http_normal(200, msg=msg if msg is not None else u'OK')
 
         except:
-            trace_msg = traceback.format_exc().decode('utf-8')
+            #trace_msg = traceback.format_exc().decode('utf-8')
+            trace_msg = traceback.format_exc()
             emsg = u'request_msg:{0} {1}'.format(self.request.body, trace_msg)
             gen_log.error(u',[session-id:{0}],{1}'.format(None, emsg))
             self.http_error(400, msg=trace_msg)

@@ -1558,6 +1558,7 @@ uiModules
 
                 for (var i = 0; i < fields.length; i++) {
                     var field = fields[i];
+                    //console.log(field);
                     var sel_val = sel_option_map[field.key];
 
                     var new_index = 1;
@@ -1600,19 +1601,23 @@ uiModules
                         $http.post("../api/sysmon-search-plugin/import_search_keywords", params)
                             .then(function successCallback(response) {
                                 const util = require('util');
-                                console.log(util.inspect(response));
+                                //console.log(util.inspect(response));
                                 function is_value_exist(dict, key) {
                                     return (key in dict && dict.key !== "undefined" && dict.key !== null);
                                 };
 
-                                var res = response.data;
-                                if (is_value_exist(res, "data")) {
-                                    var json_data = JSON.parse(res.data);
+                                var res = response;
+                                
+                                if(res.data){
+                                    //console.log(res.data);
+                                    //var json_data = JSON.parse(res.data);
+                                    var json_data = res.data;
                                     if (res.status !== 200) {
                                         console.log(util.inspect(json_data));
                                         alert(msg_failed_import_process);
                                     } else if (is_value_exist(json_data, "fields") &&
                                         Array.isArray(json_data.fields) && json_data.fields.length > 0) {
+                                        //console.log(util.inspect(json_data));
                                         set_search_criteria(json_data.fields);
                                     } else {
                                         alert(msg_no_search_criteria);
