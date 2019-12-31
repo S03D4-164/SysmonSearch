@@ -1,7 +1,6 @@
 const Utils = require('./Utils');
 const processList = require("./process_list");
 
-
 async function make_process_tree(cur, list, p_list) {
   if (cur.current != null && cur.current.key != null) {
     var key = cur.current.key;
@@ -206,7 +205,7 @@ async function process(sysmon, hostname, date, searchObj) {
     } else if (sysmon.start_time && sysmon.end_time){
       date_dict = Utils.get_range_datetime3(sysmon.start_time, sysmon.end_time);
     }
-    console.log(date_dict);
+    //console.log("[date dict]" + date_dict);
     if(date_dict){
       var range = {
         "@timestamp": {
@@ -231,15 +230,15 @@ async function process(sysmon, hostname, date, searchObj) {
         //"_source": ["record_number", "event_data"]
         "_source": source
       };
-
-      event_id[sysmon.event_id] = [3];
+      var netevent_id = {};
+      netevent_id[sysmon.event_id] = [3];
       netSearchObj = {
         "size": 10000,
         "query": {
           "bool": {
             "must": [
               {"match": host},
-              {"terms": event_id},
+              {"terms": netevent_id},
               {
                 //"range": {"@timestamp": { "gte": date_dict["start_date"], "lte": date_dict["end_date"] }}
                 "range": range
@@ -282,7 +281,7 @@ async function process(sysmon, hostname, date, searchObj) {
   const datas = await processList(
     sysmon, hostname, "net_access", date, netSearchObj
   )
-  console.log(JSON.stringify(netSearchObj));
+  console.log("[net search] " + JSON.stringify(netSearchObj, null, 2));
   //console.log("[process list datas] "  + JSON.stringify(datas));
 
   //function get_net_datas(datas) {
@@ -300,16 +299,20 @@ async function process(sysmon, hostname, date, searchObj) {
         networkInfo[ item.guid ][ item.port ].push( item.ip );
       }
     }
+    console.log("[networkInfo] " + JSON.stringify(networkInfo, null, 2));
+
+    console.log(JSON.stringify(searchObj, null, 2));
     const el_result = await sysmon.client.search({
       index: sysmon.index,
       // size: 1000,
       body: searchObj
     });
-    //console.log(JSON.stringify(searchObj) + " => " + JSON.stringify(el_result));
-    console.log("[networkInfo] " + JSON.stringify(networkInfo));
+
+    //console.log(JSON.stringify(el_result, null, 2));
+
     const process_list = await make_process_list(el_result, networkInfo);
     console.log("process_list: " + JSON.stringify(process_list));
-    const process_tree = get_datas(process_list);
+    const process_tree = await get_datas(process_list);
     console.log("process_tree: " + JSON.stringify(process_tree));
     return process_tree;
   }

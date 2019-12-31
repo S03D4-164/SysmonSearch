@@ -1,4 +1,75 @@
-const Utils = require('./Utils');
+//const Utils = require('./Utils');
+
+async function eventid_to_type(event_id) {
+  var result = "";
+  switch (event_id) {
+      case 1:
+          result = "create_process";
+          break;
+      case 11:
+          result = "create_file";
+          break;
+      case 12:
+      case 13:
+      case 14:
+          result = "registry";
+          break;
+      case 3:
+          result = "net_access";
+          break;
+      case 8:
+          result = "remote_thread";
+          break;
+      case 2:
+          result = "file_create_time";
+          break;
+      case 7:
+          result = "image_loaded";
+          break;
+      case 19:
+      case 20:
+      case 21:
+          result = "wmi";
+          break;
+      default:
+          result = "other";
+      break;
+  }
+
+  return result;
+}
+
+async function date_to_text(date) {
+  var y = await padding(date.getUTCFullYear(), 4, "0"),
+      m = await padding(date.getUTCMonth()+1, 2, "0"),
+      d = await padding(date.getUTCDate(), 2, "0"),
+      h = await padding(date.getUTCHours(), 2, "0"),
+      min = await padding(date.getUTCMinutes(), 2, "0"),
+      s = await padding(date.getUTCSeconds(), 2, "0"),
+      millsec = await padding(date.getUTCMilliseconds(), 3, "0");
+
+  return [y, m, d].join('-') + 'T' + [h, min, s].join(':') + 'Z';
+}
+
+async  function padding(n, d, p) {
+  p = p || '0';
+  return (p.repeat(d) + n).slice(-d);
+}
+
+async function getRangeDatetime(date) {
+  var date_str = date.substr(0, 10)+"T"+date.substr(11, 12)+"Z";
+  var base_date = new Date(date_str);
+  var start_date = new Date(base_date.getTime());
+  var end_date = new Date(base_date.getTime());
+  //start_date.setHours(start_date.getHours() - Number(config.refine_time_range));
+  //end_date.setHours(end_date.getHours() + Number(config.refine_time_range));
+  start_date.setHours(start_date.getHours() - 1);
+  end_date.setHours(end_date.getHours() + 1);
+  var start_date_str = await date_to_text(start_date);
+  var end_date_str = await date_to_text(end_date);
+
+  return {"start_date": start_date_str, "end_date": end_date_str};
+}
 
 async function getEventIdFromType(type){
   if (type === 'create_process') return [1];
@@ -25,7 +96,8 @@ async function processList(sysmon, hostname, eventtype, date, searchObj) {
   if(searchObj==null){
     if (date.length === 23) {
       event_id[sysmon.event_id] = [1, 11, 12, 13, 3, 8, 2, 7, 19, 20, 21];
-      var date_dict = Utils.get_range_datetime(date);
+      //var date_dict = Utils.get_range_datetime(date);
+      var date_dict = await getRangeDatetime(date);
       var query = {
         "bool": {
           "must": [
@@ -79,7 +151,7 @@ async function processList(sysmon, hostname, eventtype, date, searchObj) {
     //size: 1000,
     body: searchObj
   });
-  console.log("[process list search] " + JSON.stringify(searchObj));
+  console.log("[process list search] " + JSON.stringify(searchObj, null, 2));
   //console.log("el_result: " + JSON.stringify(el_result))
   if (el_result) {
     var hits = el_result.hits.hits;
@@ -101,7 +173,7 @@ async function processList(sysmon, hostname, eventtype, date, searchObj) {
       };
       // results.push(hit.event_data);
       //tmp['type'] = Utils.eventid_to_decription(hit.winlog.event_id);
-      tmp['type'] = Utils.eventid_to_type(winlog.event_id);
+      tmp['type'] = await eventid_to_type(winlog.event_id);
       //console.log(tmp);
       switch (tmp['type']) {
         case 'create_process':
@@ -188,7 +260,7 @@ async function processList(sysmon, hostname, eventtype, date, searchObj) {
       results.push(tmp);
     }
 
-    console.log("[process list results] " + JSON.stringify(results))
+    //console.log("[process list results] " + JSON.stringify(results))
     return results;
   }
   return;

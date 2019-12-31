@@ -346,6 +346,7 @@ uiModules
 
     })
 
+// correlation
 uiModules
     .get('app/sysmon_search_visual/process', [])
     .controller('processController', function($scope, $route, $http, $interval) {
@@ -353,6 +354,9 @@ uiModules
         $scope.lang = gLangData;
 
         var params = $route.current.params;
+        var url = '../api/sysmon-search-plugin/process/' + params.hostname + '/' + params.date;
+        var localdata;
+
         $scope.submit = function() {
             var start_str = $route.current.params.date+"T00:00:00";
             var end_str = $route.current.params.date+"T23:59:59";
@@ -369,7 +373,6 @@ uiModules
             var end_utc = end_data_obj.getTime();
 			
             //var url = '../api/sysmon-search-plugin/process/' + $route.current.params.hostname + '/' + $route.current.params.date;
-            var url = '../api/sysmon-search-plugin/process/' + params.hostname + '/' + params.date;
             url += '?';
             url += 'start_time='+start_utc;
             url += '&';
@@ -380,8 +383,6 @@ uiModules
             });
         };
 
-        var url = '../api/sysmon-search-plugin/process/' + $route.current.params.hostname + '/' + $route.current.params.date;
-        var localdata;
         $http.get(url).then((response) => {
             //this.hostname = $route.current.params.hostname;
             this.hostname = params.hostname;
@@ -563,6 +564,10 @@ uiModules
                             type: 'continuous',
                             roundness: 0
                         }
+                    },
+                    interaction: {
+                        navigationButtons: true,
+                        keyboard: true
                     }
                 };
                 // console.log( data );
@@ -575,7 +580,9 @@ uiModules
                         network.selectNodes([nodeid], true);
                         var node = this.body.data.nodes.get(nodeid);
                         if (node && node.info) {
-                            const veiw_data_1 = ["CurrentDirectory", "CommandLine", "Hashes", "ParentProcessGuid", "ParentCommandLine", "ProcessGuid"];
+                            const veiw_data_1 = [
+                                "CurrentDirectory", "CommandLine", "Hashes", "ParentProcessGuid", "ParentCommandLine", "ProcessGuid"
+                            ];
                             var str = "";
                             var alert_str = "";
                             for (var key in node.info) {
@@ -601,7 +608,8 @@ uiModules
                     var node = this.body.data.nodes.get(properties.nodes[0]);
                     console.log(node);
                     if(node.guid != null && node.guid!="" && node.guid!="root"){
-                        var url = 'sysmon_search_visual#/process_overview/' + $route.current.params.hostname + '/' + $route.current.params.date.substr(0, 10) + '/' + node.guid;
+                        //var url = 'sysmon_search_visual#/process_overview/' + $route.current.params.hostname + '/' + $route.current.params.date.substr(0, 10) + '/' + node.guid;
+                        var url = 'sysmon_search_visual#/process_overview/' + params.hostname + '/' + params.date.substr(0, 10) + '/' + node.guid;
                         console.log(url);
                         window.open(url, "_blank");
                     }
