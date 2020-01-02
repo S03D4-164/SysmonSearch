@@ -137,21 +137,24 @@ def registration(response, index_name_new, date_utc_str):
 
             #if exclude_flg == False and obj.has_key("event_data"):
             if exclude_flg == False and "event_data" in obj['winlog']:
-              if obj['winlog']['event_data'].has_key("DestinationIp"):
+              #if obj['winlog']['event_data'].has_key("DestinationIp"):
+              if "DestinationIp" in obj['winlog']['event_data']:
                 for value in setting.EXCLUDED_IPADDRESS:
                     if obj['winlog']['event_data']['DestinationIp'].startswith(value):
                         exclude_flg= True
 
             #if exclude_flg == False and obj.has_key("event_data") and obj['event_data'].has_key("DestinationIpv6"):
             if exclude_flg == False and "event_data" in obj['winlog']:
-              if obj['winlog']['event_data'].has_key("DestinationIpv6"):
+              #if obj['winlog']['event_data'].has_key("DestinationIpv6"):
+              if "DestinationIpv6" in obj['winlog']['event_data']:
                 for value in setting.EXCLUDED_IPADDRESS:
                     if obj['winlog']['event_data']['DestinationIpv6'].startswith(value):
                         exclude_flg= True
 
             #if exclude_flg == False and obj.has_key("event_data") and obj['event_data'].has_key("Image"):
             if exclude_flg == False and "event_data" in obj['winlog']:
-              if obj['winlog']['event_data'].has_key("Image"):
+              #if obj['winlog']['event_data'].has_key("Image"):
+              if "Image" in obj['winlog']['event_data']:
                 for value in setting.EXCLUDED_PROCESS:
                     if obj['winlog']['event_data']['Image'].startswith(value):
                         exclude_flg= True

@@ -67,7 +67,7 @@ if __name__ == "__main__":
 
     # Tornado Service Start
     try:
-        application.listen(options.port)
+        application.listen(options.port, "0.0.0.0")
         tornado.ioloop.IOLoop.instance().start()
     except KeyboardInterrupt:
         tornado.ioloop.IOLoop.instance().stop()

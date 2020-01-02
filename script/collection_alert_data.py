@@ -355,15 +355,16 @@ def registration(data, rule):
         obj = hit["_source"]
         print(obj)
         try :
-            if hit.has_key("_index"): new_obj['original_index'] = hit['_index']
-            if hit.has_key("_type"): new_obj['original_type'] = hit['_type']
-            if hit.has_key("_id"): new_obj['original_id'] = hit['_id']
-            if obj.has_key("@timestamp"): new_obj['@timestamp'] = obj['@timestamp']
-            if obj['winlog'].has_key("event_id"): new_obj['event_id'] = obj['winlog']['event_id']
-            if obj['winlog'].has_key("computer_name"): new_obj['computer_name'] = obj['winlog']['computer_name']
-            if obj['log'].has_key("level"): new_obj['level'] = obj['log']['level']
-            if obj['winlog'].has_key("record_id"): new_obj['record_number'] = obj['winlog']['record_id']
-            if obj['winlog'].has_key("event_data"): new_obj['event_data'] = obj['winlog']['event_data']
+            if "_index" in hit: new_obj['original_index'] = hit['_index']
+            if "_type" in hit: new_obj['original_type'] = hit['_type']
+            if "_id" in hit: new_obj['original_id'] = hit['_id']
+            if "@timestamp" in obj: new_obj['@timestamp'] = obj['@timestamp']
+            if "event_id" in obj['winlog']: new_obj['event_id'] = obj['winlog']['event_id']
+            if "computer_name" in obj['winlog']: new_obj['computer_name'] = obj['winlog']['computer_name']
+            if "level" in obj['log']: new_obj['level'] = obj['log']['level']
+            if "record_id" in obj['winlog']: new_obj['record_number'] = obj['winlog']['record_id']
+            if "event_data" in obj['winlog']: new_obj['event_data'] = obj['winlog']['event_data']
+
 #            print new_obj
 #            client.index( index=new_index_name, doc_type="wineventlog", body=new_obj )
             actions.append({'_index': new_index_name, '_type': 'doc', '_source': new_obj})

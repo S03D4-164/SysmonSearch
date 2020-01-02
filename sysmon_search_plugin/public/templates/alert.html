@@ -23,7 +23,7 @@ body, html {
     filter: alpha(opacity=70);
 }
 .resultTable {
-    display: none;
+   /* display: none;*/
 }
     </style>
     <script src="../plugins/sysmon_search_visual/dist/d3.v3.min.js"> </script>
@@ -112,6 +112,23 @@ body, html {
 </table>
 </div><!--/db_main-->
 
+<div id="host_count">
+    <table class="table">
+      <thead>
+        <tr>
+            <th><a ng-click="ctrl.hostsort('key')">{{ lang["ALERT_TABLE_HOST_NAME"] }}{{ctrl.key}}</a></th>
+            <th><a ng-click="ctrl.hostsort('doc_count')">{{ lang["ALERT_TABLE_RECORDS"] }}{{ctrl.doc_count}}</a></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr ng-repeat="data in ctrl.unique_host_data">
+          <td title="{{lang.ALERT_TABLE_HOST_NAME}}">{{data.key}}</td>
+          <td title="{{lang.ALERT_TABLE_RECORDS}}">{{data.doc_count}}</td>
+        </tr>
+      </tbody>
+    </table>
+</div><!--/host_count-->
+
 <div class="resultButton">result</div>
     <table class="table resultTable">
       <thead>
@@ -145,22 +162,6 @@ body, html {
     </table>
 </div><!--/resultButton-->
 
-<div id="host_count">
-    <table class="table">
-      <thead>
-        <tr>
-            <th><a ng-click="ctrl.hostsort('key')">{{ lang["ALERT_TABLE_HOST_NAME"] }}{{ctrl.key}}</a></th>
-            <th><a ng-click="ctrl.hostsort('doc_count')">{{ lang["ALERT_TABLE_RECORDS"] }}{{ctrl.doc_count}}</a></th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr ng-repeat="data in ctrl.unique_host_data">
-          <td title="{{lang.ALERT_TABLE_HOST_NAME}}">{{data.key}}</td>
-          <td title="{{lang.ALERT_TABLE_RECORDS}}">{{data.doc_count}}</td>
-        </tr>
-      </tbody>
-    </table>
-</div><!--/host_count-->
 
 </div>
 </div>
