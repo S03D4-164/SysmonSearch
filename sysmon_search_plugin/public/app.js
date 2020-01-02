@@ -1558,7 +1558,7 @@ uiModules
 
                 for (var i = 0; i < fields.length; i++) {
                     var field = fields[i];
-                    //console.log(field);
+                    console.log(field);
                     var sel_val = sel_option_map[field.key];
 
                     var new_index = 1;
@@ -1609,7 +1609,7 @@ uiModules
                                 var res = response;
                                 
                                 if(res.data){
-                                    //console.log(res.data);
+                                    console.log(res.data);
                                     //var json_data = JSON.parse(res.data);
                                     var json_data = res.data;
                                     if (res.status !== 200) {

@@ -1,8 +1,18 @@
-const request = require('request-promise');
+//const request = require('request-promise');
+const request = require('request');
 const CONFIG_PATH = '../../../conf.js';
 import {conf as config} from '../../../conf.js';
 const util = require('util');
 const sprintf = require('sprintf-js').sprintf;
+
+async function doRequest(options) {
+  return new Promise(function (resolve, reject) {
+    request(options, function (err, res, body) {
+      if (!err && res.statusCode == 200) resolve(res.body);
+      else reject(err);
+    });
+  });
+}
 
 async function importSearchKeywords(params) {
   console.log(params);
@@ -23,6 +33,14 @@ async function importSearchKeywords(params) {
     url, params.filename, params.contenttype
   );
   console.log(req_str);
+  const requestOptions = {
+    url: url,
+    method: "POST",
+    formData: formData,
+    json: true
+  };
+  const result = await doRequest(requestOptions);
+/*
   const result = await request.post({
       url: url, formData: formData
     }, 
@@ -42,6 +60,9 @@ async function importSearchKeywords(params) {
       }
     }
   );
+*/
+  console.log("#---------- response from STIX/IoC analyze server ----------");
+  console.log(JSON.stringify(result));
   return result;
 }
 
