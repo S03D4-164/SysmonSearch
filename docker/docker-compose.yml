@@ -3,8 +3,8 @@ services:
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.5.1
     volumes:
-      - ./es-data:/usr/share/elasticsearch/data
-      - ./elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+      - ./es/es-data:/usr/share/elasticsearch/data
+      - ./es/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
     container_name: docker-sysmonsearch-es
     environment:
       #- cluster.name=docker-cluster
@@ -29,9 +29,9 @@ services:
 #        - http_proxy=[proxy_server_URL]
 #        - https_proxy=[proxy_server_URL]
     volumes:
+      - ./kibana/kibana.yml:/usr/share/kibana/config/kibana.yml
       - ../sysmon_search_plugin:/usr/share/kibana/plugins/sysmon_search_plugin
-      - ./kibana.yml:/usr/share/kibana/config/kibana.yml
-      - ./conf.js:/usr/share/kibana/plugins/sysmon_search_plugin/conf.js
+      - ./kibana/conf.js:/usr/share/kibana/plugins/sysmon_search_plugin/conf.js
       - ./rule_files:/tmp/rule_files
     #  - rule_files:/usr/share/kibana/rule_files
     container_name: docker-sysmonsearch-kibana
@@ -45,10 +45,12 @@ services:
 #        - https_proxy=[proxy_server_URL]
     command: bash -c "cd /root/stixioc-import-server/ && python server.py"
     volumes:
+      - ../stixioc-import-server:/root/stixioc-import-server
+      - ./stixioc-import-server/server.conf:/root/stixioc-import-server/server.conf
+      - ./logs:/root/stixioc-import-server/logs
+      - ../script:/root/script
       - ./rule_files:/root/script/rule_files
       - ../winlogbeat.yml:/root/winlogbeat.yml
-      - ../script:/root/script
-      - ../stixioc-import-server:/root/stixioc-import-server
     container_name: docker-stixioc-import-server
     ports:
       - 56020:56020

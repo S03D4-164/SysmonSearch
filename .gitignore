@@ -1,0 +1,3 @@
+docker/es/es-data/*
+*.pyc
+*.log
