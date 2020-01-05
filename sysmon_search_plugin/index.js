@@ -18,7 +18,6 @@ export default function (kibana) {
       }).default();
     },
     init(server, options) {
-      // Add server routes and initialize the plugin here
       sysmon_search_Route(server);
     }
   });

@@ -34,7 +34,6 @@ services:
       - ./conf.js:/usr/share/kibana/plugins/sysmon_search_plugin/conf.js
       - ./rule_files:/tmp/rule_files
     #  - rule_files:/usr/share/kibana/rule_files
-    #  - rule_files:/usr/share/kibana/rule_files
     container_name: docker-sysmonsearch-kibana
     ports:
       - 127.0.0.1:5601:5601
