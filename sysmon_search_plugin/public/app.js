@@ -183,7 +183,7 @@ uiModules
                 start: getViewFormat(getPastDate(date1, 1, "day"), 2),
                 end: getViewFormat(date2, 2),
                 orientation: 'top',
-                zoomable: false
+                zoomable: true
             };
 
             var graph2d = new vis_graph.Graph2d(container, items, groups, options);
@@ -564,6 +564,9 @@ uiModules
                             type: 'continuous',
                             roundness: 0
                         }
+                    },
+                    layout: {
+                        improvedLayout:false
                     },
                     interaction: {
                         navigationButtons: true,
@@ -1068,7 +1071,8 @@ uiModules
                     hierarchical: {
                         direction: 'LR',
                         sortMethod: 'directed'
-                    }
+                    },
+                    improvedLayout:false
                 },
                 interaction: {
                     navigationButtons: true,

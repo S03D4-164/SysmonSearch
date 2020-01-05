@@ -1,31 +1,14 @@
 <!DOCTYPE HTML>
 <html>
 <head>
-	<title>Event List</title>
-    <style>
-        body, html {
-            font-family: sans-serif;
-        }
-        table.noBorder_tbl th,td {
-          padding: 10px;
-        }
-        table.noBorder_tbl th {
-          vertical-align: top;
-        }
-        .conditions_w373 {
-          width: 373px;
-        }
-        .button {
-          margin: 10px
-        }
-    </style>
-    <script src="../plugins/sysmon_search_visual/dist/d3.v3.min.js"> </script>
+  <title>Event List</title>
+  <script src="../plugins/sysmon_search_visual/dist/d3.v5.min.js"> </script>
 </head>
 <body>
 <div ng-cloak>
-<!--div id="header">
-<h1 class="h1_logo">SysmonSearch</h1>
-</div-->
+<!--
+<div id="header"><h1 class="h1_logo">SysmonSearch</h1></div>
+-->
 <div class="global_Nav">
 <ul id="menu" class="clearfix">
   <li>
@@ -130,12 +113,12 @@
     <table class="table">
       <thead>
         <tr>
-            <th><a ng-click="ctrl.sort('winlog.event_data.UtcTime')">UtcTime{{ctrl.utc_time}}</a></th>
-            <th><a ng-click="ctrl.sort('winlog.event_id')">EventId{{ctrl.event_id}}</a></th>
-            <th><a ng-click="ctrl.sort('log.level')">Level{{ctrl.level}}</a></th>
-            <th><a ng-click="ctrl.sort('winlog.computer_name')">Computer{{ctrl.computer_name}}</a></th>
-            <th><a ng-click="ctrl.sort('winlog.event_data.User')">UserName{{ctrl.user_name}}</a></th>
-            <th><a ng-click="ctrl.sort('winlog.event_data.Image')">Image{{ctrl.image}}</a></th>
+            <th style="width:20%;"><a ng-click="ctrl.sort('winlog.event_data.UtcTime')">UtcTime{{ctrl.utc_time}}</a></th>
+            <th style="width:10%;"><a ng-click="ctrl.sort('winlog.event_id')">EventId{{ctrl.event_id}}</a></th>
+            <th style="width:10%;"><a ng-click="ctrl.sort('log.level')">Level{{ctrl.level}}</a></th>
+            <th style="width:20%;"><a ng-click="ctrl.sort('winlog.computer_name')">Computer{{ctrl.computer_name}}</a></th>
+            <th style="width:10%;"><a ng-click="ctrl.sort('winlog.event_data.User')">UserName{{ctrl.user_name}}</a></th>
+            <th style="width:30%;"><a ng-click="ctrl.sort('winlog.event_data.Image')">Image{{ctrl.image}}</a></th>
         </tr>
       </thead>
       <tbody>
