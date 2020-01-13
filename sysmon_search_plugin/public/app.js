@@ -54,7 +54,7 @@ uiModules
             var st_dt = new Date();
             st_dt = getPastDate(st_dt,1,"month")
             keywords.fm_start_date = formatDate2(st_dt) + 'T00:00:00Z';
-            keywords.fm_end_date = formatDate2(new Date()) + 'T00:00:00Z';
+            keywords.fm_end_date = formatDate2(new Date()) + 'T23:59:59Z';
             return keywords;
         }
         this.keywords = default_date_range({});
@@ -566,7 +566,7 @@ uiModules
                         }
                     },
                     layout: {
-                        improvedLayout:false
+                        improvedLayout:true
                     },
                     interaction: {
                         navigationButtons: true,
@@ -1072,7 +1072,7 @@ uiModules
                         direction: 'LR',
                         sortMethod: 'directed'
                     },
-                    improvedLayout:false
+                    improvedLayout:true
                 },
                 interaction: {
                     navigationButtons: true,
@@ -1972,6 +1972,7 @@ function pie_chart(id, fData, legFlg, r) {
         var pointer = c % 9;
         return color[pointer];
     }
+    var color = d3.scaleOrdinal(d3.schemeCategory10);
 
     function pieChart(pD) {
         var pC = {},
@@ -1998,7 +1999,8 @@ function pie_chart(id, fData, legFlg, r) {
                 this._current = d;
             })
             .style("fill", function(d, i) {
-                return segColor(i);
+                //return segColor(i);
+                return color(i);
             })
 
         return pC;
@@ -2014,7 +2016,8 @@ function pie_chart(id, fData, legFlg, r) {
         tr.append("td").append("svg").attr("width", '16').attr("height", '16').append("rect")
             .attr("width", '16').attr("height", '16')
             .attr("fill", function(d, i) {
-                return segColor(i);
+                //return segColor(i);
+                return color(i);
             });
 
         tr.append("td").text(function(d) {

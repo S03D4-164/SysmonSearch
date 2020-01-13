@@ -121,7 +121,7 @@ async function get_datas(process_list) {
 
 async function make_process_list(el_result, networkInfo) {
   var hits = el_result.hits.hits;
-  console.log("hits: " + JSON.stringify(hits));
+  //console.log("hits: " + JSON.stringify(hits));
   var process_array = {};
   var p_process_array = {};
 
@@ -137,7 +137,7 @@ async function make_process_list(el_result, networkInfo) {
 
     var item = hits[index]._source;
     var data = item.winlog.event_data;
-    console.log(data);
+    //console.log(data);
 
     var key = data.ProcessGuid;
     var pkey = data.ParentProcessGuid;
@@ -301,7 +301,7 @@ async function process(sysmon, hostname, date, searchObj) {
     }
     console.log("[networkInfo] " + JSON.stringify(networkInfo, null, 2));
 
-    console.log(JSON.stringify(searchObj, null, 2));
+    console.log("[process search] " + JSON.stringify(searchObj, null, 2));
     const el_result = await sysmon.client.search({
       index: sysmon.index,
       // size: 1000,
@@ -311,9 +311,9 @@ async function process(sysmon, hostname, date, searchObj) {
     //console.log(JSON.stringify(el_result, null, 2));
 
     const process_list = await make_process_list(el_result, networkInfo);
-    console.log("process_list: " + JSON.stringify(process_list));
+    //console.log("process_list: " + JSON.stringify(process_list));
     const process_tree = await get_datas(process_list);
-    console.log("process_tree: " + JSON.stringify(process_tree));
+    console.log("[process_tree] " + JSON.stringify(process_tree, null, 2));
     return process_tree;
   }
   return;

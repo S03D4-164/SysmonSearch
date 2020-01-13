@@ -57,32 +57,25 @@ async function events(sysmon, hostname, date) {
            "net_access",
            //"process_terminated",
            //"driver_loaded",
-           //"image_loaded",
+           "image_loaded",
            "remote_thread",
            //"raw_access_read",
-           //"process_access",
+           "process_access",
            "create_file",
            "registry",
            //"pipe",
-           "wmi",
-           //"dns",
+           //"wmi",
+           "dns",
            //"error",
            "other" 
     ];
-
-    var results = {
-      "items":[],
-      "groups":category,
-    };
+    var results = {"items":[], "groups":category};
     for (var index in hits) {
       var item = hits[index];
       var cnt = {};
-      for(var i in category){
-        cnt[category[i]] = 0;
-      }
+      for(var i in category){cnt[category[i]] = 0;}
       for (var i in item['event_id']['buckets']) {
         var event = item['event_id']['buckets'][i];
-
         if (event['key'] == 1) {
           cnt["create_process"] += event['doc_count'];
         } else if (event['key'] == 2) {
@@ -93,24 +86,24 @@ async function events(sysmon, hostname, date) {
         //  cnt["process_terminated"] += event['doc_count'];
         //} else if (event['key'] == 6) {
         //  cnt["driver_loaded"] += event['doc_count'];
-        //} else if (event['key'] == 7) {
-        //  cnt["image_loaded"] += event['doc_count'];
+        } else if (event['key'] == 7) {
+          cnt["image_loaded"] += event['doc_count'];
         } else if (event['key'] == 8) {
           cnt["remote_thread"] += event['doc_count'];
         //} else if (event['key'] == 9) {
         //  cnt["raw_access_read"] += event['doc_count'];
-        //} else if (event['key'] == 10) {
-        //  cnt["process_access"] += event['doc_count'];
+        } else if (event['key'] == 10) {
+          cnt["process_access"] += event['doc_count'];
         } else if (event['key'] == 11) {
           cnt["create_file"] += event['doc_count'];
         } else if (event['key'] == 12 || event['key'] == 13 || event['key' == 14]) {
           cnt["registry"] += event['doc_count'];
         //} else if (event['key'] == 17 || event['key'] == 18) {
         //  cnt["pipe"] += event['doc_count'];
-        } else if (event['key'] == 19 || event['key'] == 20 || event['key'] == 21) {
-          cnt["wmi"] += event['doc_count'];
-        //} else if (event['key'] == 22) {
-        //  cnt["dns"] += event['doc_count'];
+        //} else if (event['key'] == 19 || event['key'] == 20 || event['key'] == 21) {
+        //  cnt["wmi"] += event['doc_count'];
+        } else if (event['key'] == 22) {
+          cnt["dns"] += event['doc_count'];
         //} else if (event['key'] == 255) {
         //  cnt["error"] += event['doc_count'];
         } else {

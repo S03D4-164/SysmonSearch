@@ -18,6 +18,7 @@ class SysmonSearch {
     this.index = doc["defaultindex"];
     this.start_time = null;
     this.end_time = null;
+    this.config = conf;
   }
 }
 
