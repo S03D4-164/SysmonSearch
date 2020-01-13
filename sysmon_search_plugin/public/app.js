@@ -1201,13 +1201,13 @@ uiModules
     .controller('process_detailController', function($scope, $route, $http, $interval) {
         // Set Language Data
         $scope.lang = gLangData;
-
-        var url = '../api/sysmon-search-plugin/process_detail/' + $route.current.params.hostname + '/' + $route.current.params.date + '/' + $route.current.params.guid;
+        var params = $route.current.params;
+        var url = '../api/sysmon-search-plugin/process_detail/' + params.hostname + '/' + params.date + '/' + params.guid;
 
         var localdata;
         $http.get(url).then((response) => {
-            this.hostname = $route.current.params.hostname;
-            this.date = $route.current.params.date;
+            this.hostname = params.hostname;
+            this.date = params.date;
             this.data = response.data;
             if (response.data.length > 0 && response.data[0].process != null) {
                 this.image = response.data[0].process

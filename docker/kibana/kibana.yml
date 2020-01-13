@@ -4,3 +4,4 @@ elasticsearch.hosts: ["http://elasticsearch:9200"]
 csp.rules:
   - "script-src 'self' 'unsafe-eval' 'sha256-M2M+sgC2bZ4r73FO1LV5JmHiS5COwEb2Uqw7EbsHmBY='"
   #- "script-src 'self' 'unsafe-eval' 'sha256-M2M+sgC2bZ4r73FO1LV5JmHiS5COwEb2Uqw7EbsHmBY=' 'sha256-dsOXGNHAo/syFnazt+KTBsCQeRmlcW1XKL0bCK4Baec=' 'sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8='"
+timelion.enabled: false

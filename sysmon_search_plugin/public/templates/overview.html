@@ -32,7 +32,7 @@
 
 <div class="main">
 
-<div class="overview_info" style="float:left;width:40%">
+<div class="overview_info">
   <!--
 <h2>{{ lang["PCR_H2"] }}</h2>
 <h2>{{ lang["TARGET_HOSTNAME"] }}:{{ctrl.hostname}}</h2>
@@ -41,9 +41,11 @@
 <div >
     <h2>{{ lang["PCR_H2"] }} </h2>
   <table>
-    <tr><th>GUID</th><td>{{ctrl.guid}}</td></tr>
-    <tr><th>{{ lang["TARGET_HOSTNAME"] }}</th><td>{{ctrl.hostname}}</td></tr>
-    <tr><th>{{ lang["TARGET_DATE"] }}</th><td>{{ctrl.date}}</td></tr>
+    <tr>
+      <th>GUID</th><td>{{ctrl.guid}}</td>
+      <th>{{ lang["TARGET_HOSTNAME"] }}</th><td>{{ctrl.hostname}}</td>
+      <th>{{ lang["TARGET_DATE"] }}</th><td>{{ctrl.date}}</td>
+    </tr>
   </table> 
 </div>
 
@@ -64,7 +66,7 @@
       <td>
         <input name="start_date" ng-model="keywords.start_date" type="date" placeholder="{{lang.EVENT_DETECTIONBOX_AFTER}}" ng-keyup="$event.keyCode == 13 ? ctrl.onkeyup(keywords) : null">
       </td>
-    </tr><tr>
+    
       <th>
         <span style="font-weight: bold;">{{ lang["EVENT_DETECTIONBOX_BEFORE"] }}</span>
       </th>
@@ -86,15 +88,13 @@
 </div><!--/search_Box_main-->
 </div><!--/search_Box-->
 
+    
+<div id="mynetwork"></div>
+<div class="vis-network" style="position: relative; overflow: hidden; touch-action: pan-y; -moz-user-select: none; width: 100%; height: 100%;" tabindex="900"></div>
 <div class="message">{{ctrl.message}}</div>
-
-    <p><textarea style="width:100%;" rows="10" cols="100" id="text" class="detail" readonly placeholder="{{lang.TEXTAREA_PLACEHOLDER}}">
+    <p><textarea rows="10" cols="100" id="text" class="detail" readonly placeholder="{{lang.TEXTAREA_PLACEHOLDER}}">
     </textarea></p>
 </div>
-    
-<div style="float:left;" id="mynetwork"></div>
-<div style="float:left;" class="vis-network" style="position: relative; overflow: hidden; touch-action: pan-y; -moz-user-select: none; width: 100%; height: 100%;" tabindex="900"></div>
-
 
 </div><!--/main-->
 </div><!--ng-cloak-->
