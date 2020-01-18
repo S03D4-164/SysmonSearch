@@ -57,7 +57,7 @@ path {  stroke: #fff; }
 
 .x.axis path {  display: none; }
 .legend{
-    margin-bottom:30px;
+    margin-bottom:10px;
     display:inline-block;
     border-collapse: collapse;
     border-spacing: 0px;

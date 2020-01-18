@@ -52,7 +52,7 @@
   </table> 
 </div>
 
-<div style="width:40%;float:left;" class="search_Box">
+<div class="search_Box">
   
 <div class="search_Box_Ttl">
 <img src="../plugins/sysmon_search_visual/images/search_icon.png" alt="search_icon" width="21" height="20">
@@ -85,7 +85,7 @@
 </form>
 
 <label>
-  <input name="keyword" ng-model="keyword" placeholder="キーワード" class="search_keyword ng-pristine ng-untouched ng-valid ng-empty" ng-keyup="$event.keyCode == 13 ? ctrl.onkeyup(keyword,hash) : null" type="text">
+  <input name="keyword" ng-model="keyword" placeholder="keyword" class="search_keyword ng-pristine ng-untouched ng-valid ng-empty" ng-keyup="$event.keyCode == 13 ? ctrl.onkeyup(keyword,hash) : null" type="text">
 </label>
 <label>
   <input name="hash" ng-model="hash" placeholder="HASH" class="search_hash ng-pristine ng-untouched ng-valid ng-empty" ng-keyup="$event.keyCode == 13 ? ctrl.onkeyup(keyword,hash) : null" type="text">
@@ -94,12 +94,12 @@
 </div>
 </div>
 
-<div style="width:60%;float:left;">
+<div >
 <p><textarea rows="10" cols="80" id="text" readonly placeholder="{{lang.TEXTAREA_PLACEHOLDER}}">
-  </textarea></p>
+  </textar></p>
 </div>
   
-<div style="float:left;" id="mynetwork"></div>
+<div id="mynetwork"></div>
 <div id="pos" style="position:absolute; display:none;">test</div>
 </div>
 </div>

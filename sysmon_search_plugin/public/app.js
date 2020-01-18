@@ -150,6 +150,16 @@ uiModules
         .then((response) => {
             this.hostname = hostname;
 
+            var count = [];
+            var events = response.data["count"];
+            for (let [key, value] of Object.entries(events)) {
+              count.push({
+                "type":key,
+                "value":value,
+              });
+            }
+            this.data = count;
+
             var container = document.getElementById('visualization');
 
             var items = response.data["items"];
@@ -214,10 +224,8 @@ uiModules
                 for (var i = 0; i < bar_items.length; i++) {
                     var item = bar_items[i];
                     console.log(item);
-                    if (item.height == 0) continue;
-                    
+                    if (item.height == 0) continue;                    
                     var cur_bottom = cur_top - item.height;
-
                     if (cur_bottom <= bar_height - y && bar_height - y <= cur_top) {
                         groupId = item.groupId;
                         // alert("groupId:"+groupId);
@@ -233,9 +241,17 @@ uiModules
                 return category_name;
             }
 
-            graph2d.on("click", function(params) {
-                console.log(params);
+            graph2d.on("rangechange", function() {
+                graph2d.redraw();
             });
+
+            graph2d.on("click", function(event) {
+                var click_date = event.time;
+                var click_date_str = getViewFormat(click_date, "2");
+                var category = get_category_name(click_date_str, event);
+                console.log(category);
+            });
+
             graph2d.on("doubleClick", function(event) {
                 var click_date = event.time;
                 var click_date_str = getViewFormat(click_date, "2");
@@ -272,6 +288,7 @@ uiModules
             this.date = params.date;
             var items = [];
             var item = response.data["count"];
+            var color = d3.scaleOrdinal(d3.schemePaired);
             for (let [key, value] of Object.entries(item)) {
               items.push({
                 "type":key,
@@ -577,7 +594,8 @@ uiModules
 
                 var network = new vis_network.Network(container, data, options);
 
-                network.on("oncontext", function(properties) {
+                //network.on("oncontext", function(properties) {
+                network.on("click", function(properties) {
                     var nodeid = network.getNodeAt(properties.pointer.DOM);
                     if (nodeid) {
                         network.selectNodes([nodeid], true);
@@ -1082,7 +1100,8 @@ uiModules
             // console.log( data );
             var network = new vis_network.Network(container, data, options);
 
-            network.on("oncontext", function(properties) {
+            //network.on("oncontext", function(properties) {
+            network.on("click", function(properties) {
                 var nodeid = network.getNodeAt(properties.pointer.DOM);
 
                 if (nodeid) {
@@ -1972,7 +1991,7 @@ function pie_chart(id, fData, legFlg, r) {
         var pointer = c % 9;
         return color[pointer];
     }
-    var color = d3.scaleOrdinal(d3.schemeCategory10);
+    var color = d3.scaleOrdinal(d3.schemePaired);
 
     function pieChart(pD) {
         var pC = {},
@@ -2074,7 +2093,7 @@ function histoGram(id, fD, max, title, process_flg) {
             b: 20,
             l: 0
         };
-    hGDim.w = 200//320 - hGDim.l - hGDim.r,
+        hGDim.w = 200//320 - hGDim.l - hGDim.r,
         hGDim.h = 220 - hGDim.t - hGDim.b;
 
     var hGsvg = d3.select(id).append("svg")
@@ -2136,7 +2155,7 @@ function histoGram(id, fD, max, title, process_flg) {
         .attr("x", function(d) {
             return 10;
         })
-        .style("font-size", 11)
+        .style("font-size", 14)
         .attr("text-anchor", "left");
 
     bars.append("text").text(title)
@@ -2147,7 +2166,6 @@ function histoGram(id, fD, max, title, process_flg) {
             return 10;
         })
         .attr("text-anchor", "left");
-
 
     return hG;
 }

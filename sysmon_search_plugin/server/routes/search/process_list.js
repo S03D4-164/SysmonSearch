@@ -1,5 +1,43 @@
 //const Utils = require('./Utils');
+async function getEventIdFromType(type){
+  if (type === 'create_process') return [1];
+  else if (type === 'file_create_time') return [2];
+  else if (type === 'net_access') return [3];
+  else if (type === 'pocess_terminated') return [5];
+  else if (type === 'driver_loaded') return [6];
+  else if (type === 'image_loaded') return [7];
+  else if (type === 'remote_thread') return [8];
+  else if (type === 'raw_access_read') return [9];
+  else if (type === 'process_access') return [10];
+  else if (type === 'create_file') return [11];
+  else if (type === 'registry') return [12,13,14];
+  else if (type === 'pipe') return [17,18];
+  else if (type === 'wmi') return [19,20,21];
+  else if (type === 'dns') return [22];
+  else if (type === 'error') return [255];
+  else return [];
+}
 
+async function getTypeFromEventId(id){
+  if (id == 1) return 'create_process';
+  else if (id == 2) return 'file_create_time';
+  else if (id == 3) return 'net_access';
+  else if (id == 5) return 'pocess_terminated';
+  else if (id == 6) return 'driver_loaded';
+  else if (id == 7) return 'image_loaded';
+  else if (id == 8) return 'remote_thread';
+  else if (id == 9) return 'raw_access_read';
+  else if (id == 10) return 'process_access';
+  else if (id == 11) return 'create_file';
+  else if ([12,13,14].includes(id)) return 'registry';
+  else if ([17,18].includes(id)) return 'pipe';
+  else if ([19,20,21].includes(id)) return 'wmi';
+  else if (id == 22) return 'dns';
+  else if (id == 255) return 'error';
+  else return;
+}
+
+/*
 async function eventid_to_type(event_id) {
   var result = "";
   switch (event_id) {
@@ -38,6 +76,7 @@ async function eventid_to_type(event_id) {
 
   return result;
 }
+*/
 
 async function date_to_text(date) {
   var y = await padding(date.getUTCFullYear(), 4, "0"),
@@ -71,17 +110,6 @@ async function getRangeDatetime(date) {
   return {"start_date": start_date_str, "end_date": end_date_str};
 }
 
-async function getEventIdFromType(type){
-  if (type === 'create_process') return [1];
-  else if (type === 'file_create_time') return [2];
-  else if (type === 'net_access') return [3];
-  else if (type === 'image_loaded') return [7];
-  else if (type === 'remote_thread') return [8];
-  else if (type === 'create_file') return [11];
-  else if (type === 'registry') return [12,13,14];
-  else if (type === 'wmi') return [19,20,21];
-  else return [];
-}
 
 async function processList(sysmon, hostname, eventtype, date, searchObj) {
   var host = {};
@@ -173,8 +201,9 @@ async function processList(sysmon, hostname, eventtype, date, searchObj) {
       };
       // results.push(hit.event_data);
       //tmp['type'] = Utils.eventid_to_decription(hit.winlog.event_id);
-      tmp['type'] = await eventid_to_type(winlog.event_id);
-      //console.log(tmp);
+      //tmp['type'] = await eventid_to_type(winlog.event_id);
+      tmp['type'] = await getTypeFromEventId(winlog.event_id);
+
       switch (tmp['type']) {
         case 'create_process':
           tmp['process'] = data.ParentImage;
@@ -240,6 +269,27 @@ async function processList(sysmon, hostname, eventtype, date, searchObj) {
             'Hashes': data.Hashes
           };
           break;
+
+        case 'process_access':
+          tmp['process'] = data.SourceImage;
+          tmp['disp'] = data.TargetImage;
+          tmp['info'] = {
+            'SourceProcessGuid': data.SourceProcessGuid,
+            'CallTrace': data.CallTrace,
+            'TargetProcessGuid': data.TargetProcessGuid
+          };
+          break;
+
+        case 'dns':
+          tmp['process'] = data.Image;
+          tmp['disp'] = data.QueryName;
+          tmp['info'] = {
+            'ProcessGuid': data.ProcessGuid,
+            'QueryStatus': data.QueryStatus,
+            'QueryResults': data.QueryResults
+          };
+          break;
+  
         case 'wmi':
           if (hit.winlog.event_id == 19) {
             tmp['process'] = data.Name+":"+ data.EventNamespace;

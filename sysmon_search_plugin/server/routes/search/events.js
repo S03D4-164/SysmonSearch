@@ -64,7 +64,7 @@ async function events(sysmon, hostname, date) {
            "create_file",
            "registry",
            //"pipe",
-           //"wmi",
+           "wmi",
            "dns",
            //"error",
            "other" 
@@ -100,8 +100,8 @@ async function events(sysmon, hostname, date) {
           cnt["registry"] += event['doc_count'];
         //} else if (event['key'] == 17 || event['key'] == 18) {
         //  cnt["pipe"] += event['doc_count'];
-        //} else if (event['key'] == 19 || event['key'] == 20 || event['key'] == 21) {
-        //  cnt["wmi"] += event['doc_count'];
+        } else if (event['key'] == 19 || event['key'] == 20 || event['key'] == 21) {
+          cnt["wmi"] += event['doc_count'];
         } else if (event['key'] == 22) {
           cnt["dns"] += event['doc_count'];
         //} else if (event['key'] == 255) {
@@ -116,6 +116,8 @@ async function events(sysmon, hostname, date) {
         // return piechart data
         var data = {"count":cnt};
         return data;
+      }else{
+        results["count"] = cnt;
       }
 
       for (let [key, value] of Object.entries(cnt)) {

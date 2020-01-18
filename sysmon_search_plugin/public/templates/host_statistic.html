@@ -41,7 +41,27 @@
 <div id="visualization"></div>
 </div>
 -->
+
+<table class="table">
+  <thead>
+    <tr>
+      <th>{{ lang["EVENTSUMMARY_TABLE_TYPE"] }}</th>
+      <th>{{ lang["EVENTSUMMARY_TABLE_NUM"] }}</th>
+    </tr>
+  </thead>
+  <tbody>
+  <tr ng-repeat="day_data in ctrl.data">
+<!--
+      <td title="{{lang.DATA_NAME_EVENTTYPE}}"><div class="square" id='square{{$index}}'></div> {{day_data.type}}</td>
+-->
+      <td title="{{lang.DATA_NAME_EVENTTYPE}}"><div class="square" style="background:{{day_data.color}}"></div> {{day_data.type}}</td>
+      <td><a href="sysmon_search_visual#/process_list/{{ctrl.hostname}}/{{day_data.type}}/{{ctrl.date}}/0" title="{{lang.OPEN_PROCESS}}" target="_blank" class="{{display(day_data.type) ? 'btn-abled' : 'btn-disabled'}}">{{day_data.value}}</a></td>
+  </tr>
+	</tbody>
+</table>
+
 </div>
+
 </body>
 </html>
 

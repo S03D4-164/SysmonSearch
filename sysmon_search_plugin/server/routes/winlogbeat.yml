@@ -100,6 +100,9 @@ fieldmappings:
   ProcessName: winlog.event_data.ProcessName
   Protocol: winlog.event_data.Protocol
   Properties: winlog.event_data.Properties
+  QueryName: winlog.event_data.QueryName
+  QueryStatus: winlog.event_data.QueryStatus
+  QueryResults: winlog.event_data.QueryResults
   SecurityID: winlog.event_data.SecurityID
   ServiceFileName: winlog.event_data.ServiceFileName
   ServiceName: winlog.event_data.ServiceName
