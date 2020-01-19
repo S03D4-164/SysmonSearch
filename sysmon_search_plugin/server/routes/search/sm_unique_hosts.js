@@ -1,7 +1,6 @@
 const makeQuery = require('./make_query');
 
 async function sm_unique_hosts(sysmon, params) {
-  //var search_items_and_date_query = this.make_query(params)
   var query = await makeQuery(params, sysmon.map);
 
   var uniqueHostObj = {
@@ -17,8 +16,7 @@ async function sm_unique_hosts(sysmon, params) {
   };
   console.log("[search unique host] " + JSON.stringify(uniqueHostObj, null, 2))
   const el_result = await sysmon.client.search({
-    //index: 'winlogbeat-*',                                                                                           
-    index: sysmon.map["defaultindex"],
+    index: sysmon.index,
     // size: 1000,
     body: uniqueHostObj
   });

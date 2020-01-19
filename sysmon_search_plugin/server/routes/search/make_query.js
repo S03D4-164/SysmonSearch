@@ -1,5 +1,3 @@
-const Utils = require('./Utils');
-
 function set_wildcard_value(search_items, key, params, num) {
   var match = {};
   if ("search_value_" + num in params
@@ -253,4 +251,4 @@ async function makeQuery(params, map) {
   return search_items_and_date_query;
 }
 
-module.exports = makeQuery;;
+module.exports = makeQuery;

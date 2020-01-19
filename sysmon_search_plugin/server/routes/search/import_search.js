@@ -1,8 +1,5 @@
-//const request = require('request-promise');
 const request = require('request');
-const CONFIG_PATH = '../../../conf.js';
 import {conf as config} from '../../../conf.js';
-const util = require('util');
 const sprintf = require('sprintf-js').sprintf;
 
 async function doRequest(options) {

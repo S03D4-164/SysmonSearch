@@ -2,7 +2,6 @@ const yaml = require('js-yaml');
 const fs   = require('fs');
 
 async function searchHosts(sysmon, params) {
-  //var computer = sysmon.map["ComputerName"]
 
   var search_items_and_date_query = [{
     "match": sysmon.channel
@@ -63,7 +62,6 @@ async function searchHosts(sysmon, params) {
           "computer_names": {
             "terms": {
               "size": 1000,
-              //"field": computer
               "field": sysmon.computer_name
             }
           }

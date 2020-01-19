@@ -1,24 +1,5 @@
 const process = require('./process');
 
-/*
-async function add_process_info(target, info_array) {
-  console.log("[add process info] " + JSON.stringify(target, null, 2))
-  if(target){
-    if (target.current != null && target.current.guid != null && target.current.guid in info_array) {
-      target.current['infos'] = info_array[target.current.guid];
-    }
-    console.log("[target child] " + JSON.stringify(target.child, null, 2))
-    for (var index in target.child) {
-      var item = target.child[index];
-      //if(item) target = await add_process_info(item, info_array);
-      target = await add_process_info(item, info_array);
-    } 
-  }
-  console.log("[add process info result] " + JSON.stringify(target, null, 2))
-  return target;
-}
-*/
-
 async function make_process_infos(result, target_root, config) {
   // KEY: GUID
   // VALUE: EVENT DATA
@@ -147,8 +128,6 @@ async function make_process_infos(result, target_root, config) {
       info_array[data.SourceProcessGuid].push(tmp);
     }
   }
-  //target_root = await add_process_info(target_root, info_array);
-
 
   const addProcessInfo = async function (target) {
     console.log("[add process info] " + JSON.stringify(target, null, 2))
@@ -180,7 +159,7 @@ async function sub_process_infos(sysmon, hostname, date, guid) {
   var sourceProcessGuid = {};
   sourceProcessGuid[sysmon.map["SourceProcessGuid"]] = guid;
   // Search Process Info
-  // source process is create remote thread or process is events
+  // source process is create remote thread, or process is events
   var searchObj = {
     "size": 10000,
     "query": {

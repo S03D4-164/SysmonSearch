@@ -49,8 +49,7 @@ async function alertData(sysmon, data) {
     ]
   };
 
-  //const el_result = this.search_alert(searchObj);
-
+  
   const el_result = await sysmon.client.search({
     index: 'sysmon-search-alert-*',
     // size: 1000,

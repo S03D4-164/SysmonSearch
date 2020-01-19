@@ -182,7 +182,6 @@ async function processDetail(sysmon, hostname, date, guid) {
     "sort": [{"@timestamp": "asc"}]
   };
 
-  //this.search(searchObj, get_datas);
   const el_result = await sysmon.client.search({
     index: sysmon.index,
     // size: 1000,

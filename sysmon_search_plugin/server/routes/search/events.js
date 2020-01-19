@@ -8,7 +8,6 @@ async function events(sysmon, hostname, date) {
     }
   }
   var host = {};
-  //var computer = sysmon.map["ComputerName"];
   host[sysmon.computer_name] = hostname;
   var searchObj = {
     "size": 0,
@@ -31,7 +30,6 @@ async function events(sysmon, hostname, date) {
          "aggs": {
            "event_id": {
              "terms": {
-               //"field": sysmon.map["EventID"],
                "field": sysmon.event_id,
                "size" : 100000
              }
