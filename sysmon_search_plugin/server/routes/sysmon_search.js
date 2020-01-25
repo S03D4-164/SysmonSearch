@@ -9,7 +9,7 @@ class SysmonSearch {
       //log: 'trace',
       host: host + ':' + port
     });
-    var doc = yaml.safeLoad(fs.readFileSync(__dirname + '/winlogbeat.yml', 'utf8'));
+    var doc = yaml.safeLoad(fs.readFileSync(__dirname + '/../../winlogbeat.yml', 'utf8'));
     //console.log(doc["logsources"]["windows-sysmon"]["conditions"]);
     this.channel = doc["logsources"]["windows-sysmon"]["conditions"];
     this.map = doc["fieldmappings"];

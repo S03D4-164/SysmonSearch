@@ -7,3 +7,5 @@ INDEX_NAME_ORG = "winlogbeat"
 INDEX_NAME = "sysmon-search-alert"
 MAX_GET_SIZE = 10000
 RULE_FILE_DIRECTORY = "/root/script/rule_files/*"
+WINLOGBEAT_YML = "/root/script/winlogbeat.yml"
+#WINLOGBEAT_YML = "../sysmon_search_plugn/winlogbeat.yml"

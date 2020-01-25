@@ -6,6 +6,8 @@ ELASTICSEARCH_SERVER = "elasticsearch"
 INDEX_NAME_ORG = "winlogbeat"
 INDEX_NAME = "sysmon-search-statistics"
 MAX_GET_SIZE = 10000
+WINLOGBEAT_YAML = "/root/script/winlogbeat.yml"
+#WINLOGBEAT_YAML = "../sysmon_search_plugin/winlogbeat.yml"
 
 #IP address to exclude from statistics
 EXCLUDED_IPADDRESS = [

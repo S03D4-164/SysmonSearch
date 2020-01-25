@@ -8,7 +8,7 @@ from elasticsearch import helpers
 
 import yaml
 fields = {}
-with open('../winlogbeat.yml') as file:
+with open(setting.WINLOGBEAT_YML) as file:
     yml = yaml.safe_load(file)
     fields = yml["fieldmappings"]
 
