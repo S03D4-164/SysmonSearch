@@ -58,7 +58,7 @@ async function events(sysmon, hostname, date) {
            "image_loaded",
            "remote_thread",
            //"raw_access_read",
-           "process_access",
+           //"process_access",
            "create_file",
            "registry",
            //"pipe",
@@ -90,8 +90,8 @@ async function events(sysmon, hostname, date) {
           cnt["remote_thread"] += event['doc_count'];
         //} else if (event['key'] == 9) {
         //  cnt["raw_access_read"] += event['doc_count'];
-        } else if (event['key'] == 10) {
-          cnt["process_access"] += event['doc_count'];
+        //} else if (event['key'] == 10) {
+        //  cnt["process_access"] += event['doc_count'];
         } else if (event['key'] == 11) {
           cnt["create_file"] += event['doc_count'];
         } else if (event['key'] == 12 || event['key'] == 13 || event['key' == 14]) {
@@ -118,17 +118,19 @@ async function events(sysmon, hostname, date) {
         results["count"] = cnt;
       }
 
+      let gid = 0;
       for (let [key, value] of Object.entries(cnt)) {
         var tmp = {
-          "group": key,
+          "group": gid,
           "x":item['key_as_string'],
           "y": value,
           "label":{
-            //"content":key,
+            "content":key,
             "yOffset":20
           }
         };
         results["items"].push(tmp);
+        gid++;
       }
 
     }

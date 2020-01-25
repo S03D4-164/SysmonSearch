@@ -168,8 +168,9 @@ uiModules
             var groups = new vis_graph.DataSet();
             for (var index in category){
                 groups.add({
-                    id: category[index],
+                    id: index,
                     content: category[index],
+                    className: "visgroup" + index
                 })
             }
 
@@ -184,15 +185,18 @@ uiModules
                     if(item.y<10){
                       return false;
                     }
-                    //return {
-                    //  style: "square"
-                    //}
+                    /*
+                    return {
+                      style: "square", size: 0
+                    }
+                    */
                 },
                 dataAxis: {icons: false},
-                legend: {enabled:true},
+                legend: {enabled:false},
                 start: getViewFormat(getPastDate(date1, 1, "day"), 2),
                 end: getViewFormat(date2, 2),
                 orientation: 'top',
+                sort:true,
                 zoomable: true
             };
 
@@ -206,10 +210,11 @@ uiModules
                 var bar_items = [];
                 var bar_height = 0;
                 var ids = linegraph.itemsData.getIds();
-                console.log(ids);
+                //console.log(ids);
                 for (var i = 0; i < ids.length; i++) {
                     var height = 0;
                     var item = linegraph.itemsData._getItem(ids[i]);
+                    //console.log(item);
                     if (item.x !== date_str) continue;
 
                     bar_height = bar_height + item.y;
@@ -218,6 +223,7 @@ uiModules
                         groupId: item.group
                     });
                 }
+                //console.log(bar_items);
 
                 var cur_top = bar_height;
                 var groupId = -1;
@@ -228,15 +234,13 @@ uiModules
                     var cur_bottom = cur_top - item.height;
                     if (cur_bottom <= bar_height - y && bar_height - y <= cur_top) {
                         groupId = item.groupId;
-                        // alert("groupId:"+groupId);
                         break;
                     }
                     cur_top = cur_bottom;
                 }
                 var category_name = '';
                 if (groupId != -1) {
-                    //category_name = category[groupId];
-                    category_name = groupId;
+                    category_name = category[groupId];
                 }
                 return category_name;
             }
@@ -245,12 +249,14 @@ uiModules
                 graph2d.redraw();
             });
 
+            
             graph2d.on("click", function(event) {
                 var click_date = event.time;
                 var click_date_str = getViewFormat(click_date, "2");
                 var category = get_category_name(click_date_str, event);
-                console.log(category);
+                alert(category);
             });
+            
 
             graph2d.on("doubleClick", function(event) {
                 var click_date = event.time;
@@ -260,7 +266,6 @@ uiModules
 
                 var category = get_category_name(click_date_str, event);
                 if (category == '') return;
-                //var url = 'sysmon_search_visual#/process_list/' + $route.current.params.hostname + '/' + category + '/' + click_date_str + '/0';
                 var url = 'sysmon_search_visual#/process_list/' + hostname + '/' + category + '/' + click_date_str + '/0';
                 //console.log(url);
                 window.open(url, "_blank");
@@ -288,13 +293,15 @@ uiModules
             this.date = params.date;
             var items = [];
             var item = response.data["count"];
-            var color = d3.scaleOrdinal(d3.schemePaired);
+            var total = 0;
             for (let [key, value] of Object.entries(item)) {
               items.push({
                 "type":key,
                 "value":value,
               });
+              total+=value;
             }
+            this.total = total;
             this.data = items;
             //if (item && item.result) {
             if (item) {
@@ -302,7 +309,7 @@ uiModules
                 if (item["create_process"] != 0) this.btnflg = true;
                 else  this.btnflg = false;
                 var freqData = item;
-                pie_chart('#piechart', freqData, true, 300);
+                pie_chart('#piechart', freqData, false, 400);
             }
         });
     })
@@ -1284,9 +1291,11 @@ uiModules
 
         self.rules = [];
 
-        period_list.push(getOptiion(new Date(), 1, "month"));
-
         var startdate = getStartDate(new Date(), 1);
+
+        //period_list.push(getOptiion(new Date(), 1, "month"));
+        period_list.push(getOptiion(startdate, 1, "month"));
+
         period_list.push(getOptiion(startdate, 1, "day"));
         for (var i = 0; i < (options_num - 1); i++) {
             period_list.push(getOptiion(now, day_interval, "day"));
@@ -1986,12 +1995,22 @@ function make_histset(id, desc_data_p, asc_data_p, count, labelkey, valuekey, pr
 function pie_chart(id, fData, legFlg, r) {
     function segColor(c) {
         var color = [
-            "#87CEFA", "#FFDEAD", "#7B68EE", "#8FBC8F", "#FF3366", "#33FFFF","#666699","#00FA9A","#FF00FF"
+            "#87CEFA",
+            "#FFDEAD",
+            "#7B68EE",
+            "#8FBC8F",
+            "#FF3366",
+            "#33FFFF",
+            "#666699",
+            "#00FA9A",
+            "#FF00FF",
+            "#FFA500",
+            //"#6B8E23",
         ];
-        var pointer = c % 9;
+        var pointer = c % 10;
         return color[pointer];
     }
-    var color = d3.scaleOrdinal(d3.schemePaired);
+    //var color = d3.scaleOrdinal(d3.schemePaired);
 
     function pieChart(pD) {
         var pC = {},
@@ -2018,8 +2037,8 @@ function pie_chart(id, fData, legFlg, r) {
                 this._current = d;
             })
             .style("fill", function(d, i) {
-                //return segColor(i);
-                return color(i);
+                return segColor(i);
+                //return color(i);
             })
 
         return pC;
@@ -2035,8 +2054,8 @@ function pie_chart(id, fData, legFlg, r) {
         tr.append("td").append("svg").attr("width", '16').attr("height", '16').append("rect")
             .attr("width", '16').attr("height", '16')
             .attr("fill", function(d, i) {
-                //return segColor(i);
-                return color(i);
+                return segColor(i);
+                //return color(i);
             });
 
         tr.append("td").text(function(d) {
@@ -2342,7 +2361,7 @@ function getOptiion(lt_date, interval, type) {
 function getViewFormat(date, type) {
     if (type == 1) {
         return padding(date.getFullYear(), 4, "0") + "/" + padding(date.getMonth() + 1, 2, "0") + "/" + padding(date.getDate(), 2, "0") + "/00:00:00";
-    } else {
+    } else if (type == 2) {
         return padding(date.getFullYear(), 4, "0") + "-" + padding(date.getMonth() + 1, 2, "0") + "-" + padding(date.getDate(), 2, "0");
     }
 

@@ -15,13 +15,13 @@
 <div class="global_Nav">
 <ul id="menu" class="clearfix">
   <li>
-    <a href="sysmon_search_visual#/alert" class="active">{{ lang["TAB_ALERT"] }}</a>
+    <a href="sysmon_search_visual#/alert">{{ lang["TAB_ALERT"] }}</a>
   </li>
   <li>
     <a href="sysmon_search_visual#/search">{{ lang["TAB_SEARCH"] }}</a>
   </li>
   <li>
-    <a href="sysmon_search_visual#/dashboard">{{ lang["TAB_STATISTICS"] }}</a>
+    <a href="sysmon_search_visual#/dashboard" class="active">{{ lang["TAB_STATISTICS"] }}</a>
   </li>
   <li>
     <a href="sysmon_search_visual#/">{{ lang["TAB_EVENT_LIST"] }}</a>
@@ -29,32 +29,38 @@
 </ul>
 </div>
 
+<div class="main">
+
 <table>
   <tr><th>{{ lang["EVENTSUMMARY_H2"] }}</th><td></td><th>{{ lang["TARGET_HOSTNAME"] }}</th><td>{{ctrl.hostname}}</td><th>{{ lang["TARGET_DATE"] }}</th><td>{{ctrl.date}}</td></tr>
 </table>
 
-<br />
 
 <div style="float:left;" id='piechart'></div>
 <div style="float:left;">
-<table class="table">
+<table class="legend">
   <thead>
     <tr>
       <th>{{ lang["EVENTSUMMARY_TABLE_TYPE"] }}</th>
       <th>{{ lang["EVENTSUMMARY_TABLE_NUM"] }}</th>
+      <th>Percentage</th>
     </tr>
   </thead>
   <tbody>
   <tr ng-repeat="day_data in ctrl.data">
-
       <td title="{{lang.DATA_NAME_EVENTTYPE}}"><div class="square" id='square{{$index}}'></div> {{day_data.type}}</td>
-      <td><a href="sysmon_search_visual#/process_list/{{ctrl.hostname}}/{{day_data.type}}/{{ctrl.date}}/0" title="{{lang.OPEN_PROCESS}}" target="_blank" class="{{display(day_data.type) ? 'btn-abled' : 'btn-disabled'}}">{{day_data.value}}</a></td>
-  </tr>
+      <td align="right"><a href="sysmon_search_visual#/process_list/{{ctrl.hostname}}/{{day_data.type}}/{{ctrl.date}}/0" title="{{lang.OPEN_PROCESS}}" target="_blank" class="{{display(day_data.type) ? 'btn-abled' : 'btn-disabled'}}">{{day_data.value}}</a></td>
+      <td align="right">{{(day_data.value/ctrl.total)*100 | number:0}} %</td>
+    </tr>
   <tr>
-      <td colspan="1"><a href="sysmon_search_visual#/process/{{ctrl.hostname}}/{{ctrl.date}}/0" title="{{lang.OPEN_CORRELATION}}" target="_blank" class="{{ctrl.btnflg ? 'btn-abled' : 'btn-disabled'}}">{{ lang["CORRELATION_H2"] }}</a></td>
-	</tr>
+    <td>Total</td>
+    <td >{{ctrl.total}}</td>
+    <td ><a href="sysmon_search_visual#/process/{{ctrl.hostname}}/{{ctrl.date}}/0" title="{{lang.OPEN_CORRELATION}}" target="_blank" class="{{ctrl.btnflg ? 'btn-abled' : 'btn-disabled'}}">{{ lang["CORRELATION_H2"] }}</a></td>
+
+  </tr>
 	</tbody>
 </table>
+</div>
 </div>
 
 </div>

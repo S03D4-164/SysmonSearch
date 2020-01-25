@@ -10,7 +10,9 @@ async function sm_unique_hosts(sysmon, params) {
     },
     "aggs": {
       "unique_hosts": {
-        "terms": {"field": sysmon.computer_name}
+        "terms": {
+          "field": sysmon.computer_name + ".keyword"
+        }
       }
     }
   };

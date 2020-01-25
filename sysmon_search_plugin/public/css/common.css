@@ -4,6 +4,13 @@
 body, html {
   font-family: sans-serif;
 }
+
+.main {
+	padding:15px;
+	max-width: 1280px;
+	margin: 0 auto;
+}
+
 .main h2 {
   color: #666666;
   position: relative;
@@ -32,9 +39,10 @@ body, html {
 }
 #mynetwork {
 	width: 100%;
-	height: 600px;
+	height: 500px;
 	border: 1px solid lightgray;
 	margin: 10px;
+	float: left;
 }
 .application {
   background-color: #EAEAE9;
@@ -122,9 +130,6 @@ body, html {
   border-left:1px solid #444;
 
 }
-.main {
-	padding:15px;
-}
 .ttlBox01 .period {
 	width: 500px;
 }
@@ -147,13 +152,13 @@ body, html {
 	-o-border-radius: 4px;/* for opera */
 }
 .search_Box {
-	/*width: 100%;*/
 	margin-bottom: 10px;
+	float:left;
 }
 .search_Box_Ttl {
 	color: #666;
 	font-weight: bold;
-	padding: .75em 1em;
+	padding: .15em 1em;
   border-bottom: 1px solid #ccc;
   background: -webkit-linear-gradient(top, #fff 0%, #f0f0f0 100%);
   background: linear-gradient(to bottom, #fff 0%, #f0f0f0 100%);
@@ -257,7 +262,7 @@ table.table {
 	border-spacing: 0;
 	background-color: #fff;
 	border: 1px solid #D9D9D9;
-	table-layout: fixed;
+	/*table-layout: fixed;*/
 }
 table.table th {
 	background-color: #F1F1EA;
@@ -267,6 +272,11 @@ table.table td {
 	border-left: 1px solid #D9D9D9;
         word-break:break-word;
 }
+table.legend {
+	border-spacing: 0;
+	/*border: 1px solid #D9D9D9;*/
+}
+
 .addButton {
 	display: inline-block;
 	white-space: nowrap;
@@ -423,4 +433,14 @@ table.noBorder_tbl th {
 
 input.button{
 	padding:10px;
+	border-width: thin;
 }
+
+.vis-timeline .vis-bar {
+	fill-opacity: 1;
+ }
+
+ #visualization{
+	 width: 80%;
+	 float: left;
+ }

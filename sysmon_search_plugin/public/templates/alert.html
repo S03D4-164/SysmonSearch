@@ -18,9 +18,9 @@
 <body>
 <div ng-cloak>
 
-<!--
+  <!--
   <div id="header"><h1 class="h1_logo">SysmonSearch</h1></div>
--->
+  -->
 
 <div class="global_Nav">
 <ul id="menu" class="clearfix">
@@ -107,12 +107,14 @@
 </div><!--/host_count-->
 
 <div class="resultButton">result</div>
-    <table class="table alertTable">
+    <table class="table">
       <thead>
         <tr><!-- sort sysmon-search-alert -->
             <th><a ng-click="ctrl.sort(period, keywords, 'event_data.UtcTime.keyword')">UtcTime{{ctrl.utc_time}}</a></th>
             <th><a ng-click="ctrl.sort(period, keywords, 'event_id')">EventId{{ctrl.event_id}}</a></th>
+            <!--
             <th><a ng-click="ctrl.sort(period, keywords, 'level.keyword')">Level{{ctrl.level}}</a></th>
+            -->
             <th><a ng-click="ctrl.sort(period, keywords, 'computer_name.keyword')">Computer{{ctrl.computer_name}}</a></th>
             <th><a ng-click="ctrl.sort(period, keywords, 'event_data.User.keyword')">UserName{{ctrl.user_name}}</a></th>
             <th><a ng-click="ctrl.sort(period, keywords, 'event_data.Image.keyword')">Image{{ctrl.image}}</a></th>
@@ -123,7 +125,9 @@
         <tr ng-repeat="data in ctrl.search_data">
           <td title="{{lang.DATA_NAME_UTCTIME}}">{{data.utc_time}}</td>
           <td title="{{lang.DATA_NAME_EVENTID}}">{{data.event_id}}</td>
+<!--
           <td title="{{lang.DATA_NAME_LEVEL}}">{{data.level}}</td>
+-->
           <td title="{{lang.DATA_NAME_COMPUTER}}">
               {{data.computer_name}}<BR>
               <a href="sysmon_search_visual#/process_list/{{data.computer_name}}/{{data.description}}/{{data.utc_time}}/{{data._id}}" title="{{lang.OPEN_PROCESS}}" target="_blank">{{lang.RESULTBOX_LINKNAME_TABLE}}</a>
