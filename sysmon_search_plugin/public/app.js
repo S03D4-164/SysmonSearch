@@ -149,6 +149,7 @@ uiModules
         $http.post('../api/sysmon-search-plugin/events', data)
         .then((response) => {
             this.hostname = hostname;
+            this.date = date;
 
             var count = [];
             var events = response.data["count"];
@@ -250,7 +251,7 @@ uiModules
             });
 
             
-            graph2d.on("click", function(event) {
+            graph2d.on("contextmenu", function(event) {
                 var click_date = event.time;
                 var click_date_str = getViewFormat(click_date, "2");
                 var category = get_category_name(click_date_str, event);

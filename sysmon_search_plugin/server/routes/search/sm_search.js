@@ -259,11 +259,11 @@ async function smSearch(sysmon, params) {
   const search_items_and_date_query = await makeQuery(params, sysmon.map);
 
   var sort_item = {};
-  if(params.sort_item != "winlog.event_id"){
-    sort_item[params.sort_item + ".keyword"] = params.sort_order;
-  }else{
-    sort_item[params.sort_item] = params.sort_order;
-  }
+  sort_item[params.sort_item] = params.sort_order;
+
+  //if(params.sort_item != "winlog.event_id") sort_item[params.sort_item + ".keyword"] = params.sort_order;
+  //else sort_item[params.sort_item] = params.sort_order;
+  
   var sort = [];
   sort.push(sort_item);
 

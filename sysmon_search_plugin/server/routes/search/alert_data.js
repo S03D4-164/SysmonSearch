@@ -2,12 +2,10 @@ const Utils = require('./Utils');
 
 async function alertData(sysmon, data) {
   var sort_item = {};
-  //sort_item[data.sort_item] = data.sort_order;
-  if(data.sort_item != "winlog.event_id"){
-    sort_item[data.sort_item + ".keyword"] = data.sort_order;
-  }else{
-    sort_item[data.sort_item] = data.sort_order;
-  }
+  sort_item[data.sort_item] = data.sort_order;
+  //if(data.sort_item != "event_id")sort_item[data.sort_item + ".keyword"] = data.sort_order;
+  //else sort_item[data.sort_item] = data.sort_order;
+  
   var sort = [];
   sort.push(sort_item);
 

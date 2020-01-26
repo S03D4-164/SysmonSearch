@@ -62,7 +62,8 @@ async function searchHosts(sysmon, params) {
           "computer_names": {
             "terms": {
               "size": 1000,
-              "field": sysmon.computer_name + ".keyword"
+              //"field": sysmon.computer_name + ".keyword"
+              "field": sysmon.computer_name
             }
           }
         }
