@@ -53,8 +53,10 @@ uiModules
         function default_date_range(keywords) {
             var st_dt = new Date();
             st_dt = getPastDate(st_dt,1,"month")
-            keywords.fm_start_date = formatDate2(st_dt) + 'T00:00:00Z';
-            keywords.fm_end_date = formatDate2(new Date()) + 'T23:59:59Z';
+            //keywords.fm_start_date = formatDate2(st_dt) + 'T00:00:00Z';
+            //keywords.fm_end_date = formatDate2(new Date()) + 'T23:59:59Z';
+            keywords.fm_start_date = formatDate2(st_dt) + 'T00:00:00';
+            keywords.fm_end_date = formatDate2(new Date()) + 'T23:59:59';
             return keywords;
         }
         this.keywords = default_date_range({});
