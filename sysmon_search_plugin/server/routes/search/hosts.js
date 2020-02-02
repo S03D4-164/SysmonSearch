@@ -1,6 +1,3 @@
-const yaml = require('js-yaml');
-const fs   = require('fs');
-
 async function searchHosts(sysmon, params) {
 
   var search_items_and_date_query = [{

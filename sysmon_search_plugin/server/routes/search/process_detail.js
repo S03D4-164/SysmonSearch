@@ -41,7 +41,7 @@ async function get_datas(el_result) {
             'Image': data.Image
         };
     } else if ((winlog.event_id == 12) || (winlog.event_id == 13)) {
-        tmp['type'] = 'registory';
+        tmp['type'] = 'registry';
         tmp['process'] = data.Image;
         tmp['disp'] = data.TargetObject;
         tmp['info'] = {
@@ -152,7 +152,8 @@ async function processDetail(sysmon, hostname, date, guid) {
                     "must": [
                         {"match": {"@timestamp": date}},
                         {"match": pguid},
-                        {"terms": {"winlog.event_id": event_ids}}
+                        {"terms": {[sysmon.event_id]: event_ids}}
+                        //{"terms": {"winlog.event_id": event_ids}}
                     ]
                   }
                 },
@@ -161,7 +162,8 @@ async function processDetail(sysmon, hostname, date, guid) {
                     "must": [
                         {"match": {"@timestamp": date}},
                         {"match": spguid},
-                        {"terms": {"winlog.event_id": [8]}}
+                        {"terms": {[sysmon.event_id]: [8]}}
+                        //{"terms": {"winlog.event_id": [8]}}
                     ]
                   }
                 },
@@ -169,7 +171,8 @@ async function processDetail(sysmon, hostname, date, guid) {
                   "bool": {
                     "must": [
                       {"match": pguid},
-                      {"terms": {"winlog.event_id": [1]}}
+                      {"terms": {[sysmon.event_id]: [1]}}
+                      //{"terms": {"winlog.event_id": [1]}}
                     ]
                   }
                 }

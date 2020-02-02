@@ -179,7 +179,8 @@ async function sub_process_infos(sysmon, hostname, date, guid) {
                   "match": processGuid
                   //{"event_data.ProcessGuid.keyword": guid}
                 },{
-                  "terms": {"winlog.event_id": [11, 12, 13, 3, 2, 7, 19, 20, 21]}
+                  "terms": {[sysmon.event_id]: [11, 12, 13, 3, 2, 7, 19, 20, 21]}
+                  //"terms": {"winlog.event_id": [11, 12, 13, 3, 2, 7, 19, 20, 21]}
                 }]
               }
             },{
@@ -188,7 +189,8 @@ async function sub_process_infos(sysmon, hostname, date, guid) {
                   "match": sourceProcessGuid
                   //{"event_data.SourceProcessGuid.keyword": guid}
                 },{
-                  "terms": {"winlog.event_id": [8]}
+                  "terms": {[sysmon.event_id]: [8]}
+                  //"terms": {"winlog.event_id": [8]}
                 }]
               }
             }]
@@ -240,7 +242,8 @@ async function process_overview(sysmon, hostname, date, guid) {
       {
         "bool":{
           "must": [
-            {"match": {"winlog.event_id": 1}},
+            //{"match": {"winlog.event_id": 1}},
+            {"match": {[sysmon.event_id]: 1}},
             {"match": host}
           ]
         }

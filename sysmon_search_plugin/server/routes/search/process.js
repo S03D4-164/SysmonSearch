@@ -251,7 +251,7 @@ async function process(sysmon, hostname, date, searchObj) {
         "_source": source
       };
 
-    } else {
+    } else { //!date_dict
       searchObj = {
         "size": 10000,
         "query": {
