@@ -31,6 +31,7 @@ export class SysmonEvents extends React.Component {
               date: res.date,
               pc: r.key,
               count: r.doc_count,
+              events: "ss_react/event?host=" + r.key + "&date=" + res.date,
             };
             items.push(item);
           });
@@ -48,8 +49,19 @@ export class SysmonEvents extends React.Component {
   render(){
   const columns = [
     {field: 'date', name: 'date'},
-    {field: 'pc', name: 'pc'},
-    {field: 'count', name: 'count'},
+    {
+      field: 'pc',
+      name: 'pc'
+    },
+    {
+      field: 'count',
+      name: 'count',
+      render: (count, item) => (
+        <EuiLink href={item.events} target="_blank">
+          {count}
+        </EuiLink>
+      )
+    },
   ];
 
   return (

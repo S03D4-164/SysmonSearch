@@ -8,40 +8,35 @@ import {
   EuiPageContentHeader,
   EuiPageContentBody,
   EuiText,
+  EuiLink,
 } from '@elastic/eui';
-import { FormattedMessage } from '@kbn/i18n/react';
+
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Link,
+  Redirect
+} from 'react-router-dom'
 
 import { SysmonSearchTabs } from './ss_tabs';
+import { SysmonSummary } from './ss_summary';
 
 export class Main extends React.Component {
+
   constructor(props) {
     super(props);
     this.state = {};
   }
 
-  componentDidMount() {
-    const { httpClient } = this.props;
-    console.log(httpClient)
-    //httpClient.get('../api/ss_react/example').then(resp => {
-    //  this.setState({ time: resp.data.time });
-    //});
-  }
   render() {
-    const { title } = this.props;
     return (
-      <EuiPage>
-        <EuiPageBody>
-          <EuiPageHeader>
-            <SysmonSearchTabs />
-          </EuiPageHeader>
-          <EuiPageContent>
-            <EuiPageContentHeader>
-            </EuiPageContentHeader>
-            <EuiPageContentBody>
-            </EuiPageContentBody>
-          </EuiPageContent>
-        </EuiPageBody>
-      </EuiPage>
-    );
+<Router>
+<Switch>
+<Route exact path="*/ss_react" component={SysmonSearchTabs} />
+<Route  path="*/ss_react/event" component={SysmonSummary} />
+</Switch>
+</Router>
+);
   }
 }

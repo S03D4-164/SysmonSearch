@@ -3,7 +3,6 @@ import React, { Component, Fragment } from 'react';
 import {
   EuiTabbedContent,
   EuiTitle,
-  EuiText,
   EuiSpacer,
 } from '@elastic/eui';
 
@@ -33,10 +32,16 @@ export class SysmonSearchTabs extends Component {
           <Fragment>
             <EuiSpacer />
             <EuiTitle>
+              <h3>Search</h3>
             </EuiTitle>
-            <EuiText>
-            </EuiText>
           </Fragment>
+        ),
+      },
+      {
+        id: 'alert',
+        name: 'Alert',
+        content: (
+              <h3>Alert</h3>
         ),
       },
     ];
@@ -49,11 +54,10 @@ export class SysmonSearchTabs extends Component {
         initialSelectedTab={this.tabs[0]}
         autoFocus="selected"
         onTabClick={tab => {
-          console.log('clicked tab', tab);
+          console.log(this.props);
         }}
       />
     );
   }
 }
 
-//export default SysmonSearchTabs;
