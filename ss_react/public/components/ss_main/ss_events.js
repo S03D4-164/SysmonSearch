@@ -1,4 +1,5 @@
 import React from 'react';
+import moment from 'moment';
 
 import {
   EuiBasicTable,
@@ -31,7 +32,8 @@ export class SysmonEvents extends React.Component {
               date: res.date,
               pc: r.key,
               count: r.doc_count,
-              events: "ss_react/event?host=" + r.key + "&date=" + res.date,
+              event: "ss_react/event?host=" + r.key + "&date=" + res.date,
+              stats: "ss_react/stats?host=" + r.key + "&date=" + res.date,
             };
             items.push(item);
           });
@@ -51,17 +53,22 @@ export class SysmonEvents extends React.Component {
     {field: 'date', name: 'date'},
     {
       field: 'pc',
-      name: 'pc'
+      name: 'pc',
+      render: (count, item) => (
+        <EuiLink href={item.stats} >
+          {count}
+        </EuiLink>
+      )
     },
     {
       field: 'count',
       name: 'count',
       render: (count, item) => (
-        <EuiLink href={item.events} target="_blank">
+        <EuiLink href={item.event} >
           {count}
         </EuiLink>
       )
-    },
+    }
   ];
 
   return (
@@ -71,4 +78,5 @@ export class SysmonEvents extends React.Component {
     />
   );
   }
+
 };

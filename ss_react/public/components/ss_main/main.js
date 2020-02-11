@@ -1,15 +1,4 @@
 import React from 'react';
-import {
-  EuiPage,
-  EuiPageHeader,
-  EuiTitle,
-  EuiPageBody,
-  EuiPageContent,
-  EuiPageContentHeader,
-  EuiPageContentBody,
-  EuiText,
-  EuiLink,
-} from '@elastic/eui';
 
 import {
   BrowserRouter as Router,
@@ -21,6 +10,7 @@ import {
 
 import { SysmonSearchTabs } from './ss_tabs';
 import { SysmonSummary } from './ss_summary';
+import { SysmonStats } from './ss_stats';
 
 export class Main extends React.Component {
 
@@ -31,12 +21,14 @@ export class Main extends React.Component {
 
   render() {
     return (
-<Router>
-<Switch>
-<Route exact path="*/ss_react" component={SysmonSearchTabs} />
-<Route  path="*/ss_react/event" component={SysmonSummary} />
-</Switch>
-</Router>
-);
+      <Router>
+        <Switch>
+          <Route exact path="*/ss_react" component={SysmonSearchTabs} />
+          <Route path="*/ss_react/event" component={SysmonSummary} />
+          <Route path="*/ss_react/stats" component={SysmonStats} />
+        </Switch>
+      </Router>
+    );
   }
+
 }
