@@ -62,7 +62,7 @@ export class SysmonSummary extends React.Component {
     });
   }
 
-  summaryLegend = (items, total) => {
+  summaryLegend = (items, total, host, date) => {
     return items.map(function(item, i){
       let percentage = item.value / total;
       let style= {
@@ -71,10 +71,14 @@ export class SysmonSummary extends React.Component {
         float: "left",
         marginRight: "10px",
         background: item.value > 0?segColor(i):""
-      }
+      };
+      let processlist = "process_list?";
+      processlist += "host=" + host;
+      processlist += "&date=" + date;
+      processlist += "&category=" + item.type;
       return(
       <tr key={item.type}>
-<td><div className="square" style={style}></div><a href="#">{item.type}</a></td>
+<td><div className="square" style={style}></div><a href={processlist}>{item.type}</a></td>
 <td align="right">{item.value}</td>
 <td align="right">{percentage.toFixed(2)}%</td>
 </tr>
@@ -83,7 +87,10 @@ export class SysmonSummary extends React.Component {
   }
 
   render() {
-console.log(this.state)
+    console.log(this.state);
+    let correlation = "process?"
+    correlation += "host=" + this.state.host;
+    correlation += "&date=" + this.state.date;
     return (
 <div id="summary" style={{maxWidth:"1280px",margin:"0 auto"}}>
 <EuiTitle size="m">
@@ -105,17 +112,23 @@ console.log(this.state)
 <th style={{paddingLeft:"10px"}}>Percentage</th></tr>
 </thead>
 <tbody>
-{this.summaryLegend(this.state.items,this.state.total)}
+{this.summaryLegend(
+  this.state.items,
+  this.state.total,
+  this.state.host,
+  this.state.date,
+)}
 <tr>
 <td>Total</td>
 <td align="right">{this.state.total}</td>
-<td align="right"><a href="#">Correlation</a></td>
+<td align="right"><a href={correlation}>Correlation</a></td>
 </tr>
 </tbody>
 </table>
 </EuiFlexItem>
   </EuiFlexGroup>
       </EuiText>
+<a href=".">back</a>
       </EuiPanel>
 </div>
     )
