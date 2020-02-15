@@ -21,6 +21,7 @@
     "@kbn/i18n": "link:../../packages/kbn-i18n",
     "d3": "^5.15.0",
     "query-string": "^6.10.1",
+    "react-graph-vis": "^1.0.5",
     "react-visjs-timeline": "^1.6.0",
     "vis": "^4.21.0-EOL",
     "vis-timeline": "^7.1.0"
