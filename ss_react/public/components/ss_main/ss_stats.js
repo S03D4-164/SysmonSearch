@@ -1,5 +1,7 @@
 import React from 'react';
 import moment from 'moment';
+import chrome from 'ui/chrome';
+
 import {
   EuiTitle,
   EuiPanel
@@ -24,7 +26,8 @@ export class SysmonStats extends React.Component {
   }
 
   componentDidMount(){
-    fetch('../../api/sysmon-search-plugin/events', {
+    const api = chrome.addBasePath('/api/sysmon-search-plugin/events');
+    fetch(api, {
       method:"POST",
       headers: {
         'kbn-xsrf': 'true',
@@ -80,8 +83,10 @@ export class SysmonStats extends React.Component {
     });
   }
 	
+
   render() {
     console.log(this.state)
+    const back = chrome.addBasePath('/app/ss_react');
     return (
 <div id="statistics" style={{minWidth:"1280px",margin:"0 auto"}}>
 <EuiTitle size="m">
@@ -94,6 +99,8 @@ export class SysmonStats extends React.Component {
   options={this.state.options}
   host={this.state.host}
 />
+<a href={back}>back</a>
+
       </EuiPanel>
 </div>
     )

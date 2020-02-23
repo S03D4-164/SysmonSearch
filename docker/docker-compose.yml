@@ -1,7 +1,7 @@
 version: '2.2'
 services:
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.5.1
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.6.0
     volumes:
       - ./es/es-data:/usr/share/elasticsearch/data
       - ./es/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
@@ -22,7 +22,7 @@ services:
         soft: 65536
         hard: 65536
   kibana:
-    image: docker.elastic.co/kibana/kibana-oss:7.5.1
+    image: docker.elastic.co/kibana/kibana-oss:7.6.0
     volumes:
       - ./kibana/kibana.yml:/usr/share/kibana/config/kibana.yml
       - ../sysmon_search_plugin:/usr/share/kibana/plugins/sysmon_search_plugin
