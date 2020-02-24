@@ -1,12 +1,22 @@
 import React, { Component, Fragment } from 'react';
 
 import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Link,
+  Redirect
+} from 'react-router-dom'
+
+import {
   EuiTabbedContent,
   EuiTitle,
+  EuiText,
   EuiSpacer,
 } from '@elastic/eui';
 
 import { SysmonEvents } from "./ss_events";
+import { SysmonSearch } from "./ss_smsearch";
 import { SSDatePicker } from "./date_picker";
 
 export class SysmonSearchTabs extends Component {
@@ -19,8 +29,6 @@ export class SysmonSearchTabs extends Component {
         name: 'Events',
         content: (
           <Fragment>
-            <EuiSpacer />
-            <SSDatePicker />
             <SysmonEvents />
           </Fragment>
         ),
@@ -30,10 +38,7 @@ export class SysmonSearchTabs extends Component {
         name: 'Search',
         content: (
           <Fragment>
-            <EuiSpacer />
-            <EuiTitle>
-              <h3>Search</h3>
-            </EuiTitle>
+            <SysmonSearch />
           </Fragment>
         ),
       },
@@ -51,7 +56,7 @@ export class SysmonSearchTabs extends Component {
     return (
       <EuiTabbedContent
         tabs={this.tabs}
-        initialSelectedTab={this.tabs[0]}
+        initialSelectedTab={this.tabs[1]}
         autoFocus="selected"
         onTabClick={tab => {
           console.log(this.props);

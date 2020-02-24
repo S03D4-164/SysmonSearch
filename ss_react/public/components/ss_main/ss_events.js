@@ -1,7 +1,6 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import moment from 'moment';
 import chrome from 'ui/chrome';
-
 
 import {
   EuiBasicTable,
@@ -17,6 +16,8 @@ import {
   EuiSpacer,
 } from '@elastic/eui';
 
+import { SysmonStats } from './ss_stats';
+
 export class SysmonEvents extends React.Component {
   constructor(props){
     super(props);
@@ -24,12 +25,25 @@ export class SysmonEvents extends React.Component {
       items:[],
       startDate: moment().add(-1, 'M'),
       endDate: moment().add(0, 'd'),
-      keyword:""
+      keyword:"",
+      //sortField: 'date',
+      //sortDirection: 'asc',
     };
     this.handleChangeStart = this.handleChangeStart.bind(this);
     this.handleChangeEnd = this.handleChangeEnd.bind(this);
     this.handleChange = this.handleChange.bind(this);
   }
+
+  onTableChange = ({ page = {}, sort = {} }) => {
+    const { index: pageIndex, size: pageSize } = page;
+
+    const { field: sortField, direction: sortDirection } = sort;
+
+    this.setState({
+      sortField,
+      sortDirection,
+    });
+  };
 
   componentDidMount(){
     this.getEvents();
@@ -101,19 +115,23 @@ export class SysmonEvents extends React.Component {
 
   render(){
   const columns = [
-    {field: 'date', name: 'Date'},
+    {field: 'date',
+sortable: true,
+     name: 'Date'},
     {
       field: 'pc',
       name: 'Hostname',
-      render: (count, item) => (
+      sortable: true,
+      render: (pc, item) => (
         <EuiLink href={item.stats} >
-          {count}
+          {pc}
         </EuiLink>
       )
     },
     {
       field: 'count',
       name: 'Count',
+sortable: true,
       render: (count, item) => (
         <EuiLink href={item.event} >
           {count}
@@ -122,8 +140,17 @@ export class SysmonEvents extends React.Component {
     }
   ];
 
+/*
+    const { sortField, sortDirection } = this.state;
+    const sorting = {
+      sort: {
+        field: sortField,
+        direction: sortDirection,
+      },
+    };
+*/
+
   return (
-    <div>
       <EuiPanel>
   <EuiFlexGroup >
     <EuiFlexItem>
@@ -176,10 +203,10 @@ export class SysmonEvents extends React.Component {
     <EuiBasicTable
       items={this.state.items}
       columns={columns}
+
     />
 
       </EuiPanel>
-    </div>
 
   );
   }

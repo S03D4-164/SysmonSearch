@@ -4,7 +4,10 @@ import chrome from 'ui/chrome';
 
 import {
   EuiTitle,
-  EuiPanel
+  EuiPanel,
+  EuiLink,
+  EuiSpacer,
+  EuiButton,
 } from '@elastic/eui';
 
 const qs = require('query-string');
@@ -87,6 +90,7 @@ export class SysmonStats extends React.Component {
   render() {
     console.log(this.state)
     const back = chrome.addBasePath('/app/ss_react');
+    const summary = chrome.addBasePath('/app/ss_react/event')+ this.props.location.search;
     return (
 <div id="statistics" style={{minWidth:"1280px",margin:"0 auto"}}>
 <EuiTitle size="m">
@@ -99,7 +103,13 @@ export class SysmonStats extends React.Component {
   options={this.state.options}
   host={this.state.host}
 />
-<a href={back}>back</a>
+<EuiSpacer />
+<EuiButton size="s"
+iconType="arrowLeft"
+href={back}>Top</EuiButton>
+
+<EuiButton size="s"
+href={summary}>Summary</EuiButton>
 
       </EuiPanel>
 </div>

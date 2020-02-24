@@ -2,6 +2,7 @@ import React from "react";
 import Graph from "react-graph-vis";
 import imgProgram from "./images/program.png"
 import imgNet from "./images/net.png"
+import { EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
 
 function splitByLength(str, length) {
   var resultArr = [];
@@ -18,6 +19,7 @@ function splitByLength(str, length) {
   return resultArr;
 }
 
+//function add_child_info(cur, nodes, edges) {
 function add_child_info(cur, graph) {
   for (let index in cur.child) {
     var item = cur.child[index];
@@ -28,6 +30,7 @@ function add_child_info(cur, graph) {
       "label": tmp_label,
       "title": item.current.cmd,
       "shape": "circularImage",
+      //"image": "../plugins/sysmon_search_visual/images/program.png",
       "image": imgProgram,
       "guid": item.current.guid,
       "info": item.current.info
@@ -44,6 +47,7 @@ function add_child_info(cur, graph) {
     }
 */
     // console.log( tmp_node );
+    //nodes.push(tmp_node);
     graph["nodes"].push(tmp_node);
 
     var tmp_edge = {
@@ -54,6 +58,7 @@ function add_child_info(cur, graph) {
       "length": 200
     };
     // console.log( tmp_edge );
+    //edges.push(tmp_edge);
     graph["edges"].push(tmp_edge);
 
     for( let n_key in item.current.info.Net ) {
@@ -64,6 +69,7 @@ function add_child_info(cur, graph) {
         "label": n_key+":"+n_item,
         "title": n_key+":"+n_item,
         "shape": "circularImage",
+        //"image": "../plugins/sysmon_search_visual/images/net.png",
         "image": imgNet,
         "guid": item.current.guid,
         "info": item.current.info
@@ -81,10 +87,10 @@ function add_child_info(cur, graph) {
       //edges.push(tmp_edge);
       graph["edges"].push(tmp_edge);
     }
-
+    //[nodes, edges] = add_child_info(item, nodes, edges);
     graph = add_child_info(item, graph);
   }
-
+  //return [nodes, edges]
   return graph;
 }
 
@@ -107,6 +113,7 @@ function local_search(data, keyword) {
   }
   return false;
 }
+
 
 function search(data, keyword, hash) {
   var flg1 = 1;
@@ -171,32 +178,58 @@ export class GraphView extends React.Component {
   constructor(props) {
     super(props);
 
+
   this.state = {
     graph:{},
     options:{},
     events:null,
     network:null, 
-    textarea:""
+    textarea:"",
+first:true
   }
 
     this.setNetwork = this.setNetwork.bind(this);
     this.setText = this.setText.bind(this);
+
   }
+
 
   setText(str){
       this.setState({
         textarea:str
       });
   }
+  
+  setFirst(flg){
+      this.setState({
+        first:flg
+      });
+  }
+
+  getFirst(){
+    return this.state.first
+  }
 
   setNetwork(nw){
+const network = nw;
+const setFirst = this.setFirst;
+const getFirst = this.getFirst;
     const settxt = this.setText;
     const host = this.props.host;
     const date = this.props.date;
 const events = {
+  afterDrawing: function (ctx) {
+if(getFirst){
+            network.fit();
+            setTimeout(function () {
+                //network.fit();
+            }
+                , 100);
+      setFirst(false)
+}
+  },
   doubleClick: function(properties) {
     if (!properties.nodes.length) return;
-    const network = nw;
     var node = network.body.data.nodes.get(properties.nodes[0]);
     console.log(node);
     if(node.guid != null && node.guid!="" && node.guid!="root"){
@@ -206,12 +239,13 @@ const events = {
     }
   },
   click: function(properties) {
-  const network = nw;
-  var nodeid = network.getNodeAt(properties.pointer.DOM);
-  if (nodeid) {
-    network.selectNodes([nodeid], true);
-    var node = network.body.data.nodes.get(nodeid);
-    //console.log(node)
+  if (!properties.nodes.length) return;
+  var node = network.body.data.nodes.get(properties.nodes[0]);
+  //var nodeid = network.getNodeAt(properties.pointer.DOM);
+  //if (nodeid) {
+    //network.selectNodes([nodeid], true);
+    //var node = network.body.data.nodes.get(nodeid);
+
     if (node && node.info) {
       const veiw_data_1 = [
         "CurrentDirectory", "CommandLine", "Hashes", "ParentProcessGuid", "ParentCommandLine", "ProcessGuid"
@@ -231,8 +265,6 @@ const events = {
     }
   }
 }
-}
-
     this.setState({
       network:nw,
       events:events,
@@ -248,6 +280,7 @@ const events = {
     true,
   );
 
+/*
   var options = {
     autoResize: true,
     //nodes: {size: 25},
@@ -266,30 +299,37 @@ const events = {
     },
     height: "500px"
   };
+*/
 
-
-options = {
-    layout: {improvedLayout:true},
-    interaction: {
-      navigationButtons: true,
-      keyboard: true
-    },
-
-                edges: {
-                    smooth: {
-                        type: 'cubicBezier',
-                        forceDirection: 'vertical',
-                        roundness: 0.4
-                    }
-                },
-                layout: {
-                    hierarchical: {
-                        direction: "UD"
-                    }
-                },
+var options = {
+  configure:{
+    enabled:true,
+  },
+  interaction: {
+    navigationButtons: true,
+    keyboard: true
+  },
+nodes: {
+  shapeProperties: {
+    interpolation: false
+  }
+},
+  edges: {
+    smooth: {
+      type: 'cubicBezier',
+      forceDirection: 'vertical',
+      roundness: 0.4
+    }
+  },
+  layout: {
+    hierarchical: {
+      direction: "UD",
+      sortMethod:"directed"
+    }
+           },
 
                 physics:false,
-    height: "500px",
+    height: "400px",
     autoResize: true,
 }
 
@@ -297,7 +337,7 @@ options = {
   return (
     <div>
     <div>
-    <textarea rows="7" cols="120" readonly placeholder="click node." value={this.state.textarea}></textarea>
+    <textarea rows="7" cols="120" readOnly placeholder="click node." value={this.state.textarea}></textarea>
     </div><br/>
     <Graph
       graph={graph}

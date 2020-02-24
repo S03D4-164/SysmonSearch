@@ -7,7 +7,9 @@ import {
   EuiText,
   EuiFlexGroup,
   EuiFlexItem,
-  EuiPanel
+  EuiPanel,
+  EuiSpacer,
+  EuiButton,
 } from '@elastic/eui';
 
 const qs = require('query-string');
@@ -28,7 +30,6 @@ export class SysmonSummary extends React.Component {
 
   componentDidMount(){
     const api = chrome.addBasePath('/api/sysmon-search-plugin/events');
-    //fetch('../../api/sysmon-search-plugin/events', {
     fetch(api, {
       method:"POST",
       headers: {
@@ -96,7 +97,10 @@ export class SysmonSummary extends React.Component {
     let correlation = "process?"
     correlation += "host=" + this.state.host;
     correlation += "&date=" + this.state.date;
-    let back = chrome.addBasePath('/app/ss_react');
+
+    const back = chrome.addBasePath('/app/ss_react');
+    const stats = chrome.addBasePath('/app/ss_react/stats')+ this.props.location.search;
+
     return (
 <div id="summary" style={{maxWidth:"1280px",margin:"0 auto"}}>
 <EuiTitle size="m">
@@ -133,8 +137,16 @@ export class SysmonSummary extends React.Component {
 </table>
 </EuiFlexItem>
   </EuiFlexGroup>
-      </EuiText>
-<a href={back}>back</a>
+
+<EuiButton size="s"
+iconType="arrowLeft"
+href={back}>Top</EuiButton>
+
+<EuiButton size="s"
+href={stats}>Stats</EuiButton>
+      
+</EuiText>
+
       </EuiPanel>
 </div>
     )
