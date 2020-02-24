@@ -26,6 +26,9 @@ export class SysmonStats extends React.Component {
       groups:[],
       category:[]
     };
+    this.back = chrome.addBasePath('/app/ss_react');
+    this.summary = chrome.addBasePath('/app/ss_react/event') + this.props.location.search;
+    this.process = chrome.addBasePath('/app/ss_react/process') + this.props.location.search;
   }
 
   componentDidMount(){
@@ -88,30 +91,27 @@ export class SysmonStats extends React.Component {
 	
 
   render() {
-    console.log(this.state)
-    const back = chrome.addBasePath('/app/ss_react');
-    const summary = chrome.addBasePath('/app/ss_react/event')+ this.props.location.search;
+    //console.log(this.state)
     return (
 <div id="statistics" style={{minWidth:"1280px",margin:"0 auto"}}>
-<EuiTitle size="m">
-  <h3>Host Statistics</h3>
+<EuiTitle size="s">
+<h3>Host Statistics: {this.state.host}</h3>
 </EuiTitle>
-      <EuiPanel>
+
+<EuiPanel>
+
 <Timeline
   items={this.state.items}
   groups={this.state.groups}
   options={this.state.options}
   host={this.state.host}
 />
-<EuiSpacer />
-<EuiButton size="s"
-iconType="arrowLeft"
-href={back}>Top</EuiButton>
 
-<EuiButton size="s"
-href={summary}>Summary</EuiButton>
+<EuiButton size="s" iconType="arrowLeft" href={this.back}>Top</EuiButton>
+<EuiButton size="s" href={this.summary}>Summary</EuiButton>
+<EuiButton size="s" href={this.process}>Process</EuiButton>
 
-      </EuiPanel>
+</EuiPanel>
 </div>
     )
   }

@@ -4,6 +4,7 @@ import chrome from 'ui/chrome';
 
 import {
   EuiBasicTable,
+  EuiInMemoryTable,
   EuiPanel,
   EuiSelect,
   EuiFieldText,
@@ -14,70 +15,60 @@ import {
   EuiFlexItem,
   EuiFormRow,
   EuiSpacer,
+  EuiText,
 } from '@elastic/eui';
 
 export class SysmonSearch extends React.Component {
   constructor(props){
     super(props);
     this.state = {
-      data:{},
-      fields:{},
-      values:{},
       items:[],
       total:{},
-      inputs: ['_1'],
-      startDate: moment().add(-1, 'd'),
+      inputFields: [{item:"", value:""}],
+      startDate: moment().add(-1, 'M'),
       endDate: moment().add(0, 'd'),
     };
-    this.options = [
-      {value:0, text:"-"},
-      {value:1, text:"IP Address"},
-      {value:2, text:"Port"},
-      {value:3, text:"Hostname"},
-      {value:4, text:"Process"},
+
+    this.columns = [
+    {field: 'utc', name: 'UTC Time', width:"20%"},
+    {field: 'event', name: 'Event ID', width:"10%"},
+    {field: 'pc', name: 'Hostname', width:"20%"},
+    {field: 'user', name: 'User', width:"10%"},
+    {field: 'image', name: 'image', width:"40%"},
     ];
+
+    this.options = [
+    {value:0, text:"-"},
+    {value:1, text:"IP Address"},
+    {value:2, text:"Port"},
+    {value:3, text:"Hostname"},
+    {value:4, text:"Process"},
+    ];
+
     this.handleChangeStart = this.handleChangeStart.bind(this);
     this.handleChangeEnd = this.handleChangeEnd.bind(this);
-    this.handleChangeField = this.handleChangeField.bind(this);
-    this.handleChangeValue = this.handleChangeValue.bind(this);
-    this.delInput = this.delInput.bind(this);
-  }
-
-  handleChangeStart(date) {
-    this.setState({
-      startDate: date,
-    });
-  }
-
-  handleChangeEnd(date) {
-    this.setState({
-      endDate: date,
-    });
-  }
-
-  handleChangeField (event) {
-    var data = this.state.fields;
-    console.log(event.target)
-    data[event.target.name] = event.target.value;
-    this.setState({
-      fields: data
-    });
-  }
-
-  handleChangeValue (event) {
-    var data = this.state.values;
-    console.log(event.target)
-    data[event.target.name] = event.target.value;
-    this.setState({
-      values: data
-    });
+    this.handleAddFields = this.handleAddFields.bind(this);
+    this.handleRemoveFields = this.handleRemoveFields.bind(this);
+    this.handleInputChange = this.handleInputChange.bind(this);
   }
 
   clickSearch(){
     const api = chrome.addBasePath('/api/sysmon-search-plugin/sm_search');
-    let data = {...this.state.fields, ...this.state.values};
-    data["fm_start_date"] = moment(this.state.startDate),
-    data["fm_end_date"] = moment(this.state.endDate),
+    var data = {
+      fm_start_date: moment(this.state.startDate),
+      fm_end_date: moment(this.state.endDate),
+    };
+    const inputs = this.state.inputFields;
+    for (let index in inputs) {
+      if (inputs[index].item && inputs[index].value){
+      let id = index + 1;
+      let searchItem = "search_item_" + Number(id).toString();
+      data[searchItem] = inputs[index].item;
+      let searchValue = "search_value_" + Number(id).toString();
+      data[searchValue] = inputs[index].value;
+      }
+    }
+    console.log(data);
     fetch(api, {method:"POST",
       headers: {
         'kbn-xsrf': 'true',
@@ -108,43 +99,47 @@ export class SysmonSearch extends React.Component {
     });
   }
 
-  getStateField(key){
-    return this.state.fields[key]
+  handleChangeStart(date) {
+    this.setState({ startDate:date });
   }
 
-  getStateValue(key){
-    return this.state.values[key]
+  handleChangeEnd(date) {
+    this.setState({ endDate: date });
   }
 
-  render(){
-    const columns = [
-      {
-        field: 'utc',
-        name: 'utc',
-      },
-      {
-        field: 'event',
-        name: 'event',
-      },
-      {
-        field: 'pc',
-        name: 'pc',
-      },
-      {field: 'user', name: 'user'},
-      {
-        field: 'image',
-        name: 'image',
-      },
-  ];
-  //console.log(this.state)
-  return (
-      <EuiPanel>
+  handleAddFields = () => {
+    const values = [...this.state.inputFields];
+    values.push({ item: '', value: '' });
+    this.setState({inputFields:values});
+  };
 
-  <EuiFlexGroup >
-    <EuiFlexItem grow={false}>
-      <EuiFormRow label="Date">
+  handleRemoveFields = index => {
+    const values = [...this.state.inputFields];
+    values.splice(index, 1);
+    this.setState({inputFields:values});
+  };
 
-      <EuiDatePickerRange
+  handleInputChange = (index, event) => {
+    const values = [...this.state.inputFields];
+    if (event.target.name === "item") {
+      values[index].item = event.target.value;
+    } else {
+      values[index].value = event.target.value;
+    }
+    this.setState({inputFields:values});
+  };
+
+render(){
+
+return (
+
+<EuiPanel>
+
+  <EuiFlexItem>
+  <EuiFormRow 
+   display="columnCompressed"
+   label="Date" >
+      <EuiDatePickerRange style={{minWidth:500}}
         startDateControl={
           <EuiDatePicker
             selected={this.state.startDate}
@@ -168,109 +163,74 @@ export class SysmonSearch extends React.Component {
           />
         }
       />
+  </EuiFormRow>
+  </EuiFlexItem>
 
-      </EuiFormRow>
-    </EuiFlexItem>
+<EuiSpacer size="m" />
 
+{this.state.inputFields.map((inputField, index) => (
 
-  </EuiFlexGroup >
+<EuiFlexGroup key={`input-${index}`}>
 
-
-      {this.state.inputs.map((input) => {
-      let key = {
-        item: "search_item" + input,
-        value: "search_value" + input,
-      }
-      let field = this.getStateField(key.item)
-      let value = this.getStateValue(key.value)
-      return(
-  <EuiFlexGroup key={input}>
-{input}
-    <EuiFlexItem >
-      <EuiFormRow label="Field" >
-
-      <EuiSelect 
-      key={key.item}
-      name={key.item}
-      value={field}
+  <EuiFlexItem grow={false}>
+  <EuiFormRow
+   display="columnCompressed"
+   label="Field" >
+    <EuiSelect 
+      name="item"
+      value={inputField.item}
       options={this.options}
-      onChange={this.handleChangeField}
-      />
-      </EuiFormRow>
-    </EuiFlexItem>
+      onChange={event => this.handleInputChange(index, event)}
+    />
+  </EuiFormRow>
+  </EuiFlexItem>
 
-    <EuiFlexItem >
-      <EuiFormRow label="Value" >
+  <EuiFlexItem style={{maxWidth:400}}>
+    <EuiFieldText 
+      name="value"
+      value={inputField.value}
+      onChange={event => this.handleInputChange(index, event)}
+    />
+  </EuiFlexItem>
 
-      <EuiFieldText 
-      key={key.value}
-      name={key.value}
-      onChange={this.handleChangeValue} />
+  <EuiFlexItem grow={false}>
+      <EuiButton size="m" iconType="arrowLeft"
+        onClick={() => this.handleRemoveFields(index)}
+      >DEL</EuiButton>
+  </EuiFlexItem>
 
-      </EuiFormRow>
-    </EuiFlexItem>
-    <EuiFlexItem >
-      <EuiFormRow hasEmptyLabelSpace >
-      <button name={input} onClick={this.delInput}>DEL</button>
-      </EuiFormRow>
-    </EuiFlexItem>
+</EuiFlexGroup >
 
-  </EuiFlexGroup >
+))}
+  
+<EuiSpacer size="m" />
 
-      )}
-      )}
+<EuiFlexGroup >
+  <EuiFlexItem grow={false}>
+      <EuiButton size="m" iconType="arrowUp"
+        onClick={() => this.handleAddFields()}
+      >ADD</EuiButton>
+  </EuiFlexItem>
+  <EuiFlexItem grow={false}>
+      <EuiButton size="m" onClick={ () => this.clickSearch() }>Search</EuiButton>
+  </EuiFlexItem>
+  <EuiFlexItem >
+    <EuiText><h2>Total: {this.state.total.value}</h2></EuiText>
+  </EuiFlexItem >
 
+</EuiFlexGroup >
 
-      <EuiButton size="s" onClick={ () => this.addInput() }>Add</EuiButton>
-      <EuiButton size="s" onClick={ () => this.clickSearch() }>Search</EuiButton>
-
-<EuiSpacer />
-
-    <h3>Total: {this.state.total.value}</h3>
-
-<EuiSpacer />
+<EuiSpacer size="m"/>
 
     <EuiBasicTable		
         items={this.state.items}
-        columns={columns}
-      />
-      </EuiPanel>
-  );
-  }
+        columns={this.columns}
+    />
 
-  addInput() {
-    var newInput = `_${this.state.inputs.length + 1}`;
-    this.setState(prevState => ({ inputs: prevState.inputs.concat([newInput]) }));
-  }
+</EuiPanel>
 
-  delInput(event) {
-    const index = event.target.name;
-    console.log(index)
-    var newInputs = this.state.inputs.slice();
-    newInputs.pop();
-    var inputs = this.state.inputs.slice();
-    var del = inputs.indexOf(index);
-    if (del !== -1) inputs.splice(del, 1);
-    var newFields = {};
-    var newValues = {};
-      console.log(inputs, newInputs, newFields, newValues)
-    for (let number in newInputs){
-      let fieldName = "search_item" + inputs[number];
-      let newField = "search_item" + newInputs[number];
-      newFields[newField] = this.state.fields[fieldName]
-
-      let valueName = "search_value" + inputs[number];
-      let newValue = "search_value" + newInputs[number];
-      newValues[newValue] = this.state.values[valueName]
-      console.log(inputs, newInputs, newFields, newValues)
-
-    }
-
-    this.setState({
-      inputs: newInputs,
-      fields: newFields,
-      values: newValues,
-    });
-  }
+);
+  
+}
 
 };

@@ -16,7 +16,7 @@ import {
 } from '@elastic/eui';
 
 import { SysmonEvents } from "./ss_events";
-import { SysmonSearch } from "./ss_smsearch";
+import { SysmonSearch } from "./ss_search";
 import { SSDatePicker } from "./date_picker";
 
 export class SysmonSearchTabs extends Component {
@@ -56,7 +56,7 @@ export class SysmonSearchTabs extends Component {
     return (
       <EuiTabbedContent
         tabs={this.tabs}
-        initialSelectedTab={this.tabs[1]}
+        initialSelectedTab={this.tabs[0]}
         autoFocus="selected"
         onTabClick={tab => {
           console.log(this.props);

@@ -178,133 +178,21 @@ export class GraphView extends React.Component {
   constructor(props) {
     super(props);
 
-
-  this.state = {
+    this.state = {
     graph:{},
     options:{},
     events:null,
     network:null, 
     textarea:"",
-first:true
-  }
+    first:true
+    }
 
     this.setNetwork = this.setNetwork.bind(this);
     this.setText = this.setText.bind(this);
+    this.disableRedraw = this.disableRedraw.bind(this);
 
-  }
-
-
-  setText(str){
-      this.setState({
-        textarea:str
-      });
-  }
-  
-  setFirst(flg){
-      this.setState({
-        first:flg
-      });
-  }
-
-  getFirst(){
-    return this.state.first
-  }
-
-  setNetwork(nw){
-const network = nw;
-const setFirst = this.setFirst;
-const getFirst = this.getFirst;
-    const settxt = this.setText;
-    const host = this.props.host;
-    const date = this.props.date;
-const events = {
-  afterDrawing: function (ctx) {
-if(getFirst){
-            network.fit();
-            setTimeout(function () {
-                //network.fit();
-            }
-                , 100);
-      setFirst(false)
-}
-  },
-  doubleClick: function(properties) {
-    if (!properties.nodes.length) return;
-    var node = network.body.data.nodes.get(properties.nodes[0]);
-    console.log(node);
-    if(node.guid != null && node.guid!="" && node.guid!="root"){
-      var url = '../../process_overview/' + host + '/' + date.substr(0, 10) + '/' + node.guid;
-      console.log(url);
-      //window.open(url, "_blank");
-    }
-  },
-  click: function(properties) {
-  if (!properties.nodes.length) return;
-  var node = network.body.data.nodes.get(properties.nodes[0]);
-  //var nodeid = network.getNodeAt(properties.pointer.DOM);
-  //if (nodeid) {
-    //network.selectNodes([nodeid], true);
-    //var node = network.body.data.nodes.get(nodeid);
-
-    if (node && node.info) {
-      const veiw_data_1 = [
-        "CurrentDirectory", "CommandLine", "Hashes", "ParentProcessGuid", "ParentCommandLine", "ProcessGuid"
-      ];
-      var str = "";
-      for (var key in node.info) {
-        if (veiw_data_1.indexOf(key) >= 0) {
-          if (str === "") {
-            str = key + ":" + node.info[key];
-          } else {
-            str = str + "\n" + key + ":" + node.info[key];
-          }
-        }
-      }
-      settxt(str);
-      //network.fit();
-    }
-  }
-}
-    this.setState({
-      network:nw,
-      events:events,
-    })
-  }
-
-  render(){
-
-  const graph = createNetwork(
-    this.props.tops,
-    null,
-    null,
-    true,
-  );
-
-/*
-  var options = {
-    autoResize: true,
-    //nodes: {size: 25},
-    edges: {
-      width: 2,
-      shadow: false,
-      smooth: {
-        type: 'continuous',
-        roundness: 0
-      }
-    },
-    layout: {improvedLayout:true},
-    interaction: {
-      navigationButtons: true,
-      keyboard: true
-    },
-    height: "500px"
-  };
-*/
-
-var options = {
-  configure:{
-    enabled:true,
-  },
+this.options = {
+  configure:{enabled:false},
   interaction: {
     navigationButtons: true,
     keyboard: true
@@ -326,26 +214,111 @@ nodes: {
       direction: "UD",
       sortMethod:"directed"
     }
-           },
-
-                physics:false,
-    height: "400px",
-    autoResize: true,
+  },
+  physics:false,
+  height: "400px",
+  autoResize: false,
 }
+
+  }
+
+
+  setText(str){
+      this.setState({
+        textarea:str
+      });
+  }
+  
+  disableRedraw(){
+    let events = this.state.events;
+    if (events.initRedraw){
+      events.initRedraw = null;
+      //this.setState({events:events});
+    }
+  }
+
+  setNetwork(nw){
+    const network = nw;
+    const disableRedraw = this.disableRedraw;
+    const settxt = this.setText;
+    const host = this.props.host;
+    const date = this.props.date;
+    network.once(
+      "afterDrawing",
+      function(){
+        network.fit();
+        setTimeout(function () {
+          network.fit();
+        }, 1000);
+      }
+    )
+
+  var events = {
+  oncontext: function (ctx) {
+    network.fit();
+  },
+  doubleClick: function(properties) {
+    if (!properties.nodes.length) return;
+    var node = network.body.data.nodes.get(properties.nodes[0]);
+    console.log(node);
+    if(node.guid != null && node.guid!="" && node.guid!="root"){
+      var url = '../../process_overview/' + host + '/' + date.substr(0, 10) + '/' + node.guid;
+      console.log(url);
+      //window.open(url, "_blank");
+    }
+  },
+  click: function(properties) {
+  if (!properties.nodes.length) return;
+  //var node = network.body.data.nodes.get(properties.nodes[0]);
+  var nodeid = network.getNodeAt(properties.pointer.DOM);
+  if (nodeid) {
+    network.selectNodes([nodeid], true);
+    var node = network.body.data.nodes.get(nodeid);
+
+    if (node && node.info) {
+      const veiw_data_1 = [
+        "CurrentDirectory", "CommandLine", "Hashes", "ParentProcessGuid", "ParentCommandLine", "ProcessGuid"
+      ];
+      var str = "";
+      for (var key in node.info) {
+        if (veiw_data_1.indexOf(key) >= 0) {
+          if (str === "") {
+            str = key + ":" + node.info[key];
+          } else {
+            str = str + "\n" + key + ":" + node.info[key];
+          }
+        }
+      }
+      settxt(str);
+    }
+  }
+  }
+  }
+  this.setState({network:nw, events:events})
+  }
+
+  render(){
+
+  const graph = createNetwork(
+    this.props.tops,
+    null,
+    null,
+    true,
+  );
 
   console.log(this.state);
   return (
-    <div>
+  <div>
     <div>
     <textarea rows="7" cols="120" readOnly placeholder="click node." value={this.state.textarea}></textarea>
     </div><br/>
     <Graph
       graph={graph}
-      options={options}
+      options={this.options}
       events={this.state.events}
       getNetwork={this.setNetwork}
     />
-    </div>
+  </div>
   )
 
   }

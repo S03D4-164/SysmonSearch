@@ -26,6 +26,10 @@ export class SysmonSummary extends React.Component {
       total:0
     };
     this.chartRef = React.createRef();
+
+    this.back = chrome.addBasePath('/app/ss_react');
+    this.stats = chrome.addBasePath('/app/ss_react/stats')+ this.props.location.search;
+    this.process = chrome.addBasePath('/app/ss_react/process')+ this.props.location.search;
   }
 
   componentDidMount(){
@@ -94,26 +98,25 @@ export class SysmonSummary extends React.Component {
 
   render() {
     console.log(this.state);
-    let correlation = "process?"
-    correlation += "host=" + this.state.host;
-    correlation += "&date=" + this.state.date;
-
-    const back = chrome.addBasePath('/app/ss_react');
-    const stats = chrome.addBasePath('/app/ss_react/stats')+ this.props.location.search;
 
     return (
+
 <div id="summary" style={{maxWidth:"1280px",margin:"0 auto"}}>
-<EuiTitle size="m">
-<h3>Event Summary</h3>
+
+<EuiTitle size="s">
+<h3>Event Summary: {this.state.host}@{this.state.date}</h3>
 </EuiTitle>
-      <EuiPanel>
-      <EuiText size="m">
-<h3>{this.state.host}@{this.state.date}</h3>
-  <EuiFlexGroup>
-    <EuiFlexItem grow={false}>
+<EuiPanel>
+
+<EuiText size="m">
+
+<EuiFlexGroup>
+
+<EuiFlexItem grow={false}>
 <div id="piechart" ref={cr => this.chartRef = cr}></div>
 </EuiFlexItem>
-    <EuiFlexItem grow={false}>
+
+<EuiFlexItem grow={false}>
 <table className="legend">
 <thead>
 <tr>
@@ -131,19 +134,16 @@ export class SysmonSummary extends React.Component {
 <tr>
 <td>Total</td>
 <td align="right">{this.state.total}</td>
-<td align="right"><a href={correlation}>Correlation</a></td>
+<td align="right"><a href={this.process}>Correlation</a></td>
 </tr>
 </tbody>
 </table>
 </EuiFlexItem>
   </EuiFlexGroup>
 
-<EuiButton size="s"
-iconType="arrowLeft"
-href={back}>Top</EuiButton>
-
-<EuiButton size="s"
-href={stats}>Stats</EuiButton>
+<EuiButton size="s" iconType="arrowLeft" href={this.back}>Top</EuiButton>
+<EuiButton size="s" href={this.stats}>Stats</EuiButton>
+<EuiButton size="s" href={this.process}>Process</EuiButton>
       
 </EuiText>
 
