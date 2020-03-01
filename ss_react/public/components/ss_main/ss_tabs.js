@@ -57,7 +57,6 @@ export class SysmonSearchTabs extends Component {
       <EuiTabbedContent
         tabs={this.tabs}
         initialSelectedTab={this.tabs[0]}
-        autoFocus="selected"
         onTabClick={tab => {
           console.log(this.props);
         }}

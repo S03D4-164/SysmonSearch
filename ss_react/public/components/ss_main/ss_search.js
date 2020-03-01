@@ -27,6 +27,10 @@ export class SysmonSearch extends React.Component {
       inputFields: [{item:"", value:""}],
       startDate: moment().add(-1, 'M'),
       endDate: moment().add(0, 'd'),
+      conjunction:2,
+      pageIndex: 0,
+      pageSize: 100,
+      showPerPageOptions: true,
     };
 
     this.columns = [
@@ -45,11 +49,16 @@ export class SysmonSearch extends React.Component {
     {value:4, text:"Process"},
     ];
 
+    this.conjunctions = [
+      {value:1, text:"AND"}, {value:2, text:"OR"}
+    ]
     this.handleChangeStart = this.handleChangeStart.bind(this);
     this.handleChangeEnd = this.handleChangeEnd.bind(this);
+    this.handleChangeConjunction = this.handleChangeConjunction.bind(this);
     this.handleAddFields = this.handleAddFields.bind(this);
     this.handleRemoveFields = this.handleRemoveFields.bind(this);
     this.handleInputChange = this.handleInputChange.bind(this);
+    this.onTableChange = this.onTableChange.bind(this);
   }
 
   clickSearch(){
@@ -57,6 +66,7 @@ export class SysmonSearch extends React.Component {
     var data = {
       fm_start_date: moment(this.state.startDate),
       fm_end_date: moment(this.state.endDate),
+      search_conjunction: Number(this.state.conjunction),
     };
     const inputs = this.state.inputFields;
     for (let index in inputs) {
@@ -99,12 +109,24 @@ export class SysmonSearch extends React.Component {
     });
   }
 
+  onTableChange = ({ page = {} }) => {
+    const { index: pageIndex, size: pageSize } = page;
+    this.setState({
+      pageIndex,
+      pageSize,
+    });
+  };
+
   handleChangeStart(date) {
     this.setState({ startDate:date });
   }
 
   handleChangeEnd(date) {
     this.setState({ endDate: date });
+  }
+
+  handleChangeConjunction = event => {
+    this.setState({ conjunction: event.target.value });
   }
 
   handleAddFields = () => {
@@ -130,6 +152,19 @@ export class SysmonSearch extends React.Component {
   };
 
 render(){
+    const { pageIndex, pageSize } = this.state;
+    let start = pageIndex * pageSize;
+    //let end = start + pageSize;
+    const pageOfItems = this.state.items.slice(start, pageSize);
+    const totalItemCount = this.state.total;
+
+    const pagination = {
+      pageIndex,
+      pageSize,
+      totalItemCount,
+      pageSizeOptions: [100, 500, 1000],
+      hidePerPageOptions: false,
+    };
 
 return (
 
@@ -206,6 +241,20 @@ return (
 <EuiSpacer size="m" />
 
 <EuiFlexGroup >
+
+  <EuiFlexItem grow={false}>
+  <EuiFormRow
+   display="columnCompressed"
+   label="Conjunction" >
+    <EuiSelect 
+      name="conjunction"
+      value={this.state.conjunction}
+      options={this.conjunctions}
+      onChange={this.handleChangeConjunction}
+    />
+  </EuiFormRow>
+  </EuiFlexItem>
+
   <EuiFlexItem grow={false}>
       <EuiButton size="m" iconType="arrowUp"
         onClick={() => this.handleAddFields()}
@@ -222,9 +271,10 @@ return (
 
 <EuiSpacer size="m"/>
 
-    <EuiBasicTable		
-        items={this.state.items}
-        columns={this.columns}
+    <EuiInMemoryTable		
+          items={this.state.items}
+          columns={this.columns}
+          pagination={pagination}
     />
 
 </EuiPanel>

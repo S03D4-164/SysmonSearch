@@ -2,7 +2,6 @@ import React from 'react';
 import { uiModules } from 'ui/modules';
 import chrome from 'ui/chrome';
 import { render, unmountComponentAtNode } from 'react-dom';
-import { I18nProvider } from '@kbn/i18n/react';
 
 import 'ui/autoload/styles';
 import { Main } from './components/ss_main';
@@ -22,13 +21,8 @@ app.config(stateManagementConfigProvider =>
 
 function RootController($scope, $element, $http) {
   const domNode = $element[0];
-
-  // render react to DOM
-  render(
-    <I18nProvider>
-      <Main title="ss_react" httpClient={$http} />
-    </I18nProvider>,
-    domNode
+  render(<Main />
+    ,domNode
   );
 
   // unmount react on controller destroy
@@ -36,5 +30,5 @@ function RootController($scope, $element, $http) {
     unmountComponentAtNode(domNode);
   });
 }
-
 chrome.setRootController('ssReact', RootController);
+
