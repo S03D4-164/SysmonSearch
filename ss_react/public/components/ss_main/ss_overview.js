@@ -63,12 +63,13 @@ export class SysmonOverView extends React.Component {
 
     return (
 
-<div id="correlation" style={{minWidth:"1280px",margin:"0 auto"}}>
+<div id="correlation" style={{minWidth:"800px",margin:"0 auto"}}>
 <EuiTitle size="m">
   <h3>Overview</h3>
 </EuiTitle>
       <EuiPanel>
-<GraphOverView tops={this.state.tops} />
+<h3>{this.state.guid} on {this.state.host}@{this.state.date}</h3>
+<GraphOverView tops={this.state.tops} host={this.state.host} date={this.state.date}/>
       </EuiPanel>
 </div>
     )

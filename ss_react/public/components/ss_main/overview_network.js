@@ -311,10 +311,94 @@ export class GraphOverView extends React.Component {
       textarea:""
     }
 
-    //this.setNetwork = this.setNetwork.bind(this);
-    //this.setText = this.setText.bind(this);
+    this.setNetwork = this.setNetwork.bind(this);
+    this.setText = this.setText.bind(this);
   }
 
+  setText(str){
+    this.setState({
+      textarea:str
+    });
+  }
+
+  setNetwork(nw){
+    const network = nw;
+    const settxt = this.setText;
+    const host = this.props.host;
+    const date = this.props.date;
+    network.once(
+      "afterDrawing",
+      function(){
+        network.fit();
+        setTimeout(function () {
+          network.fit();
+        }, 1000);
+      }
+    )
+
+  var events = {
+
+  oncontext: function (ctx) {
+    network.fit();
+  },
+  doubleClick: function(properties) {
+    if (!properties.nodes.length) return;
+    var node = network.body.data.nodes.get(properties.nodes[0]);
+    console.log(node);
+    if(node.guid != null && node.guid!="" && node.guid!="root"){
+      var _id = "0";
+      if(node._id != null) _id = node._id;
+      var url = '../../process_detail/' + host + '/' + date.substr(0, 10) + '/' + node.guid + '/' + _id;
+      console.log(url);
+      //window.open(url, "_blank");
+    }
+  },
+  click: function(properties) {
+  if (!properties.nodes.length) return;
+  var nodeid = network.getNodeAt(properties.pointer.DOM);
+  if (nodeid) {
+    network.selectNodes([nodeid], true);
+    var node = network.body.data.nodes.get(nodeid);
+    if (node && node.info) {
+      const view_data_1 = [
+        "CurrentDirectory", "CommandLine", "Hashes", "ParentProcessGuid", "ParentCommandLine", "ProcessGuid"
+      ];
+      const view_data_11 = ["ProcessGuid"];
+      const view_data_12 = ["EventType", "ProcessGuid"];
+      const view_data_3 = ["SourceHostname", "ProcessGuid", "SourceIsIpv6", "SourceIp", "DestinationHostname"];
+      const view_data_8 = ["SourceProcessGuid", "StartAddress", "TargetProcessGuid"];
+      const view_data_2 = ["CreationUtcTime", "PreviousCreationUtcTime"];
+      const view_data_7 = ["Hashes"];
+      const view_data_19 = ["User"];
+      const view_data_20 = ["User"];
+      const view_data_21 = ["User"];
+      var view_data = [];
+      if (node.eventid == 1) view_data = view_data_1;
+      else if (node.eventid == 11) view_data = view_data_11;
+      else if (node.eventid == 12) view_data = view_data_12;
+      else if (node.eventid == 3) view_data = view_data_3;
+      else if (node.eventid == 8) view_data = view_data_8;
+      else if (node.eventid == 2) view_data = view_data_2;
+      else if (node.eventid == 7) view_data = view_data_7;
+      else if (node.eventid == 19) view_data = view_data_19;
+      else if (node.eventid == 20) view_data = view_data_20;
+      else if (node.eventid == 21) view_data = view_data_21;
+      var str = "";
+      for (var key in node.info) {
+        if (view_data.indexOf(key) >= 0) {
+          if (str === "") str = key + ":" + node.info[key];
+          else str = str + "\n" + key + ":" + node.info[key];
+        }
+      }
+      settxt(str);
+    }
+  }
+  }
+  }
+
+  this.setState({network:nw, events:events})
+
+  }
 
   render(){
 
@@ -346,7 +430,8 @@ export class GraphOverView extends React.Component {
         navigationButtons: true,
         keyboard: true
       },
-      height:"500px",
+      width:"800px",
+      height:"600px",
     };
 
   return (
@@ -368,81 +453,6 @@ export class GraphOverView extends React.Component {
 
 /*
 const events = {}
-            network.on("click", function(properties) {
-                var nodeid = network.getNodeAt(properties.pointer.DOM);
-
-                if (nodeid) {
-                    network.selectNodes([nodeid], true);
-                    var node = this.body.data.nodes.get(nodeid);
-                    if (node && node.info) {
-                        console.log(node);
-                        const veiw_data_1 = ["CurrentDirectory", "CommandLine", "Hashes", "ParentProcessGuid", "ParentCommandLine", "ProcessGuid"];
-                        const veiw_data_11 = ["ProcessGuid"];
-                        const veiw_data_12 = ["EventType", "ProcessGuid"];
-                        const veiw_data_3 = ["SourceHostname", "ProcessGuid", "SourceIsIpv6", "SourceIp", "DestinationHostname"];
-                        const veiw_data_8 = ["SourceProcessGuid", "StartAddress", "TargetProcessGuid"];
-                        const veiw_data_2 = ["CreationUtcTime", "PreviousCreationUtcTime"];
-                        const veiw_data_7 = ["Hashes"];
-                        const veiw_data_19 = ["User"];
-                        const veiw_data_20 = ["User"];
-                        const veiw_data_21 = ["User"];
-                        var view_data = [];
-                        if (node.eventid == 1) {
-                            view_data = veiw_data_1;
-                        } else if (node.eventid == 11) {
-                            view_data = veiw_data_11;
-                        } else if (node.eventid == 12) {
-                            view_data = veiw_data_12;
-                        } else if (node.eventid == 3) {
-                            view_data = veiw_data_3;
-                        } else if (node.eventid == 8) {
-                            view_data = veiw_data_8;
-                        } else if (node.eventid == 2) {
-                            view_data = veiw_data_2;
-                        } else if (node.eventid == 7) {
-                            view_data = veiw_data_7;
-                        } else if (node.eventid == 19) {
-                            view_data = veiw_data_19;
-                        } else if (node.eventid == 20) {
-                            view_data = veiw_data_20;
-                        } else if (node.eventid == 21) {
-                            view_data = veiw_data_21;
-                        }
-                        var str = "";
-                        var alert_str = "";
-                        for (var key in node.info) {
-                            if (view_data.indexOf(key) >= 0) {
-                                if (str === "") {
-                                    str = key + ":" + node.info[key];
-                                    alert_str = new_line(key + ":" + node.info[key]);
-                                } else {
-                                    str = str + "\n" + key + ":" + node.info[key];
-                                    alert_str = alert_str + "\n" + new_line(key + ":" + node.info[key]);
-                                }
-                            }
-                        }
-                        $("#text").val(str);
-                        //alert(alert_str);
-                    }
-                }
-            });
-
-            network.on("doubleClick", function(properties) {
-                if (!properties.nodes.length) return;
-
-                var node = this.body.data.nodes.get(properties.nodes[0]);
-                if (node.guid != null && node.guid!="" && node.guid!="root") {
-                    var _id = "0";
-                    if(node._id != null){
-                        _id = node._id;
-                    }
-                    var params = $route.current.params;
-                    var url = 'sysmon_search_visual#/process_detail/' + params.hostname + '/' + params.date + '/' + node.guid + '/' + _id;
-                    window.open(url, "_blank");
-                }
-            });
-        }
-
         this.onkeyup = function(keyword, hash) {
             if(top && top != ""){
                 create_network(localdata, keyword, hash, false);

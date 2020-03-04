@@ -1,5 +1,7 @@
 import React from "react";
 import Graph from "react-graph-vis";
+import chrome from 'ui/chrome';
+
 import imgProgram from "./images/program.png"
 import imgNet from "./images/net.png"
 import { EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
@@ -20,7 +22,7 @@ function splitByLength(str, length) {
 }
 
 //function add_child_info(cur, nodes, edges) {
-function add_child_info(cur, graph) {
+function add_child_info(cur, graph, keyword, hash) {
   for (let index in cur.child) {
     var item = cur.child[index];
     var tmp_str_array = splitByLength(item.current.image, 10);
@@ -36,18 +38,16 @@ function add_child_info(cur, graph) {
       "info": item.current.info
     };
 
-/*
-    if (search(item.current.info, keyword, hash)
-    || (firstflg == true && $route.current.params.guid == item.current.guid)) {
+    if (search(item.current.info, keyword, hash)) {
+    //|| (firstflg == true && $route.current.params.guid == item.current.guid)) {
       tmp_node["color"] = {
         "background": "red",
         "border": "red"
       };
       tmp_node["borderWidth"] = 3;
+      console.log(tmp_node)
     }
-*/
-    // console.log( tmp_node );
-    //nodes.push(tmp_node);
+
     graph["nodes"].push(tmp_node);
 
     var tmp_edge = {
@@ -57,8 +57,6 @@ function add_child_info(cur, graph) {
       "color": {"color": "lightgray"},
       "length": 200
     };
-    // console.log( tmp_edge );
-    //edges.push(tmp_edge);
     graph["edges"].push(tmp_edge);
 
     for( let n_key in item.current.info.Net ) {
@@ -88,7 +86,7 @@ function add_child_info(cur, graph) {
       graph["edges"].push(tmp_edge);
     }
     //[nodes, edges] = add_child_info(item, nodes, edges);
-    graph = add_child_info(item, graph);
+    graph = add_child_info(item, graph, keyword, hash);
   }
   //return [nodes, edges]
   return graph;
@@ -96,6 +94,7 @@ function add_child_info(cur, graph) {
 
 
 function local_search(data, keyword) {
+  console.log(data)
   for (var key in data) {
     if (Array.isArray(data[key])) {
       if (local_search(data[key], keyword)) {
@@ -156,7 +155,6 @@ function createNetwork(tops, keyword, hash, firstflg) {
       "guid": top.current.guid,
       "info": top.current.info
     };
-    /*
     if (search(top.current.info, keyword, hash)) {
       tmp_node["color"] = {
         "background": "red",
@@ -164,10 +162,8 @@ function createNetwork(tops, keyword, hash, firstflg) {
       };
       tmp_node["borderWidth"] = 3;
     }
-    nodes.push(tmp_node);
-    */
     graph["nodes"].push(tmp_node);
-    graph = add_child_info(top, graph);
+    graph = add_child_info(top, graph, keyword, hash);
   }
   return graph;
 }
@@ -189,7 +185,6 @@ export class GraphView extends React.Component {
 
     this.setNetwork = this.setNetwork.bind(this);
     this.setText = this.setText.bind(this);
-    this.disableRedraw = this.disableRedraw.bind(this);
 
 this.options = {
   configure:{enabled:false},
@@ -216,8 +211,9 @@ nodes: {
     }
   },
   physics:false,
-  height: "400px",
-  autoResize: false,
+  height: "600px",
+  width: "1280px",
+  autoResize: true,
 }
 
   }
@@ -229,17 +225,8 @@ nodes: {
       });
   }
   
-  disableRedraw(){
-    let events = this.state.events;
-    if (events.initRedraw){
-      events.initRedraw = null;
-      //this.setState({events:events});
-    }
-  }
-
   setNetwork(nw){
     const network = nw;
-    const disableRedraw = this.disableRedraw;
     const settxt = this.setText;
     const host = this.props.host;
     const date = this.props.date;
@@ -255,6 +242,7 @@ nodes: {
 
   var events = {
   oncontext: function (ctx) {
+    network.redraw();
     network.fit();
   },
   doubleClick: function(properties) {
@@ -262,9 +250,9 @@ nodes: {
     var node = network.body.data.nodes.get(properties.nodes[0]);
     console.log(node);
     if(node.guid != null && node.guid!="" && node.guid!="root"){
-      var url = '../../process_overview/' + host + '/' + date.substr(0, 10) + '/' + node.guid;
-      console.log(url);
-      //window.open(url, "_blank");
+      var url = chrome.addBasePath("/app/ss_react/process_overview");
+      url += '?host=' + host + '&date=' + date.substr(0, 10) + '&guid=' + node.guid;
+      window.open(url, "_blank");
     }
   },
   click: function(properties) {
@@ -301,12 +289,12 @@ nodes: {
 
   const graph = createNetwork(
     this.props.tops,
-    null,
-    null,
+    this.props.keyword,//null,
+    this.props.hash,//null,
     true,
   );
 
-  console.log(this.state);
+  console.log(graph);
   return (
   <div>
     <div>

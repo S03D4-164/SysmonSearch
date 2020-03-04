@@ -16,6 +16,7 @@ import {
   EuiFormRow,
   EuiSpacer,
   EuiText,
+  EuiLink,
 } from '@elastic/eui';
 
 export class SysmonSearch extends React.Component {
@@ -34,11 +35,36 @@ export class SysmonSearch extends React.Component {
     };
 
     this.columns = [
-    {field: 'utc', name: 'UTC Time', width:"20%"},
-    {field: 'event', name: 'Event ID', width:"10%"},
-    {field: 'pc', name: 'Hostname', width:"20%"},
-    {field: 'user', name: 'User', width:"10%"},
-    {field: 'image', name: 'image', width:"40%"},
+    {field: 'utc', name: 'UTC Time', width:"20%", sortable:true,
+      render: (utc, item) => {
+        let link = chrome.addBasePath('/app/ss_react/stats');
+        link += "?host=" + item.pc + "&date=" + moment(item.utc).format("YYYY-MM-DD")
+        return (<EuiLink href={link} >{utc}</EuiLink>)
+      }
+    },
+    {field: 'event', name: 'Event ID', width:"10%", sortable:true},
+    {field: 'pc', name: 'Hostname', width:"20%", sortable:true,
+      render: (pc, item) => {
+        let link = chrome.addBasePath('/app/ss_react/event');
+        link += "?host=" + item.pc + "&date=" + moment(item.utc).format("YYYY-MM-DD")
+        return (<EuiLink href={link} >{pc}</EuiLink>)
+      }
+    },
+    {field: 'user', name: 'User', width:"10%", sortable:true},
+    {field: 'description', name: 'Description', width:"10%", sortable:true,
+      render: (descr, item) => {
+        let link = chrome.addBasePath('/app/ss_react/process_list');
+        link += "?host=" + item.pc + "&date=" + moment(item.utc).format("YYYY-MM-DD") + "&category=" + descr;
+        return (<EuiLink href={link} >{descr}</EuiLink>)
+      }
+    },
+    {field: 'image', name: 'image', width:"30%", sortable:true,
+      render: (image, item) => {
+        let link = chrome.addBasePath('/app/ss_react/process_overview');
+        link += "?host=" + item.pc + "&date=" + moment(item.utc).format("YYYY-MM-DD") + "&guid=" + item.guid;
+        return (<EuiLink href={link} >{image}</EuiLink>)
+      }
+    },
     ];
 
     this.options = [
@@ -46,7 +72,10 @@ export class SysmonSearch extends React.Component {
     {value:1, text:"IP Address"},
     {value:2, text:"Port"},
     {value:3, text:"Hostname"},
-    {value:4, text:"Process"},
+    {value:4, text:"Process Name"},
+    {value:5, text:"Registry Key"},
+    {value:6, text:"Registry Value"},
+    {value:7, text:"Hash"},
     ];
 
     this.conjunctions = [
@@ -96,6 +125,8 @@ export class SysmonSearch extends React.Component {
               pc: res.computer_name,
               user: res.user_name,
               image: res.image,
+              description: res.description,
+              guid: res.process_guid,
             };
             items.push(item);
         });
@@ -157,6 +188,13 @@ render(){
     //let end = start + pageSize;
     const pageOfItems = this.state.items.slice(start, pageSize);
     const totalItemCount = this.state.total;
+
+    const sorting = {
+      sort: {
+        field: "utc",
+        direction: "asc",
+      }
+    };
 
     const pagination = {
       pageIndex,
@@ -272,9 +310,10 @@ return (
 <EuiSpacer size="m"/>
 
     <EuiInMemoryTable		
-          items={this.state.items}
-          columns={this.columns}
-          pagination={pagination}
+      items={this.state.items}
+      columns={this.columns}
+      pagination={pagination}
+      sorting={sorting}
     />
 
 </EuiPanel>

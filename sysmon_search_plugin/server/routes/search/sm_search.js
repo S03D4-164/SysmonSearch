@@ -75,6 +75,7 @@ async function smSearch(sysmon, params) {
         "date": hit["@timestamp"],
         "process_guid": hit.winlog.event_data.ProcessGuid,
         "description" : description,
+        "task": hit.winlog.task,
         "_id" : hits[index]._id
       };
       if(hit.event_id == 8)tmp["source_guid"] = hit.winlog.event_data.SourceProcessGuid;

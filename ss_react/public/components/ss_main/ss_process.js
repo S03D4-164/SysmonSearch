@@ -10,6 +10,10 @@ import {
   EuiTitle,
   EuiPanel,
   EuiButton,
+  EuiFlexGroup,
+  EuiFlexItem,
+  EuiFormRow,
+  EuiFieldText,
 } from '@elastic/eui';
 
 const qs = require('query-string');
@@ -42,11 +46,22 @@ export class SysmonProcess extends React.Component {
     this.back = chrome.addBasePath('/app/ss_react');
     this.stats = chrome.addBasePath('/app/ss_react/stats')+ this.props.location.search;
     this.summary = chrome.addBasePath('/app/ss_react/event')+ this.props.location.search;
+    this.handleChange = this.handleChange.bind(this);
+    this.handleChangeHash = this.handleChangeHash.bind(this);
 
   }
 
   componentDidMount(){
-    var api = "../../api/sysmon-search-plugin/process";
+    this.getProcess();
+  }
+
+  clickSearch(){
+    this.getProcess();
+  }
+
+  getProcess(){
+    //var api = "../../api/sysmon-search-plugin/process";
+    var api = chrome.addBasePath("/api/sysmon-search-plugin/process");
     api += "/" + this.state.host
     api += "/" + this.state.date;
     fetch(api, {
@@ -60,7 +75,6 @@ export class SysmonProcess extends React.Component {
     .then((responseJson) => {
       this.setState({tops:responseJson});
       console.log(JSON.stringify(responseJson));
-
       //const tops = responseJson;
     }) 
     .catch((error) =>{
@@ -68,8 +82,20 @@ export class SysmonProcess extends React.Component {
     });
   }
 
+  handleChange (event) {
+    this.setState({
+      keyword: event.target.value
+    });
+  }
+
+  handleChangeHash (event) {
+    this.setState({
+      hash: event.target.value
+    });
+  }
+
   render() {
-    //console.log(this.state)
+    console.log(this.state)
 
 /*
     const graph = createNetwork(
@@ -89,8 +115,36 @@ export class SysmonProcess extends React.Component {
 <EuiButton size="s" iconType="arrowLeft" href={this.back}>Top</EuiButton>
 <EuiButton size="s" href={this.stats}>Stats</EuiButton>
 <EuiButton size="s" href={this.summary}>Summary</EuiButton>
-<GraphView tops={this.state.tops} host={this.state.host} date={this.state.date} />
 
+  <EuiFlexGroup >
+    <EuiFlexItem>
+      <EuiFormRow label="Keyword">
+      <EuiFieldText
+      name="keyword"
+      onChange={this.handleChange} />
+      </EuiFormRow>
+    </EuiFlexItem>
+    <EuiFlexItem>
+      <EuiFormRow label="Hash">
+      <EuiFieldText
+      name="hash"
+      onChange={this.handleChangeHash} />
+      </EuiFormRow>
+    </EuiFlexItem>
+    <EuiFlexItem>
+      <EuiFormRow hasEmptyLabelSpace display="center">
+<EuiButton onClick={ () => this.clickSearch() }>Search</EuiButton>
+      </EuiFormRow>
+    </EuiFlexItem>
+  </EuiFlexGroup >
+
+<GraphView
+ tops={this.state.tops}
+ host={this.state.host}
+ date={this.state.date}
+ keyword={this.state.keyword}
+ hash={this.state.hash}
+/>
 
 </EuiPanel>
 </div>
