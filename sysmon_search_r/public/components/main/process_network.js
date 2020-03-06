@@ -250,7 +250,7 @@ nodes: {
     var node = network.body.data.nodes.get(properties.nodes[0]);
     console.log(node);
     if(node.guid != null && node.guid!="" && node.guid!="root"){
-      var url = chrome.addBasePath("/app/ss_react/process_overview");
+      var url = chrome.addBasePath("/app/sysmon_search_r/process_overview");
       url += '?host=' + host + '&date=' + date.substr(0, 10) + '&guid=' + node.guid;
       window.open(url, "_blank");
     }

@@ -11,6 +11,7 @@ import {
   EuiDatePicker,
   EuiDatePickerRange,
   EuiButton,
+  EuiButtonIcon,
   EuiFlexGroup,
   EuiFlexItem,
   EuiFormRow,
@@ -37,7 +38,7 @@ export class SysmonSearch extends React.Component {
     this.columns = [
     {field: 'utc', name: 'UTC Time', width:"20%", sortable:true,
       render: (utc, item) => {
-        let link = chrome.addBasePath('/app/ss_react/stats');
+        let link = chrome.addBasePath('/app/sysmon_search_r/stats');
         link += "?host=" + item.pc + "&date=" + moment(item.utc).format("YYYY-MM-DD")
         return (<EuiLink href={link} >{utc}</EuiLink>)
       }
@@ -45,7 +46,7 @@ export class SysmonSearch extends React.Component {
     {field: 'event', name: 'Event ID', width:"10%", sortable:true},
     {field: 'pc', name: 'Hostname', width:"20%", sortable:true,
       render: (pc, item) => {
-        let link = chrome.addBasePath('/app/ss_react/event');
+        let link = chrome.addBasePath('/app/sysmon_search_r/event');
         link += "?host=" + item.pc + "&date=" + moment(item.utc).format("YYYY-MM-DD")
         return (<EuiLink href={link} >{pc}</EuiLink>)
       }
@@ -53,14 +54,14 @@ export class SysmonSearch extends React.Component {
     {field: 'user', name: 'User', width:"10%", sortable:true},
     {field: 'description', name: 'Description', width:"10%", sortable:true,
       render: (descr, item) => {
-        let link = chrome.addBasePath('/app/ss_react/process_list');
+        let link = chrome.addBasePath('/app/sysmon_search_r/process_list');
         link += "?host=" + item.pc + "&date=" + moment(item.utc).format("YYYY-MM-DD") + "&category=" + descr;
         return (<EuiLink href={link} >{descr}</EuiLink>)
       }
     },
     {field: 'image', name: 'image', width:"30%", sortable:true,
       render: (image, item) => {
-        let link = chrome.addBasePath('/app/ss_react/process_overview');
+        let link = chrome.addBasePath('/app/sysmon_search_r/process_overview');
         link += "?host=" + item.pc + "&date=" + moment(item.utc).format("YYYY-MM-DD") + "&guid=" + item.guid;
         return (<EuiLink href={link} >{image}</EuiLink>)
       }

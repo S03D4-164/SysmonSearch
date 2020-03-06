@@ -26,9 +26,9 @@ export class SysmonStats extends React.Component {
       groups:[],
       category:[]
     };
-    this.back = chrome.addBasePath('/app/ss_react');
-    this.summary = chrome.addBasePath('/app/ss_react/event') + this.props.location.search;
-    this.process = chrome.addBasePath('/app/ss_react/process') + this.props.location.search;
+    this.back = chrome.addBasePath('/app/sysmon_search_r');
+    this.summary = chrome.addBasePath('/app/sysmon_search_r/event') + this.props.location.search;
+    this.process = chrome.addBasePath('/app/sysmon_search_r/process') + this.props.location.search;
   }
 
   componentDidMount(){

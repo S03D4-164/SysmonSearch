@@ -26,12 +26,12 @@ export class Main extends React.Component {
     return (
       <Router>
         <Switch>
-          <Route exact path="*/ss_react" component={SysmonSearchTabs} />
-          <Route exact path="*/ss_react/event" component={SysmonSummary} />
-          <Route exact path="*/ss_react/stats" component={SysmonStats} />
-          <Route exact path="*/ss_react/process" component={SysmonProcess} />
-          <Route exact path="*/ss_react/process_list" component={SysmonProcessList} />
-          <Route exact path="*/ss_react/process_overview" component={SysmonOverView} />
+          <Route exact path="/app/sysmon_search_r" component={SysmonSearchTabs} />
+          <Route exact path="*/sysmon_search_r/event" component={SysmonSummary} />
+          <Route exact path="*/sysmon_search_r/stats" component={SysmonStats} />
+          <Route exact path="*/sysmon_search_r/process" component={SysmonProcess} />
+          <Route exact path="*/sysmon_search_r/process_list" component={SysmonProcessList} />
+          <Route exact path="*/sysmon_search_r/process_overview" component={SysmonOverView} />
         </Switch>
       </Router>
     );

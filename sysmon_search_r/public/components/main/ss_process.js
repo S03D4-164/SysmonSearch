@@ -43,9 +43,9 @@ export class SysmonProcess extends React.Component {
       textarea:"",
     };
 
-    this.back = chrome.addBasePath('/app/ss_react');
-    this.stats = chrome.addBasePath('/app/ss_react/stats')+ this.props.location.search;
-    this.summary = chrome.addBasePath('/app/ss_react/event')+ this.props.location.search;
+    this.back = chrome.addBasePath('/app/sysmon_search_r');
+    this.stats = chrome.addBasePath('/app/sysmon_search_r/stats')+ this.props.location.search;
+    this.summary = chrome.addBasePath('/app/sysmon_search_r/event')+ this.props.location.search;
     this.handleChange = this.handleChange.bind(this);
     this.handleChangeHash = this.handleChangeHash.bind(this);
 

@@ -1,8 +1,10 @@
 import React from 'react';
+import chrome from 'ui/chrome';
+
 const qs = require('query-string');
 
 import {
-  EuiBasicTable,
+  EuiInMemoryTable,
   EuiLink,
   EuiTitle,
   EuiPanel,
@@ -20,6 +22,44 @@ export class SysmonProcessList extends React.Component {
       sortField: 'date',
       sortDirection: 'asc',
     };
+
+    this.columns = [
+    {
+      field: 'number',
+      name: 'number',
+      sortable: true,
+      width:"10%",
+    },
+    {
+      field: 'date',
+      name: 'date',
+      sortable: true,
+      width:"20%",
+    },
+    {
+      field: 'type',
+      name: 'type',
+      width:"10%",
+      sortable: true,
+    },
+    { field: 'process',
+      name: 'process',
+      width:"30%",
+      sortable: true,
+    },
+    {
+      field: 'disp',
+      name: 'disp',
+      width:"30%",
+      sortable: true,
+      render: (disp, item) => (
+        <EuiLink href={item.link} >{disp}</EuiLink>
+      )
+    },
+  ];
+
+    this.onTableChange = this.onTableChange.bind(this);
+
   }
 
   onTableChange = ({ page = {}, sort = {} }) => {
@@ -31,11 +71,12 @@ export class SysmonProcessList extends React.Component {
   };
 
   componentDidMount(){
-    let api = '../../api/sysmon-search-plugin/process_list';
+    //let api = '../../api/sysmon-search-plugin/process_list';
+    let api = chrome.addBasePath('/api/sysmon-search-plugin/process_list');
     api += '/' + this.state.host;
     api += '/' + this.state.category;
     api += '/' + this.state.date;
-    console.log(api);
+    //console.log(api);
     fetch(api, {
       method:"GET",
       headers: {
@@ -48,25 +89,23 @@ export class SysmonProcessList extends React.Component {
         console.log(responseJson);
         var items = [];
         responseJson.map(res => {
-            let link = "process_overview";
-            link += "?host=" + this.state.host;
-            link += "&date=" + this.state.date;
-            let guid = res.guid?res.guid:res.info.SourceProcessGuid;
-            link += "&guid=" + guid;
-            let item = {
-              number: res.number,
-              date: res.date,
-              type: res.type,
-              process: res.process,
-              disp: res.disp,
-              info: res.info,
-              link: link,
-            };
-            items.push(item);
+          let link = "process_overview";
+          link += "?host=" + this.state.host;
+          link += "&date=" + this.state.date;
+          let guid = res.guid?res.guid:res.info.SourceProcessGuid;
+          link += "&guid=" + guid;
+          let item = {
+            number: res.number,
+            date: res.date,
+            type: res.type,
+            process: res.process,
+            disp: res.disp,
+            info: res.info,
+            link: link,
+          };
+          items.push(item);
         });
-        this.setState({
-          items:items
-        });
+        this.setState({items:items});
     })
     .catch((error) =>{
       console.error(error);
@@ -74,35 +113,6 @@ export class SysmonProcessList extends React.Component {
   }
 
   render(){
-  const columns = [
-    {
-      field: 'number',
-      name: 'number',
-      sortable: true,
-      width:"10%",
-    },
-    {
-      field: 'date',
-      name: 'date',
-      sortable: true,
-      width:"10%",
-    },
-    {
-      field: 'type',
-      name: 'type',
-      width:"10%",
-    },
-    {field: 'process', name: 'process'},
-    {
-      field: 'disp',
-      name: 'disp',
-      render: (disp, item) => (
-        <EuiLink href={item.link} >
-          {disp}
-        </EuiLink>
-      )
-    },
-  ];
 
     const sorting = {
       sort: {
@@ -113,16 +123,16 @@ export class SysmonProcessList extends React.Component {
 
   return (
 
-<div>
+<div id="processlist" style={{maxWidth:"1280px",margin:"0 auto"}}>
 <EuiTitle size="m">
   <h3>Event List</h3>
 </EuiTitle>
       <EuiPanel>
 <h3>{this.state.category} in {this.state.host}@{this.state.date}</h3>
-   <EuiBasicTable
+   <EuiInMemoryTable
       items={this.state.items}
-      columns={columns}
-      //sorting={sorting}
+      columns={this.columns}
+      sorting={sorting}
       //onChange={this.onTableChange}
     />
 </EuiPanel>

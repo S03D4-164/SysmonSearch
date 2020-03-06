@@ -4,7 +4,7 @@ import chrome from 'ui/chrome';
 import { render, unmountComponentAtNode } from 'react-dom';
 
 import 'ui/autoload/styles';
-import { Main } from './components/ss_main';
+import { Main } from './components/main';
 
 const app = uiModules.get('apps/ssReact');
 

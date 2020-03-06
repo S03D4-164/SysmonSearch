@@ -3,7 +3,7 @@ import moment from 'moment';
 import chrome from 'ui/chrome';
 
 import {
-  EuiBasicTable,
+  EuiInMemoryTable,
   EuiFieldText,
   EuiDatePicker,
   EuiDatePickerRange,
@@ -13,6 +13,9 @@ import {
   EuiFlexItem,
   EuiFormRow,
   EuiLink,
+  EuiIcon,
+  EuiButtonIcon,
+  EuiText,
   EuiSpacer,
 } from '@elastic/eui';
 
@@ -26,8 +29,8 @@ export class SysmonEvents extends React.Component {
       startDate: moment().add(-1, 'M'),
       endDate: moment().add(0, 'd'),
       keyword:"",
-      //sortField: 'date',
-      //sortDirection: 'asc',
+      sortField: 'date',
+      sortDirection: 'asc',
     };
     this.handleChangeStart = this.handleChangeStart.bind(this);
     this.handleChangeEnd = this.handleChangeEnd.bind(this);
@@ -45,13 +48,9 @@ export class SysmonEvents extends React.Component {
     });
   };
 
-  componentDidMount(){
-    this.getEvents();
-  }
+  componentDidMount(){ this.getEvents() };
   
-  clickSearch(){
-    this.getEvents();
-  }
+  clickSearch(){ this.getEvents() };
 
   getEvents(){
     const api = chrome.addBasePath('/api/sysmon-search-plugin/hosts');
@@ -72,13 +71,13 @@ export class SysmonEvents extends React.Component {
         var items = [];
         responseJson.map(res => {
           res.result.map(r  => {
+            let params = "?host=" + r.key + "&date=" + res.date;
             let item = {
               date: res.date,
               pc: r.key,
               count: r.doc_count,
-              event: "ss_react/event?host=" + r.key + "&date=" + res.date,
-              stats: "ss_react/stats?host=" + r.key + "&date=" + res.date,
-              //events: "ss_react/event?host=" + r.key + "&date=" + res.date,
+              event: "sysmon_search_r/event" + params,
+              stats: "sysmon_search_r/stats" + params,
             };
             items.push(item);
           });
@@ -116,31 +115,33 @@ export class SysmonEvents extends React.Component {
   render(){
   const columns = [
     {field: 'date',
-sortable: true,
+     sortable: true,
      name: 'Date'},
     {
       field: 'pc',
       name: 'Hostname',
       sortable: true,
       render: (pc, item) => (
-        <EuiLink href={item.stats} >
-          {pc}
-        </EuiLink>
+        <Fragment>
+        <EuiButtonIcon href={item.stats} 
+        iconType="visBarVerticalStacked" />
+        {pc}</Fragment>
       )
     },
     {
       field: 'count',
       name: 'Count',
-sortable: true,
+      sortable: true,
       render: (count, item) => (
-        <EuiLink href={item.event} >
-          {count}
-        </EuiLink>
+        <Fragment>
+        <EuiButtonIcon href={item.event}
+        iconType="visPie"/>
+        {count}</Fragment>
       )
     }
   ];
 
-/*
+
     const { sortField, sortDirection } = this.state;
     const sorting = {
       sort: {
@@ -148,14 +149,13 @@ sortable: true,
         direction: sortDirection,
       },
     };
-*/
+
 
   return (
       <EuiPanel>
   <EuiFlexGroup >
-    <EuiFlexItem>
+    <EuiFlexItem style={{ minWidth: 400 }}>
       <EuiFormRow label="Date">
-
       <EuiDatePickerRange
         startDateControl={
           <EuiDatePicker
@@ -193,17 +193,18 @@ sortable: true,
     </EuiFlexItem>
     <EuiFlexItem>
       <EuiFormRow hasEmptyLabelSpace display="center">
-<EuiButton onClick={ () => this.clickSearch() }>Search</EuiButton>
+        <EuiButton onClick={ () => this.clickSearch() }
+         iconType="search"
+        >Search</EuiButton>
       </EuiFormRow>
     </EuiFlexItem>
   </EuiFlexGroup >
+  <EuiSpacer />
 
-<EuiSpacer />
-
-    <EuiBasicTable
+    <EuiInMemoryTable
       items={this.state.items}
       columns={columns}
-
+      sorting={sorting}
     />
 
       </EuiPanel>
