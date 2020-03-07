@@ -2,18 +2,25 @@ import React from 'react';
 import chrome from 'ui/chrome';
 
 const qs = require('query-string');
-
+import { local_search } from './ss_utils';
 import {
   EuiInMemoryTable,
   EuiLink,
   EuiTitle,
+  EuiText,
   EuiPanel,
+  EuiButton,
+  EuiFlexGroup,
+  EuiFlexItem,
+  EuiFlexRow,
+  EuiFormRow,
+  EuiFieldText,
 } from '@elastic/eui';
 
 export class SysmonProcessList extends React.Component {
   constructor(props){
     super(props);
-    let params = qs.parse(this.props.location.search);
+    const params = qs.parse(this.props.location.search);
     this.state = {
       host: params.host,
       date: params.date,
@@ -21,6 +28,13 @@ export class SysmonProcessList extends React.Component {
       items:[],
       sortField: 'date',
       sortDirection: 'asc',
+      pageIndex: 0,
+      pageSize: 100,
+      showPerPageOptions: true,
+      total:0,
+      keyword:null,
+      hash:null,
+      filteredItems:[],
     };
 
     this.columns = [
@@ -58,26 +72,77 @@ export class SysmonProcessList extends React.Component {
     },
   ];
 
-    this.onTableChange = this.onTableChange.bind(this);
+    this.handleChange = this.handleChange.bind(this);
+    this.handleChangeHash = this.handleChangeHash.bind(this);
+    this.filterList = this.filterList.bind(this);
+    this.getItems = this.getItems.bind(this);
 
   }
 
-  onTableChange = ({ page = {}, sort = {} }) => {
-    const { field: sortField, direction: sortDirection } = sort;
+  handleChange (event) {
+    const keyword = event.target.value;
+    const items = this.filterList(this.state.items, keyword, this.state.hash);
     this.setState({
-      sortField,
-      sortDirection,
+      filteredItems: items,
+      keyword: keyword,
     });
+  }
+
+  handleChangeHash (event) {
+    const hash = event.target.value;
+    const items = this.filterList(this.state.items, this.state.keyword, hash);
+    this.setState({
+      filteredItems: items,
+      hash: hash,
+    });
+  }
+
+  filterList(localdata, keyword, hash) {
+    var search_data = [];
+    var tmp_data = [];
+    //var localdata = this.state.items
+    if (keyword != null && keyword !== "") {
+      for (var index in localdata) {
+        if (local_search(localdata[index], keyword)) {
+          tmp_data.push(localdata[index]);
+        }
+      }
+    } else {
+      tmp_data = localdata;
+    }
+    if (hash != null && hash !== "") {
+      for (var index in tmp_data) {
+        if (tmp_data[index]["info"] != null && tmp_data[index]["info"]["Hashes"] != null) {
+          if (tmp_data[index]["info"]["Hashes"].indexOf(hash) != -1) {
+            search_data.push(tmp_data[index]);
+          }
+        }
+      }
+    } else {
+      search_data = tmp_data;
+    }
+    return search_data;
+    /*
+    this.setState({
+      items:search_data
+    });
+    */
   };
 
   componentDidMount(){
-    //let api = '../../api/sysmon-search-plugin/process_list';
+    this.getItems();
+  }
+
+  clickSearch(){
+    this.getItems();
+  }
+
+  getItems(){
     let api = chrome.addBasePath('/api/sysmon-search-plugin/process_list');
     api += '/' + this.state.host;
     api += '/' + this.state.category;
     api += '/' + this.state.date;
-    //console.log(api);
-    fetch(api, {
+    const items = fetch(api, {
       method:"GET",
       headers: {
         'kbn-xsrf': 'true',
@@ -105,15 +170,15 @@ export class SysmonProcessList extends React.Component {
           };
           items.push(item);
         });
-        this.setState({items:items});
+        this.setState({items:items, total:items.length});
     })
     .catch((error) =>{
       console.error(error);
     });
+    return items;
   }
 
   render(){
-
     const sorting = {
       sort: {
         field: this.state.sortField,
@@ -121,19 +186,59 @@ export class SysmonProcessList extends React.Component {
       },
     };
 
-  return (
+    const { pageIndex, pageSize } = this.state;
+    const start = pageIndex * pageSize;
+    const pageOfItems = this.state.items.slice(start, pageSize);
+    const totalItemCount = this.state.total;
+    const pagination = {
+      pageIndex,
+      pageSize,
+      totalItemCount,
+      pageSizeOptions: [100, 500, 1000],
+      hidePerPageOptions: false,
+    };
+
+    console.log(this.state)
+    var items = this.state.items;
+    if (this.state.filteredItems.length>0) items = this.state.filteredItems;
+    const total = items.length;
+
+    return (
 
 <div id="processlist" style={{maxWidth:"1280px",margin:"0 auto"}}>
-<EuiTitle size="m">
-  <h3>Event List</h3>
+<EuiTitle size="s">
+<h3>{this.state.category} in {this.state.host}@{this.state.date}</h3>
 </EuiTitle>
       <EuiPanel>
-<h3>{this.state.category} in {this.state.host}@{this.state.date}</h3>
+<EuiText>Total: {total}</EuiText>
+
+  <EuiFlexGroup >
+    <EuiFlexItem>
+      <EuiFormRow label="Keyword">
+      <EuiFieldText
+      name="keyword"
+      onChange={this.handleChange} />
+      </EuiFormRow>
+    </EuiFlexItem>
+    <EuiFlexItem>
+      <EuiFormRow label="Hash">
+      <EuiFieldText
+      name="hash"
+      onChange={this.handleChangeHash} />
+      </EuiFormRow>
+    </EuiFlexItem>
+    <EuiFlexItem>
+      <EuiFormRow hasEmptyLabelSpace display="center">
+<EuiButton onClick={ () => this.clickSearch() }>Reset</EuiButton>
+      </EuiFormRow>
+    </EuiFlexItem>
+  </EuiFlexGroup >
+
    <EuiInMemoryTable
-      items={this.state.items}
+      items={items}
       columns={this.columns}
       sorting={sorting}
-      //onChange={this.onTableChange}
+      pagination={pagination}
     />
 </EuiPanel>
 </div>

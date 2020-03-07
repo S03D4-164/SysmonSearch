@@ -27,9 +27,9 @@ export class SysmonSummary extends React.Component {
     };
     this.chartRef = React.createRef();
 
-    this.back = chrome.addBasePath('/app/ss_react');
-    this.stats = chrome.addBasePath('/app/ss_react/stats')+ this.props.location.search;
-    this.process = chrome.addBasePath('/app/ss_react/process')+ this.props.location.search;
+    this.appPath = chrome.addBasePath('/app/sysmon_search_r');
+    this.stats = this.appPath + "/stats" + this.props.location.search;
+    this.process = this.appPath + "/process" + this.props.location.search;
   }
 
   componentDidMount(){
@@ -134,16 +134,15 @@ export class SysmonSummary extends React.Component {
 <tr>
 <td>Total</td>
 <td align="right">{this.state.total}</td>
-<td align="right"><a href={this.process}>Correlation</a></td>
 </tr>
 </tbody>
 </table>
 </EuiFlexItem>
   </EuiFlexGroup>
 
-<EuiButton size="s" iconType="arrowLeft" href={this.back}>Top</EuiButton>
-<EuiButton size="s" href={this.stats}>Stats</EuiButton>
-<EuiButton size="s" href={this.process}>Process</EuiButton>
+<EuiButton size="s" iconType="arrowLeft" href={this.appPath}>Top</EuiButton>
+<EuiButton size="s" href={this.stats} iconType="visBarVerticalStacked">Stats</EuiButton>
+<EuiButton size="s" href={this.process} iconType="graphApp">Process</EuiButton>
       
 </EuiText>
 

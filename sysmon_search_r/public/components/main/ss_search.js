@@ -88,7 +88,6 @@ export class SysmonSearch extends React.Component {
     this.handleAddFields = this.handleAddFields.bind(this);
     this.handleRemoveFields = this.handleRemoveFields.bind(this);
     this.handleInputChange = this.handleInputChange.bind(this);
-    this.onTableChange = this.onTableChange.bind(this);
   }
 
   clickSearch(){
@@ -141,14 +140,6 @@ export class SysmonSearch extends React.Component {
     });
   }
 
-  onTableChange = ({ page = {} }) => {
-    const { index: pageIndex, size: pageSize } = page;
-    this.setState({
-      pageIndex,
-      pageSize,
-    });
-  };
-
   handleChangeStart(date) {
     this.setState({ startDate:date });
   }
@@ -185,8 +176,6 @@ export class SysmonSearch extends React.Component {
 
 render(){
     const { pageIndex, pageSize } = this.state;
-    let start = pageIndex * pageSize;
-    //let end = start + pageSize;
     const pageOfItems = this.state.items.slice(start, pageSize);
     const totalItemCount = this.state.total;
 

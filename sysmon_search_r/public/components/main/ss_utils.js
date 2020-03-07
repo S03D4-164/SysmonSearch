@@ -62,6 +62,7 @@ export default function search(data, keyword, hash) {
 
 module.exports = {
   search: search,
+  local_search: local_search,
   splitByLength: splitByLength
 }
 
