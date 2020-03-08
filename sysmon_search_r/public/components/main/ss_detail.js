@@ -17,13 +17,14 @@ import {
   EuiFieldText,
 } from '@elastic/eui';
 
-export class SysmonProcessList extends React.Component {
+export class SysmonDetail extends React.Component {
   constructor(props){
     super(props);
     const params = qs.parse(this.props.location.search);
     this.state = {
       host: params.host,
       date: params.date,
+      guid: params.guid,
       category: params.category,
       items:[],
       sortField: 'date',
@@ -122,11 +123,6 @@ export class SysmonProcessList extends React.Component {
       search_data = tmp_data;
     }
     return search_data;
-    /*
-    this.setState({
-      items:search_data
-    });
-    */
   };
 
   componentDidMount(){
@@ -138,10 +134,10 @@ export class SysmonProcessList extends React.Component {
   }
 
   getItems(){
-    let api = chrome.addBasePath('/api/sysmon-search-plugin/process_list');
+    let api = chrome.addBasePath('/api/sysmon-search-plugin/process_detail');
     api += '/' + this.state.host;
-    api += '/' + this.state.category;
     api += '/' + this.state.date;
+    api += '/' + this.state.guid;
     const items = fetch(api, {
       method:"GET",
       headers: {
@@ -207,7 +203,7 @@ export class SysmonProcessList extends React.Component {
 
 <div id="processlist" style={{maxWidth:"1280px",margin:"0 auto"}}>
 <EuiTitle size="s">
-<h3>{this.state.category} on {this.state.host}@{this.state.date}</h3>
+<h3>{this.state.guid} on {this.state.host}@{this.state.date}</h3>
 </EuiTitle>
       <EuiPanel>
 

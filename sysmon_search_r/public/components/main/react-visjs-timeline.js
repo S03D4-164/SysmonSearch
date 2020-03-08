@@ -108,9 +108,9 @@ const get_category_name = function (date_str, event) {
     });
 
     this.$el.on("contextmenu", function(event) {
-      var click_date = moment(event.time).format("YYYY-MM-DD");
-      var category = get_category_name(click_date, event);
-      alert(category);
+      const click_date = moment(event.time).format("YYYY-MM-DD");
+      const category = get_category_name(click_date, event);
+      if(category) alert(category);
     });
 
     let hostname = this.props.host;
@@ -121,8 +121,8 @@ const get_category_name = function (date_str, event) {
       var url = 'process_list?host=' + hostname;
       url += '&category=' + category;
       url += '&date=' + click_date;
-      console.log(url);
-      //window.open(url, "_blank");
+      //console.log(url);
+      window.open(url, "_blank");
     });
 
     this.init()

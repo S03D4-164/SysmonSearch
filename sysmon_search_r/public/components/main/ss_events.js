@@ -78,6 +78,7 @@ export class SysmonEvents extends React.Component {
               count: r.doc_count,
               event: "sysmon_search_r/event" + params,
               stats: "sysmon_search_r/stats" + params,
+              process: "sysmon_search_r/process" + params,
             };
             items.push(item);
           });
@@ -114,17 +115,25 @@ export class SysmonEvents extends React.Component {
 
   render(){
   const columns = [
-    {field: 'date',
-     sortable: true,
-     name: 'Date'},
+    {
+      field: 'date',
+      sortable: true,
+      name: 'Date',
+      render: (date, item) => (
+        <Fragment>
+        <EuiButtonIcon href={item.stats} 
+        iconType="visBarVerticalStacked" />
+        {date}</Fragment>
+      )
+    },
     {
       field: 'pc',
       name: 'Hostname',
       sortable: true,
       render: (pc, item) => (
         <Fragment>
-        <EuiButtonIcon href={item.stats} 
-        iconType="visBarVerticalStacked" />
+        <EuiButtonIcon href={item.process} 
+        iconType="graphApp" />
         {pc}</Fragment>
       )
     },

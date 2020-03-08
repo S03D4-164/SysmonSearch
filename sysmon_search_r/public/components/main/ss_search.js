@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {Fragment} from 'react';
 import moment from 'moment';
 import chrome from 'ui/chrome';
 
@@ -40,7 +40,8 @@ export class SysmonSearch extends React.Component {
       render: (utc, item) => {
         let link = chrome.addBasePath('/app/sysmon_search_r/stats');
         link += "?host=" + item.pc + "&date=" + moment(item.utc).format("YYYY-MM-DD")
-        return (<EuiLink href={link} >{utc}</EuiLink>)
+        //return (<EuiLink href={link} >{utc}</EuiLink>)
+        return (<Fragment><EuiButtonIcon iconType="visBarVerticalStacked" href={link} />{utc}</Fragment>)
       }
     },
     {field: 'event', name: 'Event ID', width:"10%", sortable:true},
@@ -48,7 +49,8 @@ export class SysmonSearch extends React.Component {
       render: (pc, item) => {
         let link = chrome.addBasePath('/app/sysmon_search_r/event');
         link += "?host=" + item.pc + "&date=" + moment(item.utc).format("YYYY-MM-DD")
-        return (<EuiLink href={link} >{pc}</EuiLink>)
+        //return (<EuiLink href={link} >{pc}</EuiLink>)
+        return (<Fragment><EuiButtonIcon iconType="visPie" href={link} />{pc}</Fragment>)
       }
     },
     {field: 'user', name: 'User', width:"10%", sortable:true},
@@ -56,14 +58,16 @@ export class SysmonSearch extends React.Component {
       render: (descr, item) => {
         let link = chrome.addBasePath('/app/sysmon_search_r/process_list');
         link += "?host=" + item.pc + "&date=" + moment(item.utc).format("YYYY-MM-DD") + "&category=" + descr;
-        return (<EuiLink href={link} >{descr}</EuiLink>)
+        if(descr=="other") return(<Fragment>{descr}</Fragment>)
+        else return (<EuiLink href={link} >{descr}</EuiLink>)
       }
     },
     {field: 'image', name: 'image', width:"30%", sortable:true,
       render: (image, item) => {
         let link = chrome.addBasePath('/app/sysmon_search_r/process_overview');
         link += "?host=" + item.pc + "&date=" + moment(item.utc).format("YYYY-MM-DD") + "&guid=" + item.guid;
-        return (<EuiLink href={link} >{image}</EuiLink>)
+        //return (<EuiLink href={link} >{image}</EuiLink>)
+        return (<Fragment><EuiButtonIcon iconType="graphApp" href={link} />{image}</Fragment>)
       }
     },
     ];
@@ -176,6 +180,7 @@ export class SysmonSearch extends React.Component {
 
 render(){
     const { pageIndex, pageSize } = this.state;
+    const start = pageIndex * pageSize;
     const pageOfItems = this.state.items.slice(start, pageSize);
     const totalItemCount = this.state.total;
 
@@ -205,6 +210,7 @@ return (
       <EuiDatePickerRange style={{minWidth:500}}
         startDateControl={
           <EuiDatePicker
+            compressed
             selected={this.state.startDate}
             onChange={this.handleChangeStart}
             startDate={this.state.startDate}
@@ -216,6 +222,7 @@ return (
         }
         endDateControl={
           <EuiDatePicker
+            compressed
             selected={this.state.endDate}
             onChange={this.handleChangeEnd}
             startDate={this.state.startDate}
@@ -241,6 +248,7 @@ return (
    label="Field" >
     <EuiSelect 
       name="item"
+      compressed
       value={inputField.item}
       options={this.options}
       onChange={event => this.handleInputChange(index, event)}
@@ -251,13 +259,14 @@ return (
   <EuiFlexItem style={{maxWidth:400}}>
     <EuiFieldText 
       name="value"
+      compressed
       value={inputField.value}
       onChange={event => this.handleInputChange(index, event)}
     />
   </EuiFlexItem>
 
   <EuiFlexItem grow={false}>
-      <EuiButton size="m" iconType="arrowLeft"
+      <EuiButton size="s" iconType="arrowLeft"
         onClick={() => this.handleRemoveFields(index)}
       >DEL</EuiButton>
   </EuiFlexItem>
@@ -276,6 +285,7 @@ return (
    label="Conjunction" >
     <EuiSelect 
       name="conjunction"
+      compressed
       value={this.state.conjunction}
       options={this.conjunctions}
       onChange={this.handleChangeConjunction}
@@ -284,15 +294,15 @@ return (
   </EuiFlexItem>
 
   <EuiFlexItem grow={false}>
-      <EuiButton size="m" iconType="arrowUp"
+      <EuiButton size="s" iconType="arrowUp"
         onClick={() => this.handleAddFields()}
       >ADD</EuiButton>
   </EuiFlexItem>
   <EuiFlexItem grow={false}>
-      <EuiButton size="m" onClick={ () => this.clickSearch() }>Search</EuiButton>
+      <EuiButton size="s" onClick={ () => this.clickSearch() }>Search</EuiButton>
   </EuiFlexItem>
   <EuiFlexItem >
-    <EuiText><h2>Total: {this.state.total.value}</h2></EuiText>
+    <EuiText><h3>Total: {this.state.total.value}</h3></EuiText>
   </EuiFlexItem >
 
 </EuiFlexGroup >

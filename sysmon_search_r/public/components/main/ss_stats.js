@@ -26,9 +26,11 @@ export class SysmonStats extends React.Component {
       groups:[],
       category:[]
     };
-    this.back = chrome.addBasePath('/app/sysmon_search_r');
-    this.summary = chrome.addBasePath('/app/sysmon_search_r/event') + this.props.location.search;
-    this.process = chrome.addBasePath('/app/sysmon_search_r/process') + this.props.location.search;
+    this.top = chrome.addBasePath('/app/sysmon_search_r');
+    this.summary = this.top + '/event' + this.props.location.search;
+    this.process = this.top + '/process' + this.props.location.search;
+    //this.summary = chrome.addBasePath('/app/sysmon_search_r/event') + this.props.location.search;
+    //this.process = chrome.addBasePath('/app/sysmon_search_r/process') + this.props.location.search;
   }
 
   componentDidMount(){
@@ -107,9 +109,9 @@ export class SysmonStats extends React.Component {
   host={this.state.host}
 />
 
-<EuiButton size="s" iconType="arrowLeft" href={this.back}>Top</EuiButton>
-<EuiButton size="s" href={this.summary}>Summary</EuiButton>
-<EuiButton size="s" href={this.process}>Process</EuiButton>
+<EuiButton size="s" iconType="arrowLeft" href={this.top}>Top</EuiButton>
+<EuiButton size="s" href={this.summary} iconType="visPie">Summary</EuiButton>
+<EuiButton size="s" href={this.process} iconType="graphApp">Process</EuiButton>
 
 </EuiPanel>
 </div>

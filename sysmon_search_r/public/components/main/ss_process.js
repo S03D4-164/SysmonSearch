@@ -13,22 +13,20 @@ import {
   EuiFlexGroup,
   EuiFlexItem,
   EuiFormRow,
+  EuiSelect,
   EuiFieldText,
 } from '@elastic/eui';
 
 const qs = require('query-string');
 //import './ss_stats.css'
 import {
-  //createNetwork
-  //addChildInfo
   GraphView
 } from './process_network';
-
 
 export class SysmonProcess extends React.Component {
   constructor(props){
     super(props);
-    let params = qs.parse(this.props.location.search);
+    const params = qs.parse(this.props.location.search);
     this.state = {
       host: params.host,
       date: params.date,
@@ -36,31 +34,34 @@ export class SysmonProcess extends React.Component {
       keyword:null,
       hash:null,
       firstflg:true,
-      //option:option,
       graph:{},
       events:null,
       network:null,
       textarea:"",
+      layout: "UD",
     };
 
-    this.back = chrome.addBasePath('/app/sysmon_search_r');
-    this.stats = chrome.addBasePath('/app/sysmon_search_r/stats')+ this.props.location.search;
-    this.summary = chrome.addBasePath('/app/sysmon_search_r/event')+ this.props.location.search;
+    this.layouts =[
+      {value:"LR", text:"Left to Right"},
+      {value:"UD", text:"Up to Down"},
+      {value:"default", text:"Default"},
+    ]
+
+    this.top = chrome.addBasePath('/app/sysmon_search_r');
+    this.stats = this.top + '/stats' + this.props.location.search;
+    this.summary = this.top + '/event' + this.props.location.search;
+    //this.stats = chrome.addBasePath('/app/sysmon_search_r/stats')+ this.props.location.search;
+    //this.summary = chrome.addBasePath('/app/sysmon_search_r/event')+ this.props.location.search;
     this.handleChange = this.handleChange.bind(this);
     this.handleChangeHash = this.handleChangeHash.bind(this);
 
   }
 
-  componentDidMount(){
-    this.getProcess();
-  }
+  componentDidMount(){ this.getProcess() };
 
-  clickSearch(){
-    this.getProcess();
-  }
+  clickSearch(){ this.getProcess() };
 
   getProcess(){
-    //var api = "../../api/sysmon-search-plugin/process";
     var api = chrome.addBasePath("/api/sysmon-search-plugin/process");
     api += "/" + this.state.host
     api += "/" + this.state.date;
@@ -94,17 +95,12 @@ export class SysmonProcess extends React.Component {
     });
   }
 
+  handleChangeLayout = event => {
+    this.setState({ layout: event.target.value });
+  }
+
   render() {
     console.log(this.state)
-
-/*
-    const graph = createNetwork(
-      this.state.tops,
-      this.state.keyword,
-      this.state.hash,
-      this.state.firstflg,
-    );
-*/
 
     return (
 <div id="correlation" style={{minWidth:"1280px",margin:"0 auto"}}>
@@ -112,29 +108,39 @@ export class SysmonProcess extends React.Component {
 <h3>Event Correlation: {this.state.host}@{this.state.date}</h3>
 </EuiTitle>
 <EuiPanel>
-<EuiButton size="s" iconType="arrowLeft" href={this.back}>Top</EuiButton>
-<EuiButton size="s" href={this.stats}>Stats</EuiButton>
-<EuiButton size="s" href={this.summary}>Summary</EuiButton>
 
   <EuiFlexGroup >
+  <EuiFlexItem >
+  <EuiFormRow
+   display="columnCompressed"
+   label="Layout" >
+    <EuiSelect 
+      name="layout"
+      compressed
+      value={this.state.layout}
+      options={this.layouts}
+      onChange={this.handleChangeLayout}
+    />
+  </EuiFormRow>
+  </EuiFlexItem>
     <EuiFlexItem>
-      <EuiFormRow label="Keyword">
+      <EuiFormRow display="columnCompressed" label="Keyword">
       <EuiFieldText
       name="keyword"
+      compressed
       onChange={this.handleChange} />
       </EuiFormRow>
     </EuiFlexItem>
     <EuiFlexItem>
-      <EuiFormRow label="Hash">
+      <EuiFormRow display="columnCompressed" label="Hash">
       <EuiFieldText
       name="hash"
+      compressed
       onChange={this.handleChangeHash} />
       </EuiFormRow>
     </EuiFlexItem>
-    <EuiFlexItem>
-      <EuiFormRow hasEmptyLabelSpace display="center">
-<EuiButton onClick={ () => this.clickSearch() }>Search</EuiButton>
-      </EuiFormRow>
+    <EuiFlexItem grow={false}>
+<EuiButton size="s" onClick={ () => this.clickSearch() }>Search</EuiButton>
     </EuiFlexItem>
   </EuiFlexGroup >
 
@@ -144,7 +150,11 @@ export class SysmonProcess extends React.Component {
  date={this.state.date}
  keyword={this.state.keyword}
  hash={this.state.hash}
+ layout={this.state.layout}
 />
+<EuiButton size="s" iconType="arrowLeft" href={this.top}>Top</EuiButton>
+<EuiButton size="s" href={this.stats} iconType="visBarVerticalStacked">Stats</EuiButton>
+<EuiButton size="s" href={this.summary} iconType="visPie">Summary</EuiButton>
 
 </EuiPanel>
 </div>

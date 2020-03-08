@@ -6,22 +6,16 @@ import imgProgram from "./images/program.png"
 import imgNet from "./images/net.png"
 import { EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
 
-function splitByLength(str, length) {
-  var resultArr = [];
-  if (!str || !length || length < 1) return resultArr;
-  var index = 0;
-  var start = index;
-  var end = start + length;
-  while (start < str.length) {
-    resultArr[index] = str.substring(start, end);
-    index++;
-    start = end;
-    end = start + length;
-  }
-  return resultArr;
-}
+import { search, local_search, splitByLength } from './ss_utils';
 
-//function add_child_info(cur, nodes, edges) {
+import "./network.css";
+
+const defaultColor = {
+  "background": "#97c2fc",
+  "border": "#2b7ce9"
+};
+
+
 function add_child_info(cur, graph, keyword, hash) {
   for (let index in cur.child) {
     var item = cur.child[index];
@@ -45,7 +39,9 @@ function add_child_info(cur, graph, keyword, hash) {
         "border": "red"
       };
       tmp_node["borderWidth"] = 3;
-      console.log(tmp_node)
+    }else{
+      tmp_node["color"] = defaultColor;
+      tmp_node["borderWidth"] = 1;
     }
 
     graph["nodes"].push(tmp_node);
@@ -92,6 +88,21 @@ function add_child_info(cur, graph, keyword, hash) {
   return graph;
 }
 
+/*
+function splitByLength(str, length) {
+  var resultArr = [];
+  if (!str || !length || length < 1) return resultArr;
+  var index = 0;
+  var start = index;
+  var end = start + length;
+  while (start < str.length) {
+    resultArr[index] = str.substring(start, end);
+    index++;
+    start = end;
+    end = start + length;
+  }
+  return resultArr;
+}
 
 function local_search(data, keyword) {
   console.log(data)
@@ -141,6 +152,7 @@ function search(data, keyword, hash) {
     return false;
   }
 }
+*/
 
 function createNetwork(tops, keyword, hash, firstflg) {
   var graph = {nodes:[], edges:[]}
@@ -161,6 +173,9 @@ function createNetwork(tops, keyword, hash, firstflg) {
         "border": "red"
       };
       tmp_node["borderWidth"] = 3;
+    }else{
+      tmp_node["color"] = defaultColor;
+      tmp_node["borderWidth"] = 1;
     }
     graph["nodes"].push(tmp_node);
     graph = add_child_info(top, graph, keyword, hash);
@@ -186,35 +201,6 @@ export class GraphView extends React.Component {
     this.setNetwork = this.setNetwork.bind(this);
     this.setText = this.setText.bind(this);
 
-this.options = {
-  configure:{enabled:false},
-  interaction: {
-    navigationButtons: true,
-    keyboard: true
-  },
-nodes: {
-  shapeProperties: {
-    interpolation: false
-  }
-},
-  edges: {
-    smooth: {
-      type: 'cubicBezier',
-      forceDirection: 'vertical',
-      roundness: 0.4
-    }
-  },
-  layout: {
-    hierarchical: {
-      direction: "UD",
-      sortMethod:"directed"
-    }
-  },
-  physics:false,
-  height: "600px",
-  width: "1280px",
-  autoResize: true,
-}
 
   }
 
@@ -242,7 +228,6 @@ nodes: {
 
   var events = {
   oncontext: function (ctx) {
-    network.redraw();
     network.fit();
   },
   doubleClick: function(properties) {
@@ -289,23 +274,56 @@ nodes: {
 
   const graph = createNetwork(
     this.props.tops,
-    this.props.keyword,//null,
-    this.props.hash,//null,
+    this.props.keyword,
+    this.props.hash,
     true,
   );
+
+var options = {
+  configure:{enabled:false},
+  interaction: {
+    navigationButtons: true,
+    keyboard: true
+  },
+nodes: {
+  shapeProperties: {
+    interpolation: false
+  }
+},
+  edges: {
+    smooth: {
+      type: 'cubicBezier',
+      forceDirection: 'vertical',
+      roundness: 0.4
+    }
+  },
+  layout: {
+    hierarchical: {
+      direction: "UD",
+      sortMethod:"directed"
+    }
+  },
+  physics:false,
+  height: "600px",
+  width: "1280px",
+  autoResize: true,
+}
+
+  const layout = this.props.layout;
+  if (layout == 'UD') options['layout']['hierarchical']['direction'] = 'UD';
+  else if (layout == 'LR') options['layout']['hierarchical']['direction'] = 'LR';
+  else options['layout']['hierarchical'] = false;
 
   console.log(graph);
   return (
   <div>
-    <div>
-    <textarea rows="7" cols="120" readOnly placeholder="click node." value={this.state.textarea}></textarea>
-    </div><br/>
     <Graph
       graph={graph}
-      options={this.options}
+      options={options}
       events={this.state.events}
       getNetwork={this.setNetwork}
     />
+    <textarea rows="7" cols="150" readOnly placeholder="click node." value={this.state.textarea}></textarea>
   </div>
   )
 

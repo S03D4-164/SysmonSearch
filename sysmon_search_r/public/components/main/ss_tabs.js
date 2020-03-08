@@ -42,6 +42,7 @@ export class SysmonSearchTabs extends Component {
           </Fragment>
         ),
       },
+/*
       {
         id: 'alert',
         name: 'Alert',
@@ -49,6 +50,7 @@ export class SysmonSearchTabs extends Component {
               <h3>Alert</h3>
         ),
       },
+*/
     ];
   }
 

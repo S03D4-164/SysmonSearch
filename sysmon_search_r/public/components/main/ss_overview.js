@@ -38,12 +38,12 @@ export class SysmonOverView extends React.Component {
       network:null,
       textarea:"",
       //api:api,
-      layout:null,
+      layout: "LR",
     };
 
     this.layouts =[
-      {value:"UD", text:"Up to Down"},
       {value:"LR", text:"Left to Right"},
+      {value:"UD", text:"Up to Down"},
       {value:"default", text:"Default"},
     ]
 
@@ -68,23 +68,11 @@ export class SysmonOverView extends React.Component {
     this.setState({ layout: event.target.value });
   }
 
-  componentDidMount(){
-    this.getProcess();
-  }
+  componentDidMount(){ this.getProcess(); }
 
-  clickSearch(){
-    this.getProcess();
-  }
+  clickSearch(){ this.getProcess(); }
 
   getProcess(){
-/*
-  componentDidMount(){
-    var api = "../../api/sysmon-search-plugin/process_overview";
-    api += "/" + this.state.host;
-    api += "/" + this.state.date;
-    api += "/" + this.state.guid;
-*/
-    //fetch(this.state.api, {
     fetch(this.api, {
       method:"GET",
       headers: {
@@ -108,33 +96,47 @@ export class SysmonOverView extends React.Component {
     return (
 
 <div id="correlation" style={{minWidth:"1280px",margin:"0 auto"}}>
-<EuiTitle size="m">
-  <h3>Overview</h3>
+<EuiTitle size="s">
+<h3>{this.state.guid} on {this.state.host}@{this.state.date}</h3>
 </EuiTitle>
       <EuiPanel>
-<h3>{this.state.guid} on {this.state.host}@{this.state.date}</h3>
 
   <EuiFlexGroup >
+
+  <EuiFlexItem >
+  <EuiFormRow
+   display="columnCompressed"
+   label="Layout" >
+    <EuiSelect 
+      name="layout"
+      compressed
+      value={this.state.layout}
+      options={this.layouts}
+      onChange={this.handleChangeLayout}
+    />
+  </EuiFormRow>
+  </EuiFlexItem>
+
+
     <EuiFlexItem>
-      <EuiFormRow label="Keyword">
+      <EuiFormRow label="Keyword" display="columnCompressed">
       <EuiFieldText
+      compressed
       name="keyword"
       onChange={this.handleChange} />
       </EuiFormRow>
     </EuiFlexItem>
     <EuiFlexItem>
-      <EuiFormRow label="Hash">
+      <EuiFormRow display="columnCompressed" label="Hash">
       <EuiFieldText
       name="hash"
+      compressed
       onChange={this.handleChangeHash} />
       </EuiFormRow>
     </EuiFlexItem>
-    <EuiFlexItem>
-      <EuiFormRow hasEmptyLabelSpace display="center">
-<EuiButton onClick={ () => this.clickSearch() }>Search</EuiButton>
-      </EuiFormRow>
+    <EuiFlexItem grow={false}>
+<EuiButton size="s" onClick={ () => this.clickSearch() }>Search</EuiButton>
     </EuiFlexItem>
-
 
   </EuiFlexGroup >
 
@@ -143,23 +145,9 @@ export class SysmonOverView extends React.Component {
  host={this.state.host}
  date={this.state.date}
  keyword={this.state.keyword}
- hash={this.state.layout}
- direction={this.state.direction}
+ hash={this.state.hash}
+ layout={this.state.layout}
 />
-
-
-  <EuiFlexItem grow={false}>
-  <EuiFormRow
-   display="columnCompressed"
-   label="Layout" >
-    <EuiSelect 
-      name="layout"
-      value={this.state.layout}
-      options={this.layouts}
-      onChange={this.handleChangeLayout}
-    />
-  </EuiFormRow>
-  </EuiFlexItem>
 
       </EuiPanel>
 </div>

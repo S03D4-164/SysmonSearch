@@ -3,10 +3,25 @@ import Graph from "react-graph-vis";
 import imgProgram from "./images/program.png";
 import imgNet from "./images/net.png";
 import imgFile from "./images/file.png";
+import imgFileCreateTime from "./images/file_create_time.png";
+import imgLoaded from "./images/image_loaded.png";
 import imgReg from "./images/reg.png";
+import imgRegCategory from "./images/reg_category.png";
+import imgThread from "./images/rthread.png";
+import imgWmi from "./images/wmi.png";
 import { splitByLength, search } from "./ss_utils";
 
-function add_child_info(cur, graph) {
+import {
+  EuiFlexGroup,
+  EuiFlexItem,
+} from '@elastic/eui';
+
+const defaultColor = {
+  "background": "#97c2fc",
+  "border": "#2b7ce9"
+};
+
+function add_child_info(cur, graph, keyword, hash) {
   for (let index in cur.child) {
     var item = cur.child[index];
     var tmp_str_array = splitByLength(item.current.image, 10);
@@ -22,16 +37,17 @@ function add_child_info(cur, graph) {
       "eventid": 1,
       "_id": item.current._id
     };
-/*
-                    if (search(item.current.info, keyword, hash)) {
-                        tmp_node["color"] = {
-                            "background": "red",
-                            "border": "red"
-                        };
-                        tmp_node["borderWidth"] = 3;
-                    }
-*/
-    //nodes.push(tmp_node);
+
+    if (search(item.current.info, keyword, hash)) {
+       tmp_node["color"] = {
+         "background": "red",
+         "border": "red"
+       };
+       tmp_node["borderWidth"] = 3;
+    }else{
+       tmp_node["color"] = defaultColor;
+       tmp_node["borderWidth"] = 1;
+    }
     graph["nodes"].push(tmp_node);
 
     var tmp_edge = {
@@ -43,14 +59,13 @@ function add_child_info(cur, graph) {
       },
       "length": 200
     };
-    //edges.push(tmp_edge);
     graph["edges"].push(tmp_edge);
-    graph = add_child_info(item, graph);
+    graph = add_child_info(item, graph, keyword, hash);
   }
   return graph;
 }
 
-function add_process_info(in_cur, graph) {
+function add_process_info(in_cur, graph, keyword, hash) {
   console.log(in_cur)
   var cur = in_cur.current;
   var cur_id = cur.index;
@@ -128,7 +143,8 @@ function add_process_info(in_cur, graph) {
       };
       tmp_node.eventid = 3;
     } else if (item.id == 8) {
-      tmp_node.image = "../plugins/sysmon_search_visual/images/rthread.png";
+      //tmp_node.image = "../plugins/sysmon_search_visual/images/rthread.png";
+      tmp_node.image = imgThread;//"../plugins/sysmon_search_visual/images/rthread.png";
                         tmp_node.label = item.data.TargetImage;
                         tmp_node.title = item.data.TargetImage;
                         tmp_node.info = {
@@ -140,8 +156,9 @@ function add_process_info(in_cur, graph) {
                         };
                         tmp_node.eventid = 8;
                         tmp_node.guid = item.data.SourceProcessGuid;
-                    } else if (item.id == 2) {
-                        tmp_node.image = "../plugins/sysmon_search_visual/images/file_create_time.png";
+    } else if (item.id == 2) {
+      //tmp_node.image = "../plugins/sysmon_search_visual/images/file_create_time.png";
+      tmp_node.image = imgCreateTime;//"../plugins/sysmon_search_visual/images/file_create_time.png";
                         tmp_node.label = item.data.Image;
                         tmp_node.title = item.data.Image;
                         tmp_node.info = {
@@ -150,8 +167,9 @@ function add_process_info(in_cur, graph) {
                             'PreviousCreationUtcTime': item.data.PreviousCreationUtcTime
                         };
                         tmp_node.eventid = 2;
-                    } else if (item.id == 7) {
-                        tmp_node.image = "../plugins/sysmon_search_visual/images/image_loaded.png";
+    } else if (item.id == 7) {
+      //tmp_node.image = "../plugins/sysmon_search_visual/images/image_loaded.png";
+      tmp_node.image = imgLoaded;//"../plugins/sysmon_search_visual/images/image_loaded.png";
                         tmp_node.label = item.data.Image;
                         tmp_node.title = item.data.Image;
                         tmp_node.info = {
@@ -160,24 +178,27 @@ function add_process_info(in_cur, graph) {
                             'Hashes': item.data.Hashes
                         };
                         tmp_node.eventid = 7;
-                    } else if (item.id == 19) {
-                        tmp_node.image = "../plugins/sysmon_search_visual/images/wmi.png";
+    } else if (item.id == 19) {
+      //tmp_node.image = "../plugins/sysmon_search_visual/images/wmi.png";
+      tmp_node.image = imgWmi;//"../plugins/sysmon_search_visual/images/wmi.png";
                         tmp_node.label = item.data.Name+":"+item.data.EventNamespace;
                         tmp_node.title = item.data.Name+":"+item.data.EventNamespace;
                         tmp_node.info = {
                             'User': item.data.User
                         };
                         tmp_node.eventid = 19;
-                    } else if (item.id == 20) {
-                        tmp_node.image = "../plugins/sysmon_search_visual/images/wmi.png";
+    } else if (item.id == 20) {
+      //tmp_node.image = "../plugins/sysmon_search_visual/images/wmi.png";
+      tmp_node.image = imgWmi;//"../plugins/sysmon_search_visual/images/wmi.png";
                         tmp_node.label = item.data.Name;
                         tmp_node.title = item.data.Name;
                         tmp_node.info = {
                             'User': item.data.User
                         };
                         tmp_node.eventid = 20;
-                    } else if (item.id == 21) {
-                        tmp_node.image = "../plugins/sysmon_search_visual/images/wmi.png";
+    } else if (item.id == 21) {
+      //tmp_node.image = "../plugins/sysmon_search_visual/images/wmi.png";
+      tmp_node.image = imgWmi;//"../plugins/sysmon_search_visual/images/wmi.png";
                         tmp_node.label = item.data.Consumer;
                         tmp_node.title = item.data.Consumer;
                         tmp_node.info = {
@@ -186,16 +207,16 @@ function add_process_info(in_cur, graph) {
                         tmp_node.eventid = 21;
     }
 
-/*
     if (search(tmp_node.info, keyword, hash) || search(tmp_node.label, keyword, hash)) {
       tmp_node["color"] = {
         "background": "red",
         "border": "red"
       };
       tmp_node["borderWidth"] = 3;
+    }else{
+       tmp_node["color"] = defaultColor;
+       tmp_node["borderWidth"] = 1;
     }
-*/
-    //nodes.push(tmp_node);
     graph["nodes"].push(tmp_node);
 
     var tmp_edge = {
@@ -207,7 +228,6 @@ function add_process_info(in_cur, graph) {
       },
       "length": 200
     };
-    //edges.push(tmp_edge);
     graph["edges"].push(tmp_edge);
 
     now_id += 1;
@@ -215,7 +235,7 @@ function add_process_info(in_cur, graph) {
 
   for (let index in in_cur.child) {
     var item = in_cur.child[index];
-    graph = add_process_info(item, graph);
+    graph = add_process_info(item, graph, keyword, hash);
   }
   return graph;
 };
@@ -238,16 +258,18 @@ function createNetwork(top, keyword, hash, firstflg) {
       "eventid": 1,
       "_id": top.parent._id
     };
-/*
+
     if (search(top.parent.info, keyword, hash)) {
       tmp_parent_node["color"] = {
         "background": "red",
         "border": "red"
       };
       tmp_parent_node["borderWidth"] = 3;
+    }else{
+       tmp_parent_node["color"] = defaultColor;
+       tmp_parent_node["borderWidth"] = 1;
     }
-*/
-    //nodes.push(tmp_parent_node);
+
     graph["nodes"].push(tmp_parent_node);
 
     var tmp_edge = {
@@ -259,7 +281,6 @@ function createNetwork(top, keyword, hash, firstflg) {
       },
       "length": 200
     };
-    //edges.push(tmp_edge);
     graph["edges"].push(tmp_edge);
   }
   
@@ -279,20 +300,21 @@ function createNetwork(top, keyword, hash, firstflg) {
     "_id":  top.current._id
   };
 
-/*
+
   if (search(top.current.info, keyword, hash) || firstflg) {
     tmp_node["color"] = {
       "background": "red",
       "border": "red"
     };
     tmp_node["borderWidth"] = 3;
+  }else{
+     tmp_node["color"] = defaultColor;
+     tmp_node["borderWidth"] = 1;
   }
-*/
-  //nodes.push(tmp_node);
-  graph["nodes"].push(tmp_node);
 
-  graph = add_child_info(top, graph);
-  graph = add_process_info(top, graph);
+  graph["nodes"].push(tmp_node);
+  graph = add_child_info(top, graph, keyword, hash);
+  graph = add_process_info(top, graph, keyword, hash);
   }
 
   return graph;
@@ -309,7 +331,7 @@ export class GraphOverView extends React.Component {
       events:null,
       network:null, 
       textarea:"",
-      key:null, 
+      keyword:null, 
       hash:null, 
     }
 
@@ -319,7 +341,7 @@ export class GraphOverView extends React.Component {
 
   setText(str){
     this.setState({
-      textarea:str
+      textarea: str
     });
   }
 
@@ -351,9 +373,10 @@ export class GraphOverView extends React.Component {
     if(node.guid != null && node.guid!="" && node.guid!="root"){
       var _id = "0";
       if(node._id != null) _id = node._id;
-      var url = '../../process_detail/' + host + '/' + date.substr(0, 10) + '/' + node.guid + '/' + _id;
-      console.log(url);
-      //window.open(url, "_blank");
+      //var url = 'process_detail/' + host + '/' + date.substr(0, 10) + '/' + node.guid + '/' + _id;
+      var url = 'process_detail?host=' + host + '&date=' + date.substr(0, 10) + '&guid=' + node.guid;// + '/' + _id;
+      //console.log(url);
+      window.open(url, "_blank");
     }
   },
   click: function(properties) {
@@ -407,16 +430,24 @@ export class GraphOverView extends React.Component {
 
     const graph = createNetwork(
       this.props.tops,
-      null,
-      null,
+      this.props.keyword,
+      this.props.hash,
       true,
     );
-    console.log(graph)
+    //console.log(graph)
+
     let placeholder = "No Graph.";
-    if (graph.edges.length>0&&graph.nodes.length>0)placeholder = "click node."
+    if(graph.edges.length>0&&graph.nodes.length>0) placeholder = "click node."
     var options = {
+      configure:{
+        enabled: false,
+        //filter: 'layout',
+        container: this.configureRef,
+        showButton: false,
+      },
+/*
       nodes: {size: 25},
-/*      edges: {
+      edges: {
         width: 2,
         shadow: false,
         smooth: {
@@ -434,9 +465,8 @@ export class GraphOverView extends React.Component {
 
       layout: {
         hierarchical: {
-            //direction: 'LR',
-            direction: 'UD',
-            sortMethod: 'directed'
+          direction: 'LR',
+          sortMethod: 'directed'
         },
         improvedLayout:true
       },
@@ -444,110 +474,38 @@ export class GraphOverView extends React.Component {
         navigationButtons: true,
         keyboard: true
       },
-      width:"1280px",
-      height:"600px",
+      width:"960px",
+      height:"540px",
       physics:false,
     };
 
+  const layout = this.props.layout;
+  if (layout == 'UD') options['layout']['hierarchical']['direction'] = 'UD';
+  else if (layout == 'LR') options['layout']['hierarchical']['direction'] = 'LR';
+  else options['layout']['hierarchical'] = false;
+
   return (
     <div>
-    <div>
-    <textarea rows="7" cols="120" readOnly placeholder={placeholder} value={this.state.textarea}></textarea>
-    </div><br/>
-    <Graph
+
+<EuiFlexGroup>
+<EuiFlexItem grow={false}>
+    <Graph 
       graph={graph}
       options={options}
       events={this.state.events}
       getNetwork={this.setNetwork}
     />
+</EuiFlexItem>
+<EuiFlexItem grow={false} style={{maxWidth:500}}>
+    <div ref={r => this.configureRef = r}></div>
+</EuiFlexItem>
+</EuiFlexGroup>
+    <div>
+    <textarea rows="7" cols="120" readOnly placeholder={placeholder} value={this.state.textarea}></textarea>
+    </div>
     </div>
   )
   }
 
 }
 
-/*
-const events = {}
-            network.on("click", function(properties) {
-                var nodeid = network.getNodeAt(properties.pointer.DOM);
-
-                if (nodeid) {
-                    network.selectNodes([nodeid], true);
-                    var node = this.body.data.nodes.get(nodeid);
-                    if (node && node.info) {
-                        console.log(node);
-                        const veiw_data_1 = ["CurrentDirectory", "CommandLine", "Hashes", "ParentProcessGuid", "ParentCommandLine", "ProcessGuid"];
-                        const veiw_data_11 = ["ProcessGuid"];
-                        const veiw_data_12 = ["EventType", "ProcessGuid"];
-                        const veiw_data_3 = ["SourceHostname", "ProcessGuid", "SourceIsIpv6", "SourceIp", "DestinationHostname"];
-                        const veiw_data_8 = ["SourceProcessGuid", "StartAddress", "TargetProcessGuid"];
-                        const veiw_data_2 = ["CreationUtcTime", "PreviousCreationUtcTime"];
-                        const veiw_data_7 = ["Hashes"];
-                        const veiw_data_19 = ["User"];
-                        const veiw_data_20 = ["User"];
-                        const veiw_data_21 = ["User"];
-                        var view_data = [];
-                        if (node.eventid == 1) {
-                            view_data = veiw_data_1;
-                        } else if (node.eventid == 11) {
-                            view_data = veiw_data_11;
-                        } else if (node.eventid == 12) {
-                            view_data = veiw_data_12;
-                        } else if (node.eventid == 3) {
-                            view_data = veiw_data_3;
-                        } else if (node.eventid == 8) {
-                            view_data = veiw_data_8;
-                        } else if (node.eventid == 2) {
-                            view_data = veiw_data_2;
-                        } else if (node.eventid == 7) {
-                            view_data = veiw_data_7;
-                        } else if (node.eventid == 19) {
-                            view_data = veiw_data_19;
-                        } else if (node.eventid == 20) {
-                            view_data = veiw_data_20;
-                        } else if (node.eventid == 21) {
-                            view_data = veiw_data_21;
-                        }
-                        var str = "";
-                        var alert_str = "";
-                        for (var key in node.info) {
-                            if (view_data.indexOf(key) >= 0) {
-                                if (str === "") {
-                                    str = key + ":" + node.info[key];
-                                    alert_str = new_line(key + ":" + node.info[key]);
-                                } else {
-                                    str = str + "\n" + key + ":" + node.info[key];
-                                    alert_str = alert_str + "\n" + new_line(key + ":" + node.info[key]);
-                                }
-                            }
-                        }
-                        $("#text").val(str);
-                        //alert(alert_str);
-                    }
-                }
-            });
-
-            network.on("doubleClick", function(properties) {
-                if (!properties.nodes.length) return;
-
-                var node = this.body.data.nodes.get(properties.nodes[0]);
-                if (node.guid != null && node.guid!="" && node.guid!="root") {
-                    var _id = "0";
-                    if(node._id != null){
-                        _id = node._id;
-                    }
-                    var params = $route.current.params;
-                    var url = 'sysmon_search_visual#/process_detail/' + params.hostname + '/' + params.date + '/' + node.guid + '/' + _id;
-                    window.open(url, "_blank");
-                }
-            });
-        }
-
-        this.onkeyup = function(keyword, hash) {
-            if(top && top != ""){
-                create_network(localdata, keyword, hash, false);
-            }
-        };
-
-    })
-*/

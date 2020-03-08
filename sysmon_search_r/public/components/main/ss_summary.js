@@ -30,6 +30,8 @@ export class SysmonSummary extends React.Component {
     this.appPath = chrome.addBasePath('/app/sysmon_search_r');
     this.stats = this.appPath + "/stats" + this.props.location.search;
     this.process = this.appPath + "/process" + this.props.location.search;
+    //this.stats = chrome.addBasePath('/app/ss_react/stats')+ this.props.location.search;
+    //this.process = chrome.addBasePath('/app/ss_react/process')+ this.props.location.search;
   }
 
   componentDidMount(){
