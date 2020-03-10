@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {Component} from 'react';
 import moment from 'moment';
 import chrome from 'ui/chrome';
 
@@ -14,10 +14,10 @@ const qs = require('query-string');
 import Timeline from './react-visjs-timeline'
 import './ss_stats.css'
 
-export class SysmonStats extends React.Component {
+export class SysmonStats extends Component {
   constructor(props){
     super(props);
-    let params = qs.parse(this.props.location.search);
+    const params = qs.parse(this.props.location.search);
     this.state = {
       host: params.host,
       date: params.date,
@@ -29,8 +29,6 @@ export class SysmonStats extends React.Component {
     this.top = chrome.addBasePath('/app/sysmon_search_r');
     this.summary = this.top + '/event' + this.props.location.search;
     this.process = this.top + '/process' + this.props.location.search;
-    //this.summary = chrome.addBasePath('/app/sysmon_search_r/event') + this.props.location.search;
-    //this.process = chrome.addBasePath('/app/sysmon_search_r/process') + this.props.location.search;
   }
 
   componentDidMount(){
@@ -91,30 +89,29 @@ export class SysmonStats extends React.Component {
     });
   }
 	
-
   render() {
     //console.log(this.state)
     return (
-<div id="statistics" style={{minWidth:"1280px",margin:"0 auto"}}>
-<EuiTitle size="s">
-<h3>Host Statistics: {this.state.host}</h3>
-</EuiTitle>
+      <div id="statistics" style={{minWidth:"1280px",margin:"0 auto"}}>
+        <EuiTitle size="s">
+          <h3>Host Statistics: {this.state.host}</h3>
+        </EuiTitle>
 
-<EuiPanel>
+        <EuiPanel>
 
-<Timeline
-  items={this.state.items}
-  groups={this.state.groups}
-  options={this.state.options}
-  host={this.state.host}
-/>
+          <Timeline
+            items={this.state.items}
+            groups={this.state.groups}
+            options={this.state.options}
+            host={this.state.host}
+          />
 
-<EuiButton size="s" iconType="arrowLeft" href={this.top}>Top</EuiButton>
-<EuiButton size="s" href={this.summary} iconType="visPie">Summary</EuiButton>
-<EuiButton size="s" href={this.process} iconType="graphApp">Process</EuiButton>
+          <EuiButton size="s" href={this.top} iconType="arrowLeft">Top</EuiButton>
+          <EuiButton size="s" href={this.summary} iconType="visPie">Summary</EuiButton>
+          <EuiButton size="s" href={this.process} iconType="graphApp">Process</EuiButton>
 
-</EuiPanel>
-</div>
+        </EuiPanel>
+      </div>
     )
   }
 

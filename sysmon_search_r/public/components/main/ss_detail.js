@@ -1,8 +1,10 @@
-import React from 'react';
+import React, {Component, Fragment} from 'react';
 import chrome from 'ui/chrome';
 
+import "./ss_detail.css";
 const qs = require('query-string');
 import { local_search } from './ss_utils';
+
 import {
   EuiInMemoryTable,
   EuiLink,
@@ -17,7 +19,7 @@ import {
   EuiFieldText,
 } from '@elastic/eui';
 
-export class SysmonDetail extends React.Component {
+export class SysmonDetail extends Component {
   constructor(props){
     super(props);
     const params = qs.parse(this.props.location.search);
@@ -25,6 +27,7 @@ export class SysmonDetail extends React.Component {
       host: params.host,
       date: params.date,
       guid: params.guid,
+      id: params._id,
       category: params.category,
       items:[],
       sortField: 'date',
@@ -58,13 +61,17 @@ export class SysmonDetail extends React.Component {
       sortable: true,
     },
     { field: 'process',
-      name: 'Process',
+      name: 'Source Process',
       width:"30%",
       sortable: true,
+      render: (process, item) => {
+        if (item.id == this.state.id) return (<div className="emphasis">{process}</div>);
+        else return (<div>{process}</div>);
+      }
     },
     {
       field: 'disp',
-      name: 'Related',
+      name: 'Relevant Event Data',
       width:"30%",
       sortable: true,
       render: (disp, item) => (
@@ -162,6 +169,7 @@ export class SysmonDetail extends React.Component {
             process: res.process,
             disp: res.disp,
             info: res.info,
+            id: res._id,
             link: link,
           };
           items.push(item);

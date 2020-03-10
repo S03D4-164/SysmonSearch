@@ -14,7 +14,7 @@ from io import StringIO
 import stix.bindings.stix_core as stix
 from stix.core import STIXPackage as STIXPackage_v1
 
-from base import BaseConvertHandler
+from .base import BaseConvertHandler
 import common
 
 class StixV1ConvertHandler(BaseConvertHandler):

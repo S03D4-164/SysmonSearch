@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {Component} from 'react';
 import chrome from 'ui/chrome';
 
 import {
@@ -15,10 +15,10 @@ import {
 const qs = require('query-string');
 import {pieChart, segColor} from './pie_chart';
 
-export class SysmonSummary extends React.Component {
+export class SysmonSummary extends Component {
   constructor(props){
     super(props);
-    let params = qs.parse(this.props.location.search)
+    const params = qs.parse(this.props.location.search)
     this.state = {
       host: params.host,
       date: params.date,
@@ -26,12 +26,9 @@ export class SysmonSummary extends React.Component {
       total:0
     };
     this.chartRef = React.createRef();
-
-    this.appPath = chrome.addBasePath('/app/sysmon_search_r');
-    this.stats = this.appPath + "/stats" + this.props.location.search;
-    this.process = this.appPath + "/process" + this.props.location.search;
-    //this.stats = chrome.addBasePath('/app/ss_react/stats')+ this.props.location.search;
-    //this.process = chrome.addBasePath('/app/ss_react/process')+ this.props.location.search;
+    this.top = chrome.addBasePath('/app/sysmon_search_r');
+    this.stats = this.top + "/stats" + this.props.location.search;
+    this.process = this.top + "/process" + this.props.location.search;
   }
 
   componentDidMount(){
@@ -90,10 +87,13 @@ export class SysmonSummary extends React.Component {
       processlist += "&category=" + item.type;
       return(
       <tr key={item.type}>
-<td><div className="square" style={style}></div><a href={processlist}>{item.type}</a></td>
-<td align="right">{item.value}</td>
-<td align="right">{percentage.toFixed(2)}%</td>
-</tr>
+        <td>
+          <div className="square" style={style}></div>
+          <a href={processlist}>{item.type}</a>
+        </td>
+        <td align="right">{item.value}</td>
+        <td align="right">{percentage.toFixed(2)}%</td>
+      </tr>
       );
     });
   }
@@ -103,56 +103,50 @@ export class SysmonSummary extends React.Component {
 
     return (
 
-<div id="summary" style={{maxWidth:"1280px",margin:"0 auto"}}>
+      <div id="summary" style={{maxWidth:"1280px",margin:"0 auto"}}>
 
-<EuiTitle size="s">
-<h3>Event Summary: {this.state.host}@{this.state.date}</h3>
-</EuiTitle>
-<EuiPanel>
+        <EuiTitle size="s">
+          <h3>Event Summary: {this.state.host}@{this.state.date}</h3>
+        </EuiTitle>
 
-<EuiText size="m">
+        <EuiPanel><EuiText size="m">
 
-<EuiFlexGroup>
+          <EuiFlexGroup>
 
-<EuiFlexItem grow={false}>
-<div id="piechart" ref={cr => this.chartRef = cr}></div>
-</EuiFlexItem>
+            <EuiFlexItem grow={false}>
+              <div id="piechart" ref={cr => this.chartRef = cr}></div>
+            </EuiFlexItem>
 
-<EuiFlexItem grow={false}>
-<table className="legend">
-<thead>
-<tr>
-<th>Type</th>
-<th style={{paddingLeft:"10px"}}>Count</th>
-<th style={{paddingLeft:"10px"}}>Percentage</th></tr>
-</thead>
-<tbody>
-{this.summaryLegend(
-  this.state.items,
-  this.state.total,
-  this.state.host,
-  this.state.date,
-)}
-<tr>
-<td>Total</td>
-<td align="right">{this.state.total}</td>
-</tr>
-</tbody>
-</table>
-</EuiFlexItem>
-  </EuiFlexGroup>
+            <EuiFlexItem grow={false}>
+              <table className="legend">
+                <thead><tr>
+                  <th>Type</th>
+                  <th style={{paddingLeft:"10px"}}>Count</th>
+                  <th style={{paddingLeft:"10px"}}>Percentage</th>
+                </tr></thead>
+                <tbody>
+                  {this.summaryLegend(
+                    this.state.items,
+                    this.state.total,
+                    this.state.host,
+                    this.state.date,
+                  )}
+                  <tr>
+                    <td>Total</td>
+                    <td align="right">{this.state.total}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </EuiFlexItem>
+          </EuiFlexGroup>
 
-<EuiButton size="s" iconType="arrowLeft" href={this.appPath}>Top</EuiButton>
-<EuiButton size="s" href={this.stats} iconType="visBarVerticalStacked">Stats</EuiButton>
-<EuiButton size="s" href={this.process} iconType="graphApp">Process</EuiButton>
+          <EuiButton size="s" href={this.top} iconType="arrowLeft">Top</EuiButton>
+          <EuiButton size="s" href={this.stats} iconType="visBarVerticalStacked">Stats</EuiButton>
+          <EuiButton size="s" href={this.process} iconType="graphApp">Process</EuiButton>
       
-</EuiText>
-
-      </EuiPanel>
-</div>
+        </EuiText></EuiPanel>
+      </div>
     )
   }
-
-
 };
 

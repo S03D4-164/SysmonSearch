@@ -32,7 +32,8 @@ function local_search(data, keyword) {
   return false;
 }
 
-export default function search(data, keyword, hash) {
+//export default function search(data, keyword, hash) {
+function search(data, keyword, hash) {
   var flg1 = 1;
   var flg2 = 1;
   if (keyword != null && keyword !== "") {

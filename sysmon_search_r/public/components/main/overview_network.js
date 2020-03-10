@@ -374,7 +374,7 @@ export class GraphOverView extends React.Component {
       var _id = "0";
       if(node._id != null) _id = node._id;
       //var url = 'process_detail/' + host + '/' + date.substr(0, 10) + '/' + node.guid + '/' + _id;
-      var url = 'process_detail?host=' + host + '&date=' + date.substr(0, 10) + '&guid=' + node.guid;// + '/' + _id;
+      var url = 'process_detail?host=' + host + '&date=' + date.substr(0, 10) + '&guid=' + node.guid + "&_id=" + _id;
       //console.log(url);
       window.open(url, "_blank");
     }

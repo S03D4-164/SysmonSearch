@@ -15,7 +15,7 @@ import stixmarx
 from stix2slider.options import initialize_options, set_option_value
 from stix2slider.convert_stix import convert_indicator
 
-from base import BaseConvertHandler
+from .base import BaseConvertHandler
 import common
 
 stix_version = "2.0"

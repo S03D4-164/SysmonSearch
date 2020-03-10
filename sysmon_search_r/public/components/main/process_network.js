@@ -1,4 +1,4 @@
-import React from "react";
+import React, {Component, Fragment} from "react";
 import Graph from "react-graph-vis";
 import chrome from 'ui/chrome';
 
@@ -15,23 +15,21 @@ const defaultColor = {
   "border": "#2b7ce9"
 };
 
-
 function add_child_info(cur, graph, keyword, hash) {
   for (let index in cur.child) {
     var item = cur.child[index];
     var tmp_str_array = splitByLength(item.current.image, 10);
     var tmp_label = tmp_str_array.join('\n');
+
     var tmp_node = {
       "id": item.current.index,
       "label": tmp_label,
       "title": item.current.cmd,
       "shape": "circularImage",
-      //"image": "../plugins/sysmon_search_visual/images/program.png",
       "image": imgProgram,
       "guid": item.current.guid,
       "info": item.current.info
     };
-
     if (search(item.current.info, keyword, hash)) {
     //|| (firstflg == true && $route.current.params.guid == item.current.guid)) {
       tmp_node["color"] = {
@@ -43,7 +41,6 @@ function add_child_info(cur, graph, keyword, hash) {
       tmp_node["color"] = defaultColor;
       tmp_node["borderWidth"] = 1;
     }
-
     graph["nodes"].push(tmp_node);
 
     var tmp_edge = {
@@ -55,6 +52,7 @@ function add_child_info(cur, graph, keyword, hash) {
     };
     graph["edges"].push(tmp_edge);
 
+    //console.log(JSON.stringify(item.current.info.Net));
     for( let n_key in item.current.info.Net ) {
       var n_item = item.current.info.Net[ n_key ];
       var n_index = item.current.index+"-"+n_key;
@@ -63,96 +61,26 @@ function add_child_info(cur, graph, keyword, hash) {
         "label": n_key+":"+n_item,
         "title": n_key+":"+n_item,
         "shape": "circularImage",
-        //"image": "../plugins/sysmon_search_visual/images/net.png",
         "image": imgNet,
         "guid": item.current.guid,
         "info": item.current.info
       };
-      if( n_item > 100) {}
-      //nodes.push(tmp_node);
+      //if( n_item > 100) {}
       graph["nodes"].push(tmp_node);
       var tmp_edge = {
         "from": item.current.index,
         "to": n_index,
         "arrows": "to",
-        "color": {"color": "lightgray"},
+        //"color": {"color": "lightgray"},
+        "color": {"color": "lightblue"},
         "length": 200
       };
-      //edges.push(tmp_edge);
       graph["edges"].push(tmp_edge);
     }
-    //[nodes, edges] = add_child_info(item, nodes, edges);
     graph = add_child_info(item, graph, keyword, hash);
   }
-  //return [nodes, edges]
   return graph;
 }
-
-/*
-function splitByLength(str, length) {
-  var resultArr = [];
-  if (!str || !length || length < 1) return resultArr;
-  var index = 0;
-  var start = index;
-  var end = start + length;
-  while (start < str.length) {
-    resultArr[index] = str.substring(start, end);
-    index++;
-    start = end;
-    end = start + length;
-  }
-  return resultArr;
-}
-
-function local_search(data, keyword) {
-  console.log(data)
-  for (var key in data) {
-    if (Array.isArray(data[key])) {
-      if (local_search(data[key], keyword)) {
-        return true;
-      }
-    } else if (data[key] instanceof Object) {
-      if (local_search(data[key], keyword)) {
-        return true;
-      }
-    } else {
-      if (String(data[key]).indexOf(keyword) != -1) {
-        return true;
-      }
-    }
-  }
-  return false;
-}
-
-
-function search(data, keyword, hash) {
-  var flg1 = 1;
-  var flg2 = 1;
-  if (keyword != null && keyword !== "") {
-    if (local_search(data, keyword)) {
-      flg1 = 2;
-    }
-  } else {
-    flg1 = 3;
-  }
-
-  if (hash != null && hash !== "") {
-    if (data["Hashes"] != null) {
-      if (data["Hashes"].indexOf(hash) != -1) {
-        flg2 = 2;
-      }
-    }
-  } else {
-    flg2 = 3;
-  }
-
-  if ((flg1 == 2 && flg2 == 2) || (flg1 == 2 && flg2 == 3) || (flg1 == 3 && flg2 == 2)) {
-    return true;
-  } else {
-    return false;
-  }
-}
-*/
 
 function createNetwork(tops, keyword, hash, firstflg) {
   var graph = {nodes:[], edges:[]}
@@ -190,25 +118,23 @@ export class GraphView extends React.Component {
     super(props);
 
     this.state = {
-    graph:{},
-    options:{},
-    events:null,
-    network:null, 
-    textarea:"",
-    first:true
+      graph:{},
+      options:{},
+      events:null,
+      network:null, 
+      textarea:"",
+      first:true
     }
 
     this.setNetwork = this.setNetwork.bind(this);
     this.setText = this.setText.bind(this);
 
-
   }
 
-
   setText(str){
-      this.setState({
-        textarea:str
-      });
+    this.setState({
+      textarea:str
+    });
   }
   
   setNetwork(nw){
@@ -226,107 +152,112 @@ export class GraphView extends React.Component {
       }
     )
 
-  var events = {
-  oncontext: function (ctx) {
-    network.fit();
-  },
-  doubleClick: function(properties) {
-    if (!properties.nodes.length) return;
-    var node = network.body.data.nodes.get(properties.nodes[0]);
-    console.log(node);
-    if(node.guid != null && node.guid!="" && node.guid!="root"){
-      var url = chrome.addBasePath("/app/sysmon_search_r/process_overview");
-      url += '?host=' + host + '&date=' + date.substr(0, 10) + '&guid=' + node.guid;
-      window.open(url, "_blank");
-    }
-  },
-  click: function(properties) {
-  if (!properties.nodes.length) return;
-  //var node = network.body.data.nodes.get(properties.nodes[0]);
-  var nodeid = network.getNodeAt(properties.pointer.DOM);
-  if (nodeid) {
-    network.selectNodes([nodeid], true);
-    var node = network.body.data.nodes.get(nodeid);
+    var events = {
+      oncontext: function (ctx) {
+        network.fit();
+      },
+      doubleClick: function(properties) {
+        if (!properties.nodes.length) return;
+        var node = network.body.data.nodes.get(properties.nodes[0]);
+        console.log(node);
+        if(node.guid != null && node.guid!="" && node.guid!="root"){
+          var url = chrome.addBasePath("/app/sysmon_search_r/process_overview");
+          url += '?host=' + host;
+          url += '&date=' + date.substr(0, 10);
+          url += '&guid=' + node.guid;
+          window.open(url, "_blank");
+        }
+      },
+      click: function(properties) {
+        if (!properties.nodes.length) return;
+        //var node = network.body.data.nodes.get(properties.nodes[0]);
+        var nodeid = network.getNodeAt(properties.pointer.DOM);
+        if (nodeid) {
+          network.selectNodes([nodeid], true);
+          var node = network.body.data.nodes.get(nodeid);
 
-    if (node && node.info) {
-      const veiw_data_1 = [
-        "CurrentDirectory", "CommandLine", "Hashes", "ParentProcessGuid", "ParentCommandLine", "ProcessGuid"
-      ];
-      var str = "";
-      for (var key in node.info) {
-        if (veiw_data_1.indexOf(key) >= 0) {
-          if (str === "") {
-            str = key + ":" + node.info[key];
-          } else {
-            str = str + "\n" + key + ":" + node.info[key];
+          if (node && node.info) {
+            const view_data_1 = [
+              "CurrentDirectory",
+              "CommandLine",
+              "Hashes",
+              "ParentProcessGuid",
+              "ParentCommandLine",
+              "ProcessGuid"
+            ];
+            var str = "";
+            for (var key in node.info) {
+              if (view_data_1.indexOf(key) >= 0) {
+                if (str === "") str = key + ":" + node.info[key];
+                else str = str + "\n" + key + ":" + node.info[key];
+              }
+            }
           }
+          settxt(str);
         }
       }
-      settxt(str);
     }
-  }
-  }
-  }
-  this.setState({network:nw, events:events})
+    this.setState({network:nw, events:events});
   }
 
   render(){
 
-  const graph = createNetwork(
-    this.props.tops,
-    this.props.keyword,
-    this.props.hash,
-    true,
-  );
+    const graph = createNetwork(
+      this.props.tops,
+      this.props.keyword,
+      this.props.hash,
+      true,
+    );
 
-var options = {
-  configure:{enabled:false},
-  interaction: {
-    navigationButtons: true,
-    keyboard: true
-  },
-nodes: {
-  shapeProperties: {
-    interpolation: false
-  }
-},
-  edges: {
-    smooth: {
-      type: 'cubicBezier',
-      forceDirection: 'vertical',
-      roundness: 0.4
+    var options = {
+      configure:{enabled:false},
+      interaction: {
+        navigationButtons: true,
+        keyboard: true
+      },
+      nodes: {
+        shapeProperties: {
+          interpolation: false
+        }
+      },
+      edges: {
+        smooth: {
+          type: 'cubicBezier',
+          forceDirection: 'vertical',
+          roundness: 0.4
+        }
+      },
+      layout: {
+        hierarchical: {
+          direction: "UD",
+          sortMethod:"directed"
+        }
+      },
+      physics:false,
+      height: "600px",
+      width: "1280px",
+      autoResize: true,
     }
-  },
-  layout: {
-    hierarchical: {
-      direction: "UD",
-      sortMethod:"directed"
-    }
-  },
-  physics:false,
-  height: "600px",
-  width: "1280px",
-  autoResize: true,
-}
 
-  const layout = this.props.layout;
-  if (layout == 'UD') options['layout']['hierarchical']['direction'] = 'UD';
-  else if (layout == 'LR') options['layout']['hierarchical']['direction'] = 'LR';
-  else options['layout']['hierarchical'] = false;
+    const layout = this.props.layout;
+    if (layout == 'UD') options['layout']['hierarchical']['direction'] = 'UD';
+    else if (layout == 'LR') options['layout']['hierarchical']['direction'] = 'LR';
+    else options['layout']['hierarchical'] = false;
 
-  console.log(graph);
-  return (
-  <div>
-    <Graph
-      graph={graph}
-      options={options}
-      events={this.state.events}
-      getNetwork={this.setNetwork}
-    />
-    <textarea rows="7" cols="150" readOnly placeholder="click node." value={this.state.textarea}></textarea>
-  </div>
-  )
-
+    console.log(graph);
+ 
+    return (
+      <Fragment>
+        <Graph
+          graph={graph}
+          options={options}
+          events={this.state.events}
+          getNetwork={this.setNetwork}
+        />
+        <textarea rows="7" cols="150" readOnly placeholder="click node." value={this.state.textarea}></textarea>
+      </Fragment>
+    )
   }
+
 }
 

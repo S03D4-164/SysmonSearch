@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {Component} from 'react';
 import moment from 'moment';
 import chrome from 'ui/chrome'
 
@@ -18,12 +18,10 @@ import {
 } from '@elastic/eui';
 
 const qs = require('query-string');
-//import './ss_stats.css'
-import {
-  GraphView
-} from './process_network';
 
-export class SysmonProcess extends React.Component {
+import {GraphView} from './process_network';
+
+export class SysmonProcess extends Component {
   constructor(props){
     super(props);
     const params = qs.parse(this.props.location.search);
@@ -50,8 +48,7 @@ export class SysmonProcess extends React.Component {
     this.top = chrome.addBasePath('/app/sysmon_search_r');
     this.stats = this.top + '/stats' + this.props.location.search;
     this.summary = this.top + '/event' + this.props.location.search;
-    //this.stats = chrome.addBasePath('/app/sysmon_search_r/stats')+ this.props.location.search;
-    //this.summary = chrome.addBasePath('/app/sysmon_search_r/event')+ this.props.location.search;
+
     this.handleChange = this.handleChange.bind(this);
     this.handleChangeHash = this.handleChangeHash.bind(this);
 
@@ -76,7 +73,6 @@ export class SysmonProcess extends React.Component {
     .then((responseJson) => {
       this.setState({tops:responseJson});
       console.log(JSON.stringify(responseJson));
-      //const tops = responseJson;
     }) 
     .catch((error) =>{
       console.error(error);
@@ -103,62 +99,65 @@ export class SysmonProcess extends React.Component {
     console.log(this.state)
 
     return (
-<div id="correlation" style={{minWidth:"1280px",margin:"0 auto"}}>
-<EuiTitle size="s">
-<h3>Event Correlation: {this.state.host}@{this.state.date}</h3>
-</EuiTitle>
-<EuiPanel>
+      <div id="correlation" style={{minWidth:"1280px",margin:"0 auto"}}>
 
-  <EuiFlexGroup >
-  <EuiFlexItem >
-  <EuiFormRow
-   display="columnCompressed"
-   label="Layout" >
-    <EuiSelect 
-      name="layout"
-      compressed
-      value={this.state.layout}
-      options={this.layouts}
-      onChange={this.handleChangeLayout}
-    />
-  </EuiFormRow>
-  </EuiFlexItem>
-    <EuiFlexItem>
-      <EuiFormRow display="columnCompressed" label="Keyword">
-      <EuiFieldText
-      name="keyword"
-      compressed
-      onChange={this.handleChange} />
-      </EuiFormRow>
-    </EuiFlexItem>
-    <EuiFlexItem>
-      <EuiFormRow display="columnCompressed" label="Hash">
-      <EuiFieldText
-      name="hash"
-      compressed
-      onChange={this.handleChangeHash} />
-      </EuiFormRow>
-    </EuiFlexItem>
-    <EuiFlexItem grow={false}>
-<EuiButton size="s" onClick={ () => this.clickSearch() }>Search</EuiButton>
-    </EuiFlexItem>
-  </EuiFlexGroup >
+        <EuiTitle size="s">
+          <h3>Event Correlation: {this.state.host}@{this.state.date}</h3>
+        </EuiTitle>
 
-<GraphView
- tops={this.state.tops}
- host={this.state.host}
- date={this.state.date}
- keyword={this.state.keyword}
- hash={this.state.hash}
- layout={this.state.layout}
-/>
-<EuiButton size="s" iconType="arrowLeft" href={this.top}>Top</EuiButton>
-<EuiButton size="s" href={this.stats} iconType="visBarVerticalStacked">Stats</EuiButton>
-<EuiButton size="s" href={this.summary} iconType="visPie">Summary</EuiButton>
+        <EuiPanel>
 
-</EuiPanel>
-</div>
+          <EuiFlexGroup>
+
+            <EuiFlexItem>
+              <EuiFormRow display="columnCompressed" label="Layout">
+                <EuiSelect 
+                  name="layout"
+                  compressed
+                  value={this.state.layout}
+                  options={this.layouts}
+                  onChange={this.handleChangeLayout} />
+              </EuiFormRow>
+            </EuiFlexItem>
+
+            <EuiFlexItem>
+              <EuiFormRow display="columnCompressed" label="Keyword">
+                <EuiFieldText
+                  name="keyword"
+                  compressed
+                  onChange={this.handleChange} />
+              </EuiFormRow>
+            </EuiFlexItem>
+
+            <EuiFlexItem>
+              <EuiFormRow display="columnCompressed" label="Hash">
+                <EuiFieldText
+                  name="hash"
+                  compressed
+                  onChange={this.handleChangeHash} />
+              </EuiFormRow>
+            </EuiFlexItem>
+
+          </EuiFlexGroup >
+
+          <GraphView
+            tops={this.state.tops}
+            host={this.state.host}
+            date={this.state.date}
+            keyword={this.state.keyword}
+            hash={this.state.hash}
+            layout={this.state.layout}
+
+          />
+
+          <EuiButton size="s" href={this.top} iconType="arrowLeft">Top</EuiButton>
+          <EuiButton size="s" href={this.stats} iconType="visBarVerticalStacked">Stats</EuiButton>
+          <EuiButton size="s" href={this.summary} iconType="visPie">Summary</EuiButton>
+
+        </EuiPanel>
+      </div>
     )
   }
+
 };
 

@@ -16,7 +16,7 @@ export default function (kibana) {
       hacks: [
         'plugins/sysmon_search_r/hack'
       ],
-      styleSheetPaths: [resolve(__dirname, 'public/app.scss'), resolve(__dirname, 'public/app.css')].find(p => existsSync(p)),
+      //styleSheetPaths: [resolve(__dirname, 'public/app.scss'), resolve(__dirname, 'public/app.css')].find(p => existsSync(p)),
     },
 
     config(Joi) {

@@ -68,6 +68,6 @@ function pieChart(id, fData, legFlg, r) {
 }
 
 module.exports = {
-pieChart:pieChart,
-segColor:segColor
+  pieChart:pieChart,
+  segColor:segColor
 };

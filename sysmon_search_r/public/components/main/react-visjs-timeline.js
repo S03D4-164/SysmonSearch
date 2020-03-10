@@ -58,46 +58,47 @@ export default class Timeline extends Component {
     var graph2d = new vis.Graph2d(container, undefined, this.props.options)
     this.$el = graph2d;
 
-const get_category_name = function (date_str, event) {
-  var y = event.value[0];
-  var linegraph = graph2d.linegraph;
-  var groups = linegraph.groups;
+    const get_category_name = function (date_str, event) {
+      var y = event.value[0];
+      var linegraph = graph2d.linegraph;
+      var groups = linegraph.groups;
 
-  var bar_items = [];
-  var bar_height = 0;
-  var ids = linegraph.itemsData.getIds();
-  //console.log(ids);
-  for (var i = 0; i < ids.length; i++) {
-    var height = 0;
-    var item = linegraph.itemsData._getItem(ids[i]);
-    //console.log(item, date_str);
-    if (item.x !== date_str) continue;
+      var bar_items = [];
+      var bar_height = 0;
+      var ids = linegraph.itemsData.getIds();
+      //console.log(ids);
+      for (var i = 0; i < ids.length; i++) {
+        var height = 0;
+        var item = linegraph.itemsData._getItem(ids[i]);
+        //console.log(item, date_str);
+        if (item.x !== date_str) continue;
 
-    bar_height = bar_height + item.y;
-    bar_items.push({
-      height: item.y,
-      groupId: item.group
-    });
-  }
-  //console.log(bar_items);
+        bar_height = bar_height + item.y;
+        bar_items.push({
+          height: item.y,
+          groupId: item.group
+        });
+      }
+      //console.log(bar_items);
 
-  var cur_top = bar_height;
-  var groupId = -1;
-  for (var i = 0; i < bar_items.length; i++) {
-    var item = bar_items[i];
-    //console.log(item);
-    if (item.height == 0) continue;
-    var cur_bottom = cur_top - item.height;
-    if (cur_bottom <= bar_height - y && bar_height - y <= cur_top) {
-      groupId = item.groupId;
-      break;
+      var cur_top = bar_height;
+      var groupId = -1;
+
+      for (var i = 0; i < bar_items.length; i++) {
+        var item = bar_items[i];
+        //console.log(item);
+        if (item.height == 0) continue;
+        var cur_bottom = cur_top - item.height;
+        if (cur_bottom <= bar_height - y && bar_height - y <= cur_top) {
+          groupId = item.groupId;
+          break;
+        }
+        cur_top = cur_bottom;
+      }
+      var category_name = '';
+      if (groupId != -1) category_name = groups[groupId]["content"];
+      return category_name;
     }
-    cur_top = cur_bottom;
-  }
-  var category_name = '';
-  if (groupId != -1) category_name = groups[groupId]["content"];
-  return category_name;
-}
 
     //events.forEach(event => {
     //  this.$el.on(event, this.props[`${event}Handler`])
@@ -107,7 +108,7 @@ const get_category_name = function (date_str, event) {
       graph2d.redraw();
     });
 
-    this.$el.on("contextmenu", function(event) {
+    this.$el.on("click", function(event) {
       const click_date = moment(event.time).format("YYYY-MM-DD");
       const category = get_category_name(click_date, event);
       if(category) alert(category);

@@ -6,7 +6,7 @@ import { render, unmountComponentAtNode } from 'react-dom';
 import 'ui/autoload/styles';
 import { Main } from './components/main';
 
-const app = uiModules.get('apps/ssReact');
+const app = uiModules.get('apps/sysmon_search_r');
 
 app.config($locationProvider => {
   $locationProvider.html5Mode({
@@ -30,5 +30,5 @@ function RootController($scope, $element, $http) {
     unmountComponentAtNode(domNode);
   });
 }
-chrome.setRootController('ssReact', RootController);
+chrome.setRootController('sysmon_search_r', RootController);
 

@@ -8,11 +8,7 @@
     "templateVersion": "1.0.0"
   },
   "scripts": {
-    "lint": "eslint .",
-    "start": "plugin-helpers start",
-    "test:server": "plugin-helpers test:server",
-    "test:browser": "plugin-helpers test:browser",
-    "build": "plugin-helpers build"
+    "lint": "eslint ."
   },
   "dependencies": {
     "d3": "^5.15.0",
