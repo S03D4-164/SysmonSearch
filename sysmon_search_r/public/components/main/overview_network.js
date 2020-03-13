@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Component } from "react";
 import Graph from "react-graph-vis";
 import imgProgram from "./images/program.png";
 import imgNet from "./images/net.png";
@@ -143,68 +143,62 @@ function add_process_info(in_cur, graph, keyword, hash) {
       };
       tmp_node.eventid = 3;
     } else if (item.id == 8) {
-      //tmp_node.image = "../plugins/sysmon_search_visual/images/rthread.png";
       tmp_node.image = imgThread;//"../plugins/sysmon_search_visual/images/rthread.png";
-                        tmp_node.label = item.data.TargetImage;
-                        tmp_node.title = item.data.TargetImage;
-                        tmp_node.info = {
-                            'SourceProcessGuid': item.data.SourceProcessGuid,
-                            'StartAddress': item.data.StartAddress,
-                            'TargetProcessGuid': item.data.TargetProcessGuid,
-                            'TargetImage': item.data.TargetImage,
-                            'SourceImage': item.data.SourceImage
-                        };
-                        tmp_node.eventid = 8;
-                        tmp_node.guid = item.data.SourceProcessGuid;
+      tmp_node.label = item.data.TargetImage;
+      tmp_node.title = item.data.TargetImage;
+      tmp_node.info = {
+        'SourceProcessGuid': item.data.SourceProcessGuid,
+        'StartAddress': item.data.StartAddress,
+        'TargetProcessGuid': item.data.TargetProcessGuid,
+        'TargetImage': item.data.TargetImage,
+        'SourceImage': item.data.SourceImage
+      };
+      tmp_node.eventid = 8;
+      tmp_node.guid = item.data.SourceProcessGuid;
     } else if (item.id == 2) {
-      //tmp_node.image = "../plugins/sysmon_search_visual/images/file_create_time.png";
       tmp_node.image = imgCreateTime;//"../plugins/sysmon_search_visual/images/file_create_time.png";
-                        tmp_node.label = item.data.Image;
-                        tmp_node.title = item.data.Image;
-                        tmp_node.info = {
-                            'Image': item.data.Image,
-                            'CreationUtcTime': item.data.CreationUtcTime,
-                            'PreviousCreationUtcTime': item.data.PreviousCreationUtcTime
-                        };
-                        tmp_node.eventid = 2;
+      tmp_node.label = item.data.Image;
+      tmp_node.title = item.data.Image;
+      tmp_node.info = {
+        'Image': item.data.Image,
+        'CreationUtcTime': item.data.CreationUtcTime,
+        'PreviousCreationUtcTime': item.data.PreviousCreationUtcTime
+      };
+      tmp_node.eventid = 2;
     } else if (item.id == 7) {
-      //tmp_node.image = "../plugins/sysmon_search_visual/images/image_loaded.png";
       tmp_node.image = imgLoaded;//"../plugins/sysmon_search_visual/images/image_loaded.png";
-                        tmp_node.label = item.data.Image;
-                        tmp_node.title = item.data.Image;
-                        tmp_node.info = {
-                            'Image': item.data.Image,
-                            'ImageLoaded': item.data.ImageLoaded,
-                            'Hashes': item.data.Hashes
-                        };
-                        tmp_node.eventid = 7;
+      tmp_node.label = item.data.Image;
+      tmp_node.title = item.data.Image;
+      tmp_node.info = {
+        'Image': item.data.Image,
+        'ImageLoaded': item.data.ImageLoaded,
+        'Hashes': item.data.Hashes
+      };
+      tmp_node.eventid = 7;
     } else if (item.id == 19) {
-      //tmp_node.image = "../plugins/sysmon_search_visual/images/wmi.png";
       tmp_node.image = imgWmi;//"../plugins/sysmon_search_visual/images/wmi.png";
-                        tmp_node.label = item.data.Name+":"+item.data.EventNamespace;
-                        tmp_node.title = item.data.Name+":"+item.data.EventNamespace;
-                        tmp_node.info = {
-                            'User': item.data.User
-                        };
-                        tmp_node.eventid = 19;
+      tmp_node.label = item.data.Name+":"+item.data.EventNamespace;
+      tmp_node.title = item.data.Name+":"+item.data.EventNamespace;
+      tmp_node.info = {
+        'User': item.data.User
+      };
+      tmp_node.eventid = 19;
     } else if (item.id == 20) {
-      //tmp_node.image = "../plugins/sysmon_search_visual/images/wmi.png";
       tmp_node.image = imgWmi;//"../plugins/sysmon_search_visual/images/wmi.png";
-                        tmp_node.label = item.data.Name;
-                        tmp_node.title = item.data.Name;
-                        tmp_node.info = {
-                            'User': item.data.User
-                        };
-                        tmp_node.eventid = 20;
+      tmp_node.label = item.data.Name;
+      tmp_node.title = item.data.Name;
+      tmp_node.info = {
+        'User': item.data.User
+      };
+      tmp_node.eventid = 20;
     } else if (item.id == 21) {
-      //tmp_node.image = "../plugins/sysmon_search_visual/images/wmi.png";
       tmp_node.image = imgWmi;//"../plugins/sysmon_search_visual/images/wmi.png";
-                        tmp_node.label = item.data.Consumer;
-                        tmp_node.title = item.data.Consumer;
-                        tmp_node.info = {
-                            'User': item.data.User
-                        };
-                        tmp_node.eventid = 21;
+      tmp_node.label = item.data.Consumer;
+      tmp_node.title = item.data.Consumer;
+      tmp_node.info = {
+        'User': item.data.User
+      };
+      tmp_node.eventid = 21;
     }
 
     if (search(tmp_node.info, keyword, hash) || search(tmp_node.label, keyword, hash)) {
@@ -285,43 +279,41 @@ function createNetwork(top, keyword, hash, firstflg) {
   }
   
   if(top.current != null){
-
-  var tmp_str_array = splitByLength(top.current.image, 10);
-  var tmp_label = tmp_str_array.join('\n');
-  var tmp_node = {
-    "id": top.current.index,
-    "label": tmp_label,
-    "title": top.current.cmd,
-    "shape": "circularImage",
-    "image": imgProgram,
-    "guid": top.current.guid,
-    "info": top.current.info,
-    "eventid": 1,
-    "_id":  top.current._id
-  };
-
-
-  if (search(top.current.info, keyword, hash) || firstflg) {
-    tmp_node["color"] = {
-      "background": "red",
-      "border": "red"
+    var tmp_str_array = splitByLength(top.current.image, 10);
+    var tmp_label = tmp_str_array.join('\n');
+    var tmp_node = {
+      "id": top.current.index,
+      "label": tmp_label,
+      "title": top.current.cmd,
+      "shape": "circularImage",
+      "image": imgProgram,
+      "guid": top.current.guid,
+      "info": top.current.info,
+      "eventid": 1,
+      "_id":  top.current._id
     };
-    tmp_node["borderWidth"] = 3;
-  }else{
-     tmp_node["color"] = defaultColor;
-     tmp_node["borderWidth"] = 1;
-  }
 
-  graph["nodes"].push(tmp_node);
-  graph = add_child_info(top, graph, keyword, hash);
-  graph = add_process_info(top, graph, keyword, hash);
+    if (search(top.current.info, keyword, hash) || firstflg) {
+      tmp_node["color"] = {
+        "background": "red",
+        "border": "red"
+      };
+      tmp_node["borderWidth"] = 3;
+    }else{
+      tmp_node["color"] = defaultColor;
+      tmp_node["borderWidth"] = 1;
+    }
+    graph["nodes"].push(tmp_node);
+
+    graph = add_child_info(top, graph, keyword, hash);
+    graph = add_process_info(top, graph, keyword, hash);
   }
 
   return graph;
 
 }
 
-export class GraphOverView extends React.Component {
+export class GraphOverView extends Component {
 
   constructor(props) {
     super(props);
@@ -334,7 +326,6 @@ export class GraphOverView extends React.Component {
       keyword:null, 
       hash:null, 
     }
-
     this.setNetwork = this.setNetwork.bind(this);
     this.setText = this.setText.bind(this);
   }
@@ -361,73 +352,76 @@ export class GraphOverView extends React.Component {
       }
     )
 
-  var events = {
-
-  oncontext: function (ctx) {
-    network.fit();
-  },
-  doubleClick: function(properties) {
-    if (!properties.nodes.length) return;
-    var node = network.body.data.nodes.get(properties.nodes[0]);
-    console.log(node);
-    if(node.guid != null && node.guid!="" && node.guid!="root"){
-      var _id = "0";
-      if(node._id != null) _id = node._id;
-      //var url = 'process_detail/' + host + '/' + date.substr(0, 10) + '/' + node.guid + '/' + _id;
-      var url = 'process_detail?host=' + host + '&date=' + date.substr(0, 10) + '&guid=' + node.guid + "&_id=" + _id;
-      //console.log(url);
-      window.open(url, "_blank");
-    }
-  },
-  click: function(properties) {
-  if (!properties.nodes.length) return;
-  var nodeid = network.getNodeAt(properties.pointer.DOM);
-  if (nodeid) {
-    network.selectNodes([nodeid], true);
-    var node = network.body.data.nodes.get(nodeid);
-    if (node && node.info) {
-      const view_data_1 = [
-        "CurrentDirectory", "CommandLine", "Hashes", "ParentProcessGuid", "ParentCommandLine", "ProcessGuid"
-      ];
-      const view_data_11 = ["ProcessGuid"];
-      const view_data_12 = ["EventType", "ProcessGuid"];
-      const view_data_3 = ["SourceHostname", "ProcessGuid", "SourceIsIpv6", "SourceIp", "DestinationHostname"];
-      const view_data_8 = ["SourceProcessGuid", "StartAddress", "TargetProcessGuid"];
-      const view_data_2 = ["CreationUtcTime", "PreviousCreationUtcTime"];
-      const view_data_7 = ["Hashes"];
-      const view_data_19 = ["User"];
-      const view_data_20 = ["User"];
-      const view_data_21 = ["User"];
-      var view_data = [];
-      if (node.eventid == 1) view_data = view_data_1;
-      else if (node.eventid == 11) view_data = view_data_11;
-      else if (node.eventid == 12) view_data = view_data_12;
-      else if (node.eventid == 3) view_data = view_data_3;
-      else if (node.eventid == 8) view_data = view_data_8;
-      else if (node.eventid == 2) view_data = view_data_2;
-      else if (node.eventid == 7) view_data = view_data_7;
-      else if (node.eventid == 19) view_data = view_data_19;
-      else if (node.eventid == 20) view_data = view_data_20;
-      else if (node.eventid == 21) view_data = view_data_21;
-      var str = "";
-      for (var key in node.info) {
-        if (view_data.indexOf(key) >= 0) {
-          if (str === "") str = key + ":" + node.info[key];
-          else str = str + "\n" + key + ":" + node.info[key];
+    var events = {
+      oncontext: function (ctx) {
+        network.fit();
+      },
+      doubleClick: function(properties) {
+        if (!properties.nodes.length) return;
+        var node = network.body.data.nodes.get(properties.nodes[0]);
+        console.log(node);
+        if(node.guid != null && node.guid!="" && node.guid!="root"){
+          var _id = "0";
+          if(node._id != null) _id = node._id;
+          //var url = 'process_detail/' + host + '/' + date.substr(0, 10) + '/' + node.guid + '/' + _id;
+          var url = 'process_detail?host=' + host;
+          url += '&date=' + date.substr(0, 10);
+          url += '&guid=' + node.guid;
+          url += "&_id=" + _id;
+          //console.log(url);
+          window.open(url, "_blank");
+        }
+      },
+      click: function(properties) {
+        if (!properties.nodes.length) return;
+        var nodeid = network.getNodeAt(properties.pointer.DOM);
+        if (nodeid) {
+          network.selectNodes([nodeid], true);
+          var node = network.body.data.nodes.get(nodeid);
+          if (node && node.info) {
+            const view_data_1 = [
+              "CurrentDirectory", "CommandLine", "Hashes", "ParentProcessGuid", "ParentCommandLine", "ProcessGuid"
+            ];
+            const view_data_11 = ["ProcessGuid"];
+            const view_data_12 = ["EventType", "ProcessGuid"];
+            const view_data_3 = [
+              "SourceHostname", "ProcessGuid", "SourceIsIpv6", "SourceIp", "DestinationHostname"
+            ];
+            const view_data_8 = ["SourceProcessGuid", "StartAddress", "TargetProcessGuid"];
+            const view_data_2 = ["CreationUtcTime", "PreviousCreationUtcTime"];
+            const view_data_7 = ["Hashes"];
+            const view_data_19 = ["User"];
+            const view_data_20 = ["User"];
+            const view_data_21 = ["User"];
+            var view_data = [];
+            if (node.eventid == 1) view_data = view_data_1;
+            else if (node.eventid == 11) view_data = view_data_11;
+            else if (node.eventid == 12) view_data = view_data_12;
+            else if (node.eventid == 3) view_data = view_data_3;
+            else if (node.eventid == 8) view_data = view_data_8;
+            else if (node.eventid == 2) view_data = view_data_2;
+            else if (node.eventid == 7) view_data = view_data_7;
+            else if (node.eventid == 19) view_data = view_data_19;
+            else if (node.eventid == 20) view_data = view_data_20;
+            else if (node.eventid == 21) view_data = view_data_21;
+            var str = "";
+            for (var key in node.info) {
+              if (view_data.indexOf(key) >= 0) {
+                if (str === "") str = key + ":" + node.info[key];
+                else str = str + "\n" + key + ":" + node.info[key];
+              }
+            }
+            settxt(str);
+          }
         }
       }
-      settxt(str);
     }
-  }
-  }
-  }
 
-  this.setState({network:nw, events:events})
+    this.setState({network:nw, events:events})
 
   }
 
   render(){
-
     const graph = createNetwork(
       this.props.tops,
       this.props.keyword,
@@ -445,24 +439,13 @@ export class GraphOverView extends React.Component {
         container: this.configureRef,
         showButton: false,
       },
-/*
-      nodes: {size: 25},
       edges: {
-        width: 2,
-        shadow: false,
         smooth: {
-          type: 'continuous',
-          roundness: 0
+          type: 'cubicBezier',
+          forceDirection: 'vertical',
+          roundness: 0.4
         }
-      },*/
-  edges: {
-    smooth: {
-      type: 'cubicBezier',
-      forceDirection: 'vertical',
-      roundness: 0.4
-    }
-  },
-
+      },
       layout: {
         hierarchical: {
           direction: 'LR',
@@ -479,33 +462,38 @@ export class GraphOverView extends React.Component {
       physics:false,
     };
 
-  const layout = this.props.layout;
-  if (layout == 'UD') options['layout']['hierarchical']['direction'] = 'UD';
-  else if (layout == 'LR') options['layout']['hierarchical']['direction'] = 'LR';
-  else options['layout']['hierarchical'] = false;
+    const layout = this.props.layout;
+    if (layout == 'UD') {
+      options['layout']['hierarchical']['direction'] = 'UD';
+    } else if (layout == 'LR') {
+      options['layout']['hierarchical']['direction'] = 'LR';
+    } else {
+      options['layout']['hierarchical'] = false;
+    }
 
-  return (
-    <div>
-
-<EuiFlexGroup>
-<EuiFlexItem grow={false}>
-    <Graph 
-      graph={graph}
-      options={options}
-      events={this.state.events}
-      getNetwork={this.setNetwork}
-    />
-</EuiFlexItem>
-<EuiFlexItem grow={false} style={{maxWidth:500}}>
-    <div ref={r => this.configureRef = r}></div>
-</EuiFlexItem>
-</EuiFlexGroup>
-    <div>
-    <textarea rows="7" cols="120" readOnly placeholder={placeholder} value={this.state.textarea}></textarea>
-    </div>
-    </div>
-  )
+    return (
+      <div>
+        <EuiFlexGroup>
+          <EuiFlexItem grow={false}>
+            <Graph 
+              graph={graph}
+              options={options}
+              events={this.state.events}
+              getNetwork={this.setNetwork}
+            />
+          </EuiFlexItem>
+          <EuiFlexItem grow={false} style={{maxWidth:500}}>
+            <div id="visConfig" ref={r => this.configureRef = r}></div>
+          </EuiFlexItem>
+        </EuiFlexGroup>
+        <div>
+          <textarea rows="7" cols="120" readOnly
+            placeholder={placeholder}
+            value={this.state.textarea}>
+          </textarea>
+        </div>
+      </div>
+    )
   }
-
 }
 

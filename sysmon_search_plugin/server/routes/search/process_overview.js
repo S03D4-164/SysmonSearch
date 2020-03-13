@@ -168,7 +168,8 @@ async function sub_process_infos(sysmon, hostname, date, guid) {
           {"bool":
             {"must": [
                 {"match": {"@timestamp": date}},
-                {"match": host}
+                {"match": host},
+                {"match": sysmon.channel}
               ]
             }
           },{
@@ -179,7 +180,7 @@ async function sub_process_infos(sysmon, hostname, date, guid) {
                   "match": processGuid
                   //{"event_data.ProcessGuid.keyword": guid}
                 },{
-                  "terms": {[sysmon.event_id]: [11, 12, 13, 3, 2, 7, 19, 20, 21]}
+                  "terms": {[sysmon.event_id]: [11, 12, 13, 3, 2, 7, 19, 20, 21, 22]}
                   //"terms": {"winlog.event_id": [11, 12, 13, 3, 2, 7, 19, 20, 21]}
                 }]
               }
@@ -244,7 +245,8 @@ async function process_overview(sysmon, hostname, date, guid) {
           "must": [
             //{"match": {"winlog.event_id": 1}},
             {"match": {[sysmon.event_id]: 1}},
-            {"match": host}
+            {"match": host},
+            {"match": sysmon.channel},
           ]
         }
       },{

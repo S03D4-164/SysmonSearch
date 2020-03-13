@@ -1,4 +1,4 @@
-import React, {Fragment} from 'react';
+import React, {Component, Fragment} from 'react';
 import moment from 'moment';
 import chrome from 'ui/chrome';
 
@@ -20,7 +20,7 @@ import {
   EuiLink,
 } from '@elastic/eui';
 
-export class SysmonSearch extends React.Component {
+export class SysmonSearch extends Component {
   constructor(props){
     super(props);
     this.state = {
@@ -29,58 +29,95 @@ export class SysmonSearch extends React.Component {
       inputFields: [{item:"", value:""}],
       startDate: moment().add(-1, 'M'),
       endDate: moment().add(0, 'd'),
-      conjunction:2,
+      conjunction:2,//OR
       pageIndex: 0,
       pageSize: 100,
       showPerPageOptions: true,
     };
 
     this.columns = [
-    {field: 'utc', name: 'UTC Time', width:"20%", sortable:true,
-      render: (utc, item) => {
-        let link = chrome.addBasePath('/app/sysmon_search_r/stats');
-        link += "?host=" + item.pc + "&date=" + moment(item.utc).format("YYYY-MM-DD")
-        //return (<EuiLink href={link} >{utc}</EuiLink>)
-        return (<Fragment><EuiButtonIcon iconType="visBarVerticalStacked" href={link} />{utc}</Fragment>)
-      }
-    },
-    {field: 'event', name: 'Event ID', width:"10%", sortable:true},
-    {field: 'pc', name: 'Hostname', width:"20%", sortable:true,
-      render: (pc, item) => {
-        let link = chrome.addBasePath('/app/sysmon_search_r/event');
-        link += "?host=" + item.pc + "&date=" + moment(item.utc).format("YYYY-MM-DD")
-        //return (<EuiLink href={link} >{pc}</EuiLink>)
-        return (<Fragment><EuiButtonIcon iconType="visPie" href={link} />{pc}</Fragment>)
-      }
-    },
-    {field: 'user', name: 'User', width:"10%", sortable:true},
-    {field: 'description', name: 'Description', width:"10%", sortable:true,
-      render: (descr, item) => {
-        let link = chrome.addBasePath('/app/sysmon_search_r/process_list');
-        link += "?host=" + item.pc + "&date=" + moment(item.utc).format("YYYY-MM-DD") + "&category=" + descr;
-        if(descr=="other") return(<Fragment>{descr}</Fragment>)
-        else return (<EuiLink href={link} >{descr}</EuiLink>)
-      }
-    },
-    {field: 'image', name: 'image', width:"30%", sortable:true,
-      render: (image, item) => {
-        let link = chrome.addBasePath('/app/sysmon_search_r/process_overview');
-        link += "?host=" + item.pc + "&date=" + moment(item.utc).format("YYYY-MM-DD") + "&guid=" + item.guid;
-        //return (<EuiLink href={link} >{image}</EuiLink>)
-        return (<Fragment><EuiButtonIcon iconType="graphApp" href={link} />{image}</Fragment>)
-      }
-    },
+      {
+        field: 'utc', name: 'UTC Time', width:"20%", sortable:true,
+        render: (utc, item) => {
+          let link = chrome.addBasePath('/app/sysmon_search_r/stats');
+          link += "?host=" + item.pc;
+          link += "&date=" + moment(item.utc).format("YYYY-MM-DD");
+          return (
+            <Fragment>
+              <EuiButtonIcon
+                iconType="visBarVerticalStacked"
+                href={link}
+                aria-label="Event Stats"
+              />
+              {utc}
+            </Fragment>
+          )
+        }
+      },
+      {
+        field: 'event', name: 'Event ID', width:"10%", sortable:true
+      },
+      {
+        field: 'pc', name: 'Hostname', width:"20%", sortable:true,
+        render: (pc, item) => {
+          let link = chrome.addBasePath('/app/sysmon_search_r/event');
+          link += "?host=" + item.pc;
+          link += "&date=" + moment(item.utc).format("YYYY-MM-DD");
+          return (
+            <Fragment>
+              <EuiButtonIcon
+                iconType="visPie"
+                href={link}
+                aria-label="Event Pie Chart"
+              />{pc}
+            </Fragment>
+          )
+        }
+      },
+      {
+        field: 'user', name: 'User', width:"10%", sortable:true
+      },
+      {
+        field: 'description', name: 'Description', width:"10%", sortable:true,
+        render: (descr, item) => {
+          let link = chrome.addBasePath('/app/sysmon_search_r/process_list');
+          link += "?host=" + item.pc;
+          link += "&date=" + moment(item.utc).format("YYYY-MM-DD")
+          link += "&category=" + descr;
+          if(descr=="other") return(<Fragment>{descr}</Fragment>)
+          else return (<EuiLink href={link} >{descr}</EuiLink>)
+        }
+      },
+      {
+        field: 'image', name: 'image', width:"30%", sortable:true,
+        render: (image, item) => {
+          let link = chrome.addBasePath('/app/sysmon_search_r/process_overview');
+          link += "?host=" + item.pc;
+          link += "&date=" + moment(item.utc).format("YYYY-MM-DD");
+          link += "&guid=" + item.guid;
+          return (
+            <Fragment>
+              <EuiButtonIcon
+                iconType="graphApp"
+                href={link}
+                aria-label="Process Graph"
+              />
+              {image}
+            </Fragment>
+          )
+        }
+      },
     ];
 
     this.options = [
-    {value:0, text:"-"},
-    {value:1, text:"IP Address"},
-    {value:2, text:"Port"},
-    {value:3, text:"Hostname"},
-    {value:4, text:"Process Name"},
-    {value:5, text:"Registry Key"},
-    {value:6, text:"Registry Value"},
-    {value:7, text:"Hash"},
+      {value:0, text:"-"},
+      {value:1, text:"IP Address"},
+      {value:2, text:"Port"},
+      {value:3, text:"Hostname"},
+      {value:4, text:"Process Name"},
+      {value:5, text:"Registry Key"},
+      {value:6, text:"Registry Value"},
+      {value:7, text:"Hash"},
     ];
 
     this.conjunctions = [
@@ -104,11 +141,11 @@ export class SysmonSearch extends React.Component {
     const inputs = this.state.inputFields;
     for (let index in inputs) {
       if (inputs[index].item && inputs[index].value){
-      let id = index + 1;
-      let searchItem = "search_item_" + Number(id).toString();
-      data[searchItem] = inputs[index].item;
-      let searchValue = "search_value_" + Number(id).toString();
-      data[searchValue] = inputs[index].value;
+        let id = index + 1;
+        let searchItem = "search_item_" + Number(id).toString();
+        data[searchItem] = inputs[index].item;
+        let searchValue = "search_value_" + Number(id).toString();
+        data[searchValue] = inputs[index].value;
       }
     }
     console.log(data);
@@ -120,24 +157,24 @@ export class SysmonSearch extends React.Component {
       body:JSON.stringify(data)
     }).then((response) => response.json())
     .then((responseJson) => {
-        console.log(responseJson);
-        var items = [];
-        responseJson.hits.map(res => {
-            let item = {
-              utc: res.utc_time,
-              event: res.event_id,
-              pc: res.computer_name,
-              user: res.user_name,
-              image: res.image,
-              description: res.description,
-              guid: res.process_guid,
-            };
-            items.push(item);
-        });
-        this.setState({
-          items:items,
-          total:responseJson.total,
-        });
+      console.log(responseJson);
+      var items = [];
+      responseJson.hits.map(res => {
+        let item = {
+          utc: res.utc_time,
+          event: res.event_id,
+          pc: res.computer_name,
+          user: res.user_name,
+          image: res.image,
+          description: res.description,
+          guid: res.process_guid,
+        };
+        items.push(item);
+      });
+      this.setState({
+        items:items,
+        total:responseJson.total,
+      });
     })
     .catch((error) =>{
       console.error(error);
@@ -178,7 +215,7 @@ export class SysmonSearch extends React.Component {
     this.setState({inputFields:values});
   };
 
-render(){
+  render(){
     const { pageIndex, pageSize } = this.state;
     const start = pageIndex * pageSize;
     const pageOfItems = this.state.items.slice(start, pageSize);
@@ -199,127 +236,110 @@ render(){
       hidePerPageOptions: false,
     };
 
-return (
+    return (
+      <EuiPanel>
+        <EuiFlexItem>
+          <EuiFormRow display="columnCompressed" label="Date" >
+            <EuiDatePickerRange style={{minWidth:500}}
+              startDateControl={
+                <EuiDatePicker compressed
+                  selected={this.state.startDate}
+                  onChange={this.handleChangeStart}
+                  startDate={this.state.startDate}
+                  endDate={this.state.endDate}
+                  isInvalid={this.state.startDate > this.state.endDate}
+                  aria-label="Start date"
+                  showTimeSelect
+                />
+              }
+              endDateControl={
+                <EuiDatePicker compressed
+                  selected={this.state.endDate}
+                  onChange={this.handleChangeEnd}
+                  startDate={this.state.startDate}
+                  endDate={this.state.endDate}
+                  isInvalid={this.state.startDate > this.state.endDate}
+                  aria-label="End date"
+                  showTimeSelect
+                />
+              }
+            />
+          </EuiFormRow>
+        </EuiFlexItem>
+        <EuiSpacer size="m" />
 
-<EuiPanel>
+        {this.state.inputFields.map((inputField, index) => (
+          <EuiFlexGroup key={`input-${index}`}>
+            <EuiFlexItem grow={false}>
+              <EuiFormRow
+                display="columnCompressed"
+                label="Field" >
+                <EuiSelect 
+                  name="item"
+                  compressed
+                  value={inputField.item}
+                  options={this.options}
+                  onChange={event => this.handleInputChange(index, event)}
+                />
+              </EuiFormRow>
+            </EuiFlexItem>
 
-  <EuiFlexItem>
-  <EuiFormRow 
-   display="columnCompressed"
-   label="Date" >
-      <EuiDatePickerRange style={{minWidth:500}}
-        startDateControl={
-          <EuiDatePicker
-            compressed
-            selected={this.state.startDate}
-            onChange={this.handleChangeStart}
-            startDate={this.state.startDate}
-            endDate={this.state.endDate}
-            isInvalid={this.state.startDate > this.state.endDate}
-            aria-label="Start date"
-            showTimeSelect
-          />
-        }
-        endDateControl={
-          <EuiDatePicker
-            compressed
-            selected={this.state.endDate}
-            onChange={this.handleChangeEnd}
-            startDate={this.state.startDate}
-            endDate={this.state.endDate}
-            isInvalid={this.state.startDate > this.state.endDate}
-            aria-label="End date"
-            showTimeSelect
-          />
-        }
-      />
-  </EuiFormRow>
-  </EuiFlexItem>
+            <EuiFlexItem style={{maxWidth:400}}>
+              <EuiFieldText name="value" compressed
+                value={inputField.value}
+                onChange={event => this.handleInputChange(index, event)}
+              />
+            </EuiFlexItem>
 
-<EuiSpacer size="m" />
-
-{this.state.inputFields.map((inputField, index) => (
-
-<EuiFlexGroup key={`input-${index}`}>
-
-  <EuiFlexItem grow={false}>
-  <EuiFormRow
-   display="columnCompressed"
-   label="Field" >
-    <EuiSelect 
-      name="item"
-      compressed
-      value={inputField.item}
-      options={this.options}
-      onChange={event => this.handleInputChange(index, event)}
-    />
-  </EuiFormRow>
-  </EuiFlexItem>
-
-  <EuiFlexItem style={{maxWidth:400}}>
-    <EuiFieldText 
-      name="value"
-      compressed
-      value={inputField.value}
-      onChange={event => this.handleInputChange(index, event)}
-    />
-  </EuiFlexItem>
-
-  <EuiFlexItem grow={false}>
-      <EuiButton size="s" iconType="arrowLeft"
-        onClick={() => this.handleRemoveFields(index)}
-      >DEL</EuiButton>
-  </EuiFlexItem>
-
-</EuiFlexGroup >
-
-))}
+            <EuiFlexItem grow={false}>
+              <EuiButton size="s" iconType="arrowLeft"
+                onClick={() => this.handleRemoveFields(index)}
+              >DEL</EuiButton>
+            </EuiFlexItem>
+          </EuiFlexGroup >
+        ))}
   
-<EuiSpacer size="m" />
+        <EuiSpacer size="m" />
 
-<EuiFlexGroup >
+        <EuiFlexGroup >
 
-  <EuiFlexItem grow={false}>
-  <EuiFormRow
-   display="columnCompressed"
-   label="Conjunction" >
-    <EuiSelect 
-      name="conjunction"
-      compressed
-      value={this.state.conjunction}
-      options={this.conjunctions}
-      onChange={this.handleChangeConjunction}
-    />
-  </EuiFormRow>
-  </EuiFlexItem>
+          <EuiFlexItem grow={false}>
+            <EuiFormRow display="columnCompressed" label="Conjunction" >
+              <EuiSelect name="conjunction" compressed
+                value={this.state.conjunction}
+                options={this.conjunctions}
+                onChange={this.handleChangeConjunction}
+              />
+            </EuiFormRow>
+          </EuiFlexItem>
 
-  <EuiFlexItem grow={false}>
-      <EuiButton size="s" iconType="arrowUp"
-        onClick={() => this.handleAddFields()}
-      >ADD</EuiButton>
-  </EuiFlexItem>
-  <EuiFlexItem grow={false}>
-      <EuiButton size="s" onClick={ () => this.clickSearch() }>Search</EuiButton>
-  </EuiFlexItem>
-  <EuiFlexItem >
-    <EuiText><h3>Total: {this.state.total.value}</h3></EuiText>
-  </EuiFlexItem >
+          <EuiFlexItem grow={false}>
+            <EuiButton size="s" iconType="arrowUp"
+              onClick={() => this.handleAddFields()}
+            >ADD</EuiButton>
+          </EuiFlexItem>
+          <EuiFlexItem grow={false}>
+            <EuiButton size="s"
+              onClick={ () => this.clickSearch() }
+            >Search</EuiButton>
+          </EuiFlexItem>
+          <EuiFlexItem >
+            <EuiText><h3>Total: {this.state.total.value}</h3></EuiText>
+          </EuiFlexItem >
+        </EuiFlexGroup >
 
-</EuiFlexGroup >
+        <EuiSpacer size="m"/>
 
-<EuiSpacer size="m"/>
+        <EuiInMemoryTable		
+          items={this.state.items}
+          columns={this.columns}
+          pagination={pagination}
+          sorting={sorting}
+        />
 
-    <EuiInMemoryTable		
-      items={this.state.items}
-      columns={this.columns}
-      pagination={pagination}
-      sorting={sorting}
-    />
-
-</EuiPanel>
-
-);
+      </EuiPanel>
+    );
   
-}
+  }
 
 };

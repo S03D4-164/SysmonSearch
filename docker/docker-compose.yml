@@ -26,6 +26,7 @@ services:
     volumes:
       - ./kibana/kibana.yml:/usr/share/kibana/config/kibana.yml
       - ../sysmon_search_plugin:/usr/share/kibana/plugins/sysmon_search_plugin
+      - ../sysmon_search_r:/usr/share/kibana/plugins/sysmon_search_r
       - ./kibana/conf.js:/usr/share/kibana/plugins/sysmon_search_plugin/conf.js
       - ./rule_files:/tmp/rule_files
     container_name: docker-sysmonsearch-kibana

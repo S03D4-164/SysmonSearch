@@ -142,7 +142,12 @@ async function processDetail(sysmon, hostname, date, guid) {
       "bool": {
         "must": [
           {
-            "bool":{"must": [{"match": host}]}
+            "bool":{
+              "must": [
+                {"match": host},
+                {"match": sysmon.channel},
+               ]
+            }
           },
           {
             "bool": {

@@ -25,6 +25,7 @@ function str_escape(str) {
 
 async function smSearch(sysmon, params) {
   const search_items_and_date_query = await makeQuery(params, sysmon.map);
+  search_items_and_date_query.push({"match":sysmon.channel});
 
   var sort_item = {};
   sort_item[params.sort_item] = params.sort_order;

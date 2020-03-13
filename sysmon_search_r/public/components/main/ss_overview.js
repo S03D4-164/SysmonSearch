@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Component } from 'react';
 import chrome from 'ui/chrome'
 
 import {
@@ -15,11 +15,10 @@ import {
 const qs = require('query-string');
 import {GraphOverView} from './overview_network';
 
-export class SysmonOverView extends React.Component {
+export class SysmonOverView extends Component {
   constructor(props){
     super(props);
-    let params = qs.parse(this.props.location.search);
-    //var api = "../../api/sysmon-search-plugin/process_overview";
+    const params = qs.parse(this.props.location.search);
     this.api = chrome.addBasePath("/api/sysmon-search-plugin/process_overview");
     this.api += "/" + params.host;
     this.api += "/" + params.date;
@@ -32,12 +31,10 @@ export class SysmonOverView extends React.Component {
       keyword:null,
       hash:null,
       firstflg:true,
-      //option:option,
       graph:{},
       events:null,
       network:null,
       textarea:"",
-      //api:api,
       layout: "LR",
     };
 
@@ -82,7 +79,7 @@ export class SysmonOverView extends React.Component {
     })
     .then((response) => response.json())
     .then((responseJson) => {
-      if(responseJson)this.setState({tops:responseJson});
+      if(responseJson) this.setState({tops:responseJson});
       console.log(JSON.stringify(responseJson));
     }) 
     .catch((error) =>{
@@ -94,63 +91,53 @@ export class SysmonOverView extends React.Component {
     //console.log(this.state)
 
     return (
+      <div id="correlation" style={{minWidth:"1280px",margin:"0 auto"}}>
+        <EuiTitle size="s">
+          <h3>{this.state.guid} on {this.state.host}@{this.state.date}</h3>
+        </EuiTitle>
+        <EuiPanel>
+          <EuiFlexGroup >
+            <EuiFlexItem >
+              <EuiFormRow display="columnCompressed" label="Layout">
+                <EuiSelect name="layout" compressed
+                  value={this.state.layout}
+                  options={this.layouts}
+                  onChange={this.handleChangeLayout}
+                />
+              </EuiFormRow>
+            </EuiFlexItem>
 
-<div id="correlation" style={{minWidth:"1280px",margin:"0 auto"}}>
-<EuiTitle size="s">
-<h3>{this.state.guid} on {this.state.host}@{this.state.date}</h3>
-</EuiTitle>
-      <EuiPanel>
+            <EuiFlexItem>
+              <EuiFormRow label="Keyword" display="columnCompressed">
+                <EuiFieldText compressed
+                  name="keyword"
+                  onChange={this.handleChange} />
+              </EuiFormRow>
+            </EuiFlexItem>
+            <EuiFlexItem>
+              <EuiFormRow display="columnCompressed" label="Hash">
+                <EuiFieldText name="hash" compressed
+                  onChange={this.handleChangeHash} />
+              </EuiFormRow>
+            </EuiFlexItem>
+            <EuiFlexItem grow={false}>
+              <EuiButton size="s"
+                onClick={ () => this.clickSearch() }>
+                Search
+              </EuiButton>
+            </EuiFlexItem>
+          </EuiFlexGroup >
 
-  <EuiFlexGroup >
-
-  <EuiFlexItem >
-  <EuiFormRow
-   display="columnCompressed"
-   label="Layout" >
-    <EuiSelect 
-      name="layout"
-      compressed
-      value={this.state.layout}
-      options={this.layouts}
-      onChange={this.handleChangeLayout}
-    />
-  </EuiFormRow>
-  </EuiFlexItem>
-
-
-    <EuiFlexItem>
-      <EuiFormRow label="Keyword" display="columnCompressed">
-      <EuiFieldText
-      compressed
-      name="keyword"
-      onChange={this.handleChange} />
-      </EuiFormRow>
-    </EuiFlexItem>
-    <EuiFlexItem>
-      <EuiFormRow display="columnCompressed" label="Hash">
-      <EuiFieldText
-      name="hash"
-      compressed
-      onChange={this.handleChangeHash} />
-      </EuiFormRow>
-    </EuiFlexItem>
-    <EuiFlexItem grow={false}>
-<EuiButton size="s" onClick={ () => this.clickSearch() }>Search</EuiButton>
-    </EuiFlexItem>
-
-  </EuiFlexGroup >
-
-<GraphOverView
- tops={this.state.tops}
- host={this.state.host}
- date={this.state.date}
- keyword={this.state.keyword}
- hash={this.state.hash}
- layout={this.state.layout}
-/>
-
-      </EuiPanel>
-</div>
+          <GraphOverView
+            tops={this.state.tops}
+            host={this.state.host}
+            date={this.state.date}
+            keyword={this.state.keyword}
+            hash={this.state.hash}
+            layout={this.state.layout}
+          />
+        </EuiPanel>
+      </div>
     )
   }
 };

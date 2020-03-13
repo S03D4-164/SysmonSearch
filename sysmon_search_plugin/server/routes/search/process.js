@@ -219,6 +219,7 @@ async function process(sysmon, hostname, date, searchObj) {
             "must": [
               {"match": host},
               {"match": event_id},
+              {"match": sysmon.channel},
               {
                 //"range": {"@timestamp": { "gte": date_dict["start_date"], "lte": date_dict["end_date"] }}
                 "range": range
@@ -238,6 +239,7 @@ async function process(sysmon, hostname, date, searchObj) {
           "bool": {
             "must": [
               {"match": host},
+              {"match": sysmon.channel},
               {"terms": netevent_id},
               {
                 //"range": {"@timestamp": { "gte": date_dict["start_date"], "lte": date_dict["end_date"] }}
@@ -257,14 +259,13 @@ async function process(sysmon, hostname, date, searchObj) {
         "query": {
           "bool": {
             "must": [
+              {"match": host},
+              {"match": sysmon.channel},
               {
-                "match": host
-              },{
                 "match": event_id
                 //{"winlog.event_id": 1}
-              },{
-                "match": {"@timestamp": date}
-              }
+              },
+              {"match": {"@timestamp": date}}
             ]
           }
         },

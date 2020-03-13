@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import React, { Component, Fragment } from 'react';
 import moment from 'moment';
 import chrome from 'ui/chrome';
 
@@ -21,7 +21,7 @@ import {
 
 import { SysmonStats } from './ss_stats';
 
-export class SysmonEvents extends React.Component {
+export class SysmonEvents extends Component {
   constructor(props){
     super(props);
     this.state = {
@@ -29,24 +29,16 @@ export class SysmonEvents extends React.Component {
       startDate: moment().add(-1, 'M'),
       endDate: moment().add(0, 'd'),
       keyword:"",
-      sortField: 'date',
-      sortDirection: 'asc',
+      //sortField: 'date',
+      //sortDirection: 'asc',
+      totalItemCount: 0,
+      pageIndex: 0,
+      pageSize: 100,
     };
     this.handleChangeStart = this.handleChangeStart.bind(this);
     this.handleChangeEnd = this.handleChangeEnd.bind(this);
     this.handleChange = this.handleChange.bind(this);
   }
-
-  onTableChange = ({ page = {}, sort = {} }) => {
-    const { index: pageIndex, size: pageSize } = page;
-
-    const { field: sortField, direction: sortDirection } = sort;
-
-    this.setState({
-      sortField,
-      sortDirection,
-    });
-  };
 
   componentDidMount(){ this.getEvents() };
   
@@ -84,7 +76,8 @@ export class SysmonEvents extends React.Component {
           });
         });
         this.setState({
-          items:items
+          items: items,
+          totalItemCount: items.length,
         });
         //console.log(JSON.stringify(items));
     })
@@ -114,111 +107,127 @@ export class SysmonEvents extends React.Component {
   }
 
   render(){
-  const columns = [
-    {
-      field: 'date',
-      sortable: true,
-      name: 'Date',
-      render: (date, item) => (
-        <Fragment>
-        <EuiButtonIcon href={item.stats} 
-        iconType="visBarVerticalStacked" />
-        {date}</Fragment>
-      )
-    },
-    {
-      field: 'pc',
-      name: 'Hostname',
-      sortable: true,
-      render: (pc, item) => (
-        <Fragment>
-        <EuiButtonIcon href={item.process} 
-        iconType="graphApp" />
-        {pc}</Fragment>
-      )
-    },
-    {
-      field: 'count',
-      name: 'Count',
-      sortable: true,
-      render: (count, item) => (
-        <Fragment>
-        <EuiButtonIcon href={item.event}
-        iconType="visPie"/>
-        {count}</Fragment>
-      )
-    }
-  ];
 
+    const columns = [
+      {
+        field: 'date',
+        sortable: true,
+        name: 'Date',
+        render: (date, item) => (
+          <Fragment>
+            <EuiButtonIcon
+              href={item.stats} 
+              iconType="visBarVerticalStacked"
+              aria-label="Event Stats"
+            />
+            {date}
+          </Fragment>
+        )
+      },
+      {
+        field: 'pc',
+        name: 'Hostname',
+        sortable: true,
+        render: (pc, item) => (
+          <Fragment>
+            <EuiButtonIcon
+              href={item.process} 
+              iconType="graphApp"
+              aria-label="Process Graph"
+            />
+            {pc}
+          </Fragment>
+        )
+      },
+      {
+        field: 'count',
+        name: 'Count',
+        sortable: true,
+        render: (count, item) => (
+          <Fragment>
+            <EuiButtonIcon
+              href={item.event}
+              iconType="visPie"
+              aria-label="Event Pie Chart"
+            />
+            {count}
+          </Fragment>
+        )
+      }
+    ];
 
-    const { sortField, sortDirection } = this.state;
+    //const { sortField, sortDirection } = this.state;
     const sorting = {
       sort: {
-        field: sortField,
-        direction: sortDirection,
+        field: "date",
+        direction: "asc",
       },
     };
+    const { pageIndex, pageSize, totalItemCount } = this.state;
+    const pagination = {
+      pageIndex,
+      pageSize,
+      totalItemCount,
+      pageSizeOptions: [100, 500, 1000],
+      hidePerPageOptions: false,
+    };
 
-
-  return (
+    return (
       <EuiPanel>
-  <EuiFlexGroup >
-    <EuiFlexItem style={{ minWidth: 400 }}>
-      <EuiFormRow label="Date">
-      <EuiDatePickerRange
-        startDateControl={
-          <EuiDatePicker
-            selected={this.state.startDate}
-            onChange={this.handleChangeStart}
-            startDate={this.state.startDate}
-            endDate={this.state.endDate}
-            isInvalid={this.state.startDate > this.state.endDate}
-            aria-label="Start date"
-            showTimeSelect
-          />
-        }
-        endDateControl={
-          <EuiDatePicker
-            selected={this.state.endDate}
-            onChange={this.handleChangeEnd}
-            startDate={this.state.startDate}
-            endDate={this.state.endDate}
-            isInvalid={this.state.startDate > this.state.endDate}
-            aria-label="End date"
-            showTimeSelect
-          />
-        }
-      />
-
-      </EuiFormRow>
-    </EuiFlexItem>
-    <EuiFlexItem>
-
-      <EuiFormRow label="Hostname">
-      <EuiFieldText
-      name="keyword"
-      onChange={this.handleChange} />
-      </EuiFormRow>
-    </EuiFlexItem>
-    <EuiFlexItem>
-      <EuiFormRow hasEmptyLabelSpace display="center">
-        <EuiButton onClick={ () => this.clickSearch() }
-         iconType="search"
-        >Search</EuiButton>
-      </EuiFormRow>
-    </EuiFlexItem>
-  </EuiFlexGroup >
-  <EuiSpacer />
-
-    <EuiInMemoryTable
-      items={this.state.items}
-      columns={columns}
-      sorting={sorting}
-    />
-
+        <EuiFlexGroup >
+          <EuiFlexItem style={{ minWidth: 400 }}>
+            <EuiFormRow label="Date">
+              <EuiDatePickerRange
+                startDateControl={
+                  <EuiDatePicker
+                    selected={this.state.startDate}
+                    onChange={this.handleChangeStart}
+                    startDate={this.state.startDate}
+                    endDate={this.state.endDate}
+                    isInvalid={this.state.startDate > this.state.endDate}
+                    aria-label="Start date"
+                    showTimeSelect
+                  />
+                }
+                endDateControl={
+                  <EuiDatePicker
+                    selected={this.state.endDate}
+                    onChange={this.handleChangeEnd}
+                    startDate={this.state.startDate}
+                    endDate={this.state.endDate}
+                    isInvalid={this.state.startDate > this.state.endDate}
+                    aria-label="End date"
+                    showTimeSelect
+                  />
+                }
+              />
+            </EuiFormRow>
+          </EuiFlexItem>
+          <EuiFlexItem>
+            <EuiFormRow label="Hostname">
+              <EuiFieldText
+                name="keyword"
+                onChange={this.handleChange}
+              />
+            </EuiFormRow>
+          </EuiFlexItem>
+          <EuiFlexItem>
+            <EuiFormRow hasEmptyLabelSpace display="center">
+              <EuiButton
+                onClick={ () => this.clickSearch() }
+                iconType="search"
+              >Search</EuiButton>
+            </EuiFormRow>
+          </EuiFlexItem>
+        </EuiFlexGroup >
+        <EuiSpacer />
+        <EuiInMemoryTable
+          items={this.state.items}
+          columns={columns}
+          sorting={sorting}
+          pagination={pagination}
+        />
       </EuiPanel>
-
-  );
+    );
   }
-
 };

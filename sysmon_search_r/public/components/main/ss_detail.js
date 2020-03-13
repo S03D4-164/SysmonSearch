@@ -78,7 +78,7 @@ export class SysmonDetail extends Component {
         <EuiLink href={item.link} >{disp}</EuiLink>
       )
     },
-  ];
+    ];
 
     this.handleChange = this.handleChange.bind(this);
     this.handleChangeHash = this.handleChangeHash.bind(this);
@@ -191,8 +191,8 @@ export class SysmonDetail extends Component {
     };
 
     const { pageIndex, pageSize } = this.state;
-    const start = pageIndex * pageSize;
-    const pageOfItems = this.state.items.slice(start, pageSize);
+    //const start = pageIndex * pageSize;
+    //const pageOfItems = this.state.items.slice(start, pageSize);
     const totalItemCount = this.state.total;
     const pagination = {
       pageIndex,
@@ -208,39 +208,38 @@ export class SysmonDetail extends Component {
     const total = items.length;
 
     return (
+      <div id="processlist" style={{maxWidth:"1280px",margin:"0 auto"}}>
+        <EuiTitle size="s">
+          <h3>{this.state.guid} on {this.state.host}@{this.state.date}</h3>
+        </EuiTitle>
+        <EuiPanel>
 
-<div id="processlist" style={{maxWidth:"1280px",margin:"0 auto"}}>
-<EuiTitle size="s">
-<h3>{this.state.guid} on {this.state.host}@{this.state.date}</h3>
-</EuiTitle>
-      <EuiPanel>
+          <EuiFlexGroup >
+            <EuiFlexItem>
+              <EuiFormRow label="Keyword">
+                <EuiFieldText
+                  name="keyword"
+                  onChange={this.handleChange} />
+              </EuiFormRow>
+            </EuiFlexItem>
+            <EuiFlexItem>
+              <EuiFormRow label="Hash">
+                <EuiFieldText
+                  name="hash"
+                  onChange={this.handleChangeHash} />
+              </EuiFormRow>
+            </EuiFlexItem>
+          </EuiFlexGroup >
+          <EuiText><h3>Total: {total}</h3></EuiText>
 
-  <EuiFlexGroup >
-    <EuiFlexItem>
-      <EuiFormRow label="Keyword">
-      <EuiFieldText
-      name="keyword"
-      onChange={this.handleChange} />
-      </EuiFormRow>
-    </EuiFlexItem>
-    <EuiFlexItem>
-      <EuiFormRow label="Hash">
-      <EuiFieldText
-      name="hash"
-      onChange={this.handleChangeHash} />
-      </EuiFormRow>
-    </EuiFlexItem>
-  </EuiFlexGroup >
-<EuiText><h3>Total: {total}</h3></EuiText>
-
-   <EuiInMemoryTable
-      items={items}
-      columns={this.columns}
-      sorting={sorting}
-      pagination={pagination}
-    />
-</EuiPanel>
-</div>
-  );
+          <EuiInMemoryTable
+            items={items}
+            columns={this.columns}
+            sorting={sorting}
+            pagination={pagination}
+          />
+        </EuiPanel>
+      </div>
+    );
   }
 };

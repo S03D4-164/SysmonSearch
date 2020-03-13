@@ -37,47 +37,6 @@ async function getTypeFromEventId(id){
   else return;
 }
 
-/*
-async function eventid_to_type(event_id) {
-  var result = "";
-  switch (event_id) {
-      case 1:
-          result = "create_process";
-          break;
-      case 11:
-          result = "create_file";
-          break;
-      case 12:
-      case 13:
-      case 14:
-          result = "registry";
-          break;
-      case 3:
-          result = "net_access";
-          break;
-      case 8:
-          result = "remote_thread";
-          break;
-      case 2:
-          result = "file_create_time";
-          break;
-      case 7:
-          result = "image_loaded";
-          break;
-      case 19:
-      case 20:
-      case 21:
-          result = "wmi";
-          break;
-      default:
-          result = "other";
-      break;
-  }
-
-  return result;
-}
-*/
-
 async function date_to_text(date) {
   var y = await padding(date.getUTCFullYear(), 4, "0"),
       m = await padding(date.getUTCMonth()+1, 2, "0"),

@@ -2,7 +2,7 @@ const makeQuery = require('./make_query');
 
 async function sm_unique_hosts(sysmon, params) {
   var query = await makeQuery(params, sysmon.map);
-
+  query.push({"match":sysmon.channel});
   var uniqueHostObj = {
     //"size": 0,
     "query": {
