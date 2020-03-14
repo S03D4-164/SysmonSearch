@@ -1,5 +1,7 @@
-import vis from 'vis/dist/vis-timeline-graph2d.min'
-import 'vis/dist/vis-timeline-graph2d.min.css'
+//import { DataSet, Graph2d } from "vis-timeline/standalone";
+//import 'vis-timeline/styles/vis-timeline-graph2d.min.css'
+import vis from 'vis-timeline/dist/vis-timeline-graph2d.min'
+import 'vis-timeline/dist/vis-timeline-graph2d.min.css'
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import difference from 'lodash/difference'
@@ -54,8 +56,8 @@ export default class Timeline extends Component {
   componentDidMount() {
     const container = this.chartRef;
 
-    //this.$el = new vis.Timeline(container, undefined, this.props.options)
     var graph2d = new vis.Graph2d(container, undefined, this.props.options)
+    //var graph2d = new Graph2d(container, undefined, this.props.options)
     this.$el = graph2d;
 
     const get_category_name = function (date_str, event) {
@@ -69,7 +71,8 @@ export default class Timeline extends Component {
       //console.log(ids);
       for (var i = 0; i < ids.length; i++) {
         var height = 0;
-        var item = linegraph.itemsData._getItem(ids[i]);
+        //var item = linegraph.itemsData._getItem(ids[i]);
+        var item = linegraph.itemsData.get(ids[i]);
         //console.log(item, date_str);
         if (item.x !== date_str) continue;
 
@@ -179,6 +182,7 @@ export default class Timeline extends Component {
 
     if (groups.length > 0) {
       const groupsDataset = new vis.DataSet()
+      //const groupsDataset = new DataSet()
       groupsDataset.add(groups)
       this.$el.setGroups(groupsDataset)
     }

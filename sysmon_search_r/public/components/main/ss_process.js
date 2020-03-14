@@ -2,7 +2,6 @@ import React, {Component} from 'react';
 import moment from 'moment';
 import chrome from 'ui/chrome'
 
-import Graph from "react-graph-vis";
 import imgProgram from "./images/program.png"
 import imgNet from "./images/net.png"
 

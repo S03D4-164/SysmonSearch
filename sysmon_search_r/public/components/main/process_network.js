@@ -1,5 +1,5 @@
 import React, {Component, Fragment} from "react";
-import Graph from "react-graph-vis";
+import Graph from "./react-graph-vis";
 import chrome from 'ui/chrome';
 
 import imgProgram from "./images/program.png"

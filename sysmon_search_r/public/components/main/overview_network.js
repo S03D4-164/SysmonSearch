@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import Graph from "react-graph-vis";
+import Graph from "./react-graph-vis";
 import imgProgram from "./images/program.png";
 import imgNet from "./images/net.png";
 import imgFile from "./images/file.png";
