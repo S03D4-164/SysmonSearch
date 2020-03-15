@@ -121,10 +121,6 @@ export class SysmonOverView extends Component {
               </EuiFormRow>
             </EuiFlexItem>
             <EuiFlexItem grow={false}>
-              <EuiButton size="s"
-                onClick={ () => this.clickSearch() }>
-                Search
-              </EuiButton>
             </EuiFlexItem>
           </EuiFlexGroup >
 

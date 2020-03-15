@@ -3,6 +3,7 @@ import defaultsDeep from "lodash/fp/defaultsDeep";
 import isEqual from "lodash/isEqual";
 import differenceWith from "lodash/differenceWith";
 import vis from "./dist/vis-network";
+import "./dist/vis-network.css";
 import uuid from "uuid";
 import PropTypes from "prop-types";
 

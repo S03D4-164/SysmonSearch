@@ -155,6 +155,7 @@ export class GraphView extends React.Component {
     var events = {
       oncontext: function (ctx) {
         network.fit();
+        ctx.event.preventDefault();
       },
       doubleClick: function(properties) {
         if (!properties.nodes.length) return;
@@ -235,7 +236,7 @@ export class GraphView extends React.Component {
       },
       physics:false,
       height: "600px",
-      width: "1280px",
+      width: "1200px",
       autoResize: true,
     }
 

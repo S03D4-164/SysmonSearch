@@ -12,7 +12,7 @@ async function make_process_infos(result, target_root, config) {
   for (var index in hits) {
     var item = hits[index]._source;
     var _id = hits[index]._id;
-    //console.log("[make process info item] " + JSON.stringify(item));
+    console.log("[make process info item] " + JSON.stringify(item));
     var winlog = item.winlog;
     var data = winlog.event_data;
 
@@ -98,6 +98,23 @@ async function make_process_infos(result, target_root, config) {
         info_array[data.ProcessGuid].push(tmp);
         info_create_file_array[data.ProcessGuid].push(tmp);
       }
+
+    } else if (winlog.event_id==22){//dns
+      if ((data.ProcessGuid in info_array) == false) {
+          info_array[data.ProcessGuid] = [];
+          info_create_file_array[data.ProcessGuid] = [];
+          info_create_file_time_array[data.ProcessGuid] = [];
+          info_net_array[data.ProcessGuid] = {};
+      }
+      var tmp = {
+          id: winlog.event_id,
+          data: data,
+          type: 'normal',
+          message: item.message,
+          _id: _id
+      };
+      info_array[data.ProcessGuid].push(tmp);
+
     } else if (winlog.event_id!=8){
       if ((data.ProcessGuid in info_array) == false) {
           info_array[data.ProcessGuid] = [];

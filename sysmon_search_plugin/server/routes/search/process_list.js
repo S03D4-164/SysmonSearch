@@ -3,7 +3,7 @@ async function getEventIdFromType(type){
   if (type === 'create_process') return [1];
   else if (type === 'file_create_time') return [2];
   else if (type === 'net_access') return [3];
-  else if (type === 'pocess_terminated') return [5];
+  else if (type === 'process_terminated') return [5];
   else if (type === 'driver_loaded') return [6];
   else if (type === 'image_loaded') return [7];
   else if (type === 'remote_thread') return [8];
@@ -22,7 +22,7 @@ async function getTypeFromEventId(id){
   if (id == 1) return 'create_process';
   else if (id == 2) return 'file_create_time';
   else if (id == 3) return 'net_access';
-  else if (id == 5) return 'pocess_terminated';
+  else if (id == 5) return 'process_terminated';
   else if (id == 6) return 'driver_loaded';
   else if (id == 7) return 'image_loaded';
   else if (id == 8) return 'remote_thread';
@@ -112,7 +112,6 @@ async function processList(sysmon, hostname, eventtype, date, searchObj) {
       };
     } else if(eventtype){
       //const event_id = await getEventIdFromType(eventtype);
-      // pass eventid is better?
       event_id[sysmon.event_id] = await getEventIdFromType(eventtype);
       var query = {
         "bool": {

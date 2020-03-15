@@ -116,6 +116,16 @@ async function get_datas(el_result) {
         tmp['info'] = {
             'User': data.User
         };
+
+    } else if (winlog.event_id == 22) {
+        tmp['type'] = 'dns';
+        tmp['process'] = data.Image;
+        tmp['disp'] = data.QueryName;
+        tmp['info'] = {
+            'QueryStatus': data.QueryStatus,
+            'QueryResult': data.QueryResults,
+        };
+
     } else {
         tmp['type'] = 'other';
         tmp['process'] = tmp["image"];
@@ -134,7 +144,7 @@ async function processDetail(sysmon, hostname, date, guid) {
   pguid[sysmon.map["ProcessGuid"]] = guid;
   var spguid = {};
   spguid[sysmon.map["SourceProcessGuid"]] = guid;
-  var event_ids = [11, 12, 13, 3, 2, 7, 19, 20, 21];
+  var event_ids = [11, 12, 13, 3, 2, 7, 19, 20, 21, 22];
 
   var searchObj = {
     "size": 10000,

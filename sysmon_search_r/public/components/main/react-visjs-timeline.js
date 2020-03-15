@@ -1,7 +1,7 @@
-//import { DataSet, Graph2d } from "vis-timeline/standalone";
-//import 'vis-timeline/styles/vis-timeline-graph2d.min.css'
-import vis from 'vis-timeline/dist/vis-timeline-graph2d.min'
-import 'vis-timeline/dist/vis-timeline-graph2d.min.css'
+import { DataSet, Graph2d } from "./vis-timeline/standalone";
+import './vis-timeline/styles/vis-timeline-graph2d.css'
+//import vis from 'vis-timeline/dist/vis-timeline-graph2d.min'
+//import 'vis-timeline/dist/vis-timeline-graph2d.min.css'
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import difference from 'lodash/difference'
@@ -56,8 +56,8 @@ export default class Timeline extends Component {
   componentDidMount() {
     const container = this.chartRef;
 
-    var graph2d = new vis.Graph2d(container, undefined, this.props.options)
-    //var graph2d = new Graph2d(container, undefined, this.props.options)
+    //var graph2d = new vis.Graph2d(container, undefined, this.props.options)
+    var graph2d = new Graph2d(container, undefined, this.props.options)
     this.$el = graph2d;
 
     const get_category_name = function (date_str, event) {
@@ -111,10 +111,11 @@ export default class Timeline extends Component {
       graph2d.redraw();
     });
 
-    this.$el.on("click", function(event) {
+    this.$el.on("contextmenu", function(event) {
       const click_date = moment(event.time).format("YYYY-MM-DD");
       const category = get_category_name(click_date, event);
       if(category) alert(category);
+　　　event.event.preventDefault();
     });
 
     let hostname = this.props.host;
@@ -181,8 +182,8 @@ export default class Timeline extends Component {
     this.$el.setOptions(timelineOptions)
 
     if (groups.length > 0) {
-      const groupsDataset = new vis.DataSet()
-      //const groupsDataset = new DataSet()
+      //const groupsDataset = new vis.DataSet()
+      const groupsDataset = new DataSet()
       groupsDataset.add(groups)
       this.$el.setGroups(groupsDataset)
     }

@@ -34,8 +34,6 @@ export class SysmonSearchTabs extends Component {
         name: 'Alert',
         content: (
             <Fragment>
-            <SysmonEvents />
-            <SysmonSearch />
             </Fragment>
         ),
       },

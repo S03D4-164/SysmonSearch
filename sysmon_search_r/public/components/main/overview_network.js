@@ -80,7 +80,8 @@ function add_process_info(in_cur, graph, keyword, hash) {
       "image": imgProgram,
       "guid": item.data.ProcessGuid,
       "eventid": 1,
-      "_id": item._id
+      "_id": item._id,
+      "message": null
     };
 
     tmp_node.id = now_id;
@@ -199,6 +200,19 @@ function add_process_info(in_cur, graph, keyword, hash) {
         'User': item.data.User
       };
       tmp_node.eventid = 21;
+    } else if (item.id == 22) {
+      tmp_node.image = imgNet;
+      tmp_node.label = item.data.QueryName;
+      tmp_node.title = item.data.QueryName;
+      tmp_node.info = {
+        "QueryStatus": item.data.QueryStatus,
+        "QueryResults": item.data.QueryResults,
+        "Image": item.data.Image,
+        "ProcessGuid": item.data.ProcessGuid,
+        "QueryName": item.data.QueryName,   
+      };
+      tmp_node.message = item.message;
+      tmp_node.eventid = 22;
     }
 
     if (search(tmp_node.info, keyword, hash) || search(tmp_node.label, keyword, hash)) {
@@ -393,6 +407,7 @@ export class GraphOverView extends Component {
             const view_data_19 = ["User"];
             const view_data_20 = ["User"];
             const view_data_21 = ["User"];
+            const view_data_22 = ["QueryStatus", "QueryResults", "QueryName"];
             var view_data = [];
             if (node.eventid == 1) view_data = view_data_1;
             else if (node.eventid == 11) view_data = view_data_11;
@@ -404,6 +419,7 @@ export class GraphOverView extends Component {
             else if (node.eventid == 19) view_data = view_data_19;
             else if (node.eventid == 20) view_data = view_data_20;
             else if (node.eventid == 21) view_data = view_data_21;
+            else if (node.eventid == 22) view_data = view_data_22;
             var str = "";
             for (var key in node.info) {
               if (view_data.indexOf(key) >= 0) {
@@ -411,6 +427,7 @@ export class GraphOverView extends Component {
                 else str = str + "\n" + key + ":" + node.info[key];
               }
             }
+            if(node.message) str = node.message;
             settxt(str);
           }
         }
@@ -457,8 +474,8 @@ export class GraphOverView extends Component {
         navigationButtons: true,
         keyboard: true
       },
-      width:"960px",
-      height:"540px",
+      width:"1200px",
+      height:"600px",
       physics:false,
     };
 
@@ -487,7 +504,7 @@ export class GraphOverView extends Component {
           </EuiFlexItem>
         </EuiFlexGroup>
         <div>
-          <textarea rows="7" cols="120" readOnly
+          <textarea rows="7" cols="150" readOnly
             placeholder={placeholder}
             value={this.state.textarea}>
           </textarea>

@@ -30,6 +30,14 @@ var Utils = {
             case 21:
                 result = "wmi";
                 break;
+
+            case 22:
+                result = "dns";
+                break;
+            //case 5:
+            //    result = "process_terminated";
+            //    break;
+
             default:
                 result = "other";
             break;
