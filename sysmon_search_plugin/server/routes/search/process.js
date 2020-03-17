@@ -58,11 +58,12 @@ async function find_root_process(cur, list, p_list, index) {
   }
 }
 
-//async function get_datas(process_array, p_process_array) {
-async function get_datas(process_list) {
+async function get_datas(process_array, p_process_array) {
+  //async function get_datas(process_list) {
   //var tmp = make_process_list(datas);
-  var process_array = process_list[0];
-  var p_process_array = process_list[1];
+
+  //var process_array = process_list[0];
+  //var p_process_array = process_list[1];
 
   var info = {
     'CurrentDirectory': '',
@@ -93,7 +94,6 @@ async function get_datas(process_list) {
   };
   console.log("[system root] " + JSON.stringify(system_root, null, 2))
   var process_tree = [];
-  //process_tree.push(system_root); <- why?
 
   var index = 2;
   for (var key_index in process_array) {
@@ -126,6 +126,12 @@ async function make_process_list(el_result, networkInfo) {
   var p_process_array = {};
 
   for (let index in hits) {
+    var item = hits[index]._source;
+    var data = item.winlog.event_data;
+    //console.log(data);
+
+    var key = data.ProcessGuid;
+    var pkey = data.ParentProcessGuid;
 
     var net_info = {};
     if( key in networkInfo ) {
@@ -135,12 +141,6 @@ async function make_process_list(el_result, networkInfo) {
       }
     }
 
-    var item = hits[index]._source;
-    var data = item.winlog.event_data;
-    //console.log(data);
-
-    var key = data.ProcessGuid;
-    var pkey = data.ParentProcessGuid;
     
     var info = {
       'CurrentDirectory': data.CurrentDirectory,
@@ -182,9 +182,10 @@ async function make_process_list(el_result, networkInfo) {
   }
 
   
-  return [process_array, p_process_array]
-  //const process_tree = await get_datas(process_array, p_process_array)
-  //return process_tree;
+  //return [process_array, p_process_array]
+
+  const process_tree = await get_datas(process_array, p_process_array)
+  return process_tree;
 }
 
 async function process(sysmon, hostname, date, searchObj) {
@@ -311,9 +312,11 @@ async function process(sysmon, hostname, date, searchObj) {
 
     //console.log(JSON.stringify(el_result, null, 2));
 
-    const process_list = await make_process_list(el_result, networkInfo);
+     //const process_list = await make_process_list(el_result, networkInfo);
+     const process_tree = await make_process_list(el_result, networkInfo);
     //console.log("process_list: " + JSON.stringify(process_list));
-    const process_tree = await get_datas(process_list);
+    //const process_tree = await get_datas(process_list);
+
     console.log("[process_tree] " + JSON.stringify(process_tree, null, 2));
     return process_tree;
   }
