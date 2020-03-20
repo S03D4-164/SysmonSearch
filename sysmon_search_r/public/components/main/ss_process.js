@@ -13,6 +13,7 @@ import {
   EuiFlexItem,
   EuiFormRow,
   EuiSelect,
+  EuiSpacer,
   EuiFieldText,
 } from '@elastic/eui';
 
@@ -98,7 +99,7 @@ export class SysmonProcess extends Component {
     console.log(this.state)
 
     return (
-      <div id="correlation" style={{minWidth:"1280px",margin:"0 auto"}}>
+      <div id="correlation" style={{maxWidth:"1280px",margin:"0 auto"}}>
 
         <EuiTitle size="s">
           <h3>Event Correlation: {this.state.host}@{this.state.date}</h3>
@@ -109,10 +110,9 @@ export class SysmonProcess extends Component {
           <EuiFlexGroup>
 
             <EuiFlexItem>
-              <EuiFormRow display="columnCompressed" label="Layout">
+              <EuiFormRow label="Layout">
                 <EuiSelect 
                   name="layout"
-                  compressed
                   value={this.state.layout}
                   options={this.layouts}
                   onChange={this.handleChangeLayout} />
@@ -120,19 +120,17 @@ export class SysmonProcess extends Component {
             </EuiFlexItem>
 
             <EuiFlexItem>
-              <EuiFormRow display="columnCompressed" label="Keyword">
+              <EuiFormRow label="Keyword">
                 <EuiFieldText
                   name="keyword"
-                  compressed
                   onChange={this.handleChange} />
               </EuiFormRow>
             </EuiFlexItem>
 
             <EuiFlexItem>
-              <EuiFormRow display="columnCompressed" label="Hash">
+              <EuiFormRow label="Hash">
                 <EuiFieldText
                   name="hash"
-                  compressed
                   onChange={this.handleChangeHash} />
               </EuiFormRow>
             </EuiFlexItem>
@@ -148,6 +146,8 @@ export class SysmonProcess extends Component {
             layout={this.state.layout}
 
           />
+
+          <EuiSpacer />
 
           <EuiButton size="s" href={this.top} iconType="arrowLeft">Top</EuiButton>
           <EuiButton size="s" href={this.stats} iconType="visBarVerticalStacked">Stats</EuiButton>

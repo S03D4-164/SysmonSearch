@@ -1,5 +1,5 @@
-import { DataSet, Graph2d } from "./vis-timeline/standalone";
-import './vis-timeline/styles/vis-timeline-graph2d.css'
+import { DataSet, Graph2d } from "./dist/vis-timeline/standalone";
+import './dist/vis-timeline/styles/vis-timeline-graph2d.css'
 //import vis from 'vis-timeline/dist/vis-timeline-graph2d.min'
 //import 'vis-timeline/dist/vis-timeline-graph2d.min.css'
 import React, { Component } from 'react'

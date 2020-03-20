@@ -82,7 +82,7 @@ async function processList(sysmon, hostname, eventtype, date, searchObj) {
   ];
   if(searchObj==null){
     if (date.length === 23) {
-      event_id[sysmon.event_id] = [1, 11, 12, 13, 3, 8, 2, 7, 19, 20, 21];
+      event_id[sysmon.event_id] = [1, 11, 12, 13, 3, 8, 2, 7, 19, 20, 21, 22];
       //var date_dict = Utils.get_range_datetime(date);
       var date_dict = await getRangeDatetime(date);
       var query = {

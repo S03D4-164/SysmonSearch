@@ -44,11 +44,6 @@ export class SysmonSearch extends Component {
           link += "&date=" + moment(item.utc).format("YYYY-MM-DD");
           return (
             <Fragment>
-              <EuiButtonIcon
-                iconType="visBarVerticalStacked"
-                href={link}
-                aria-label="Event Stats"
-              />
               {utc}
             </Fragment>
           )
@@ -60,15 +55,15 @@ export class SysmonSearch extends Component {
       {
         field: 'pc', name: 'Hostname', width:"20%", sortable:true,
         render: (pc, item) => {
-          let link = chrome.addBasePath('/app/sysmon_search_r/event');
+          let link = chrome.addBasePath('/app/sysmon_search_r/process');
           link += "?host=" + item.pc;
-          link += "&date=" + moment(item.utc).format("YYYY-MM-DD");
+          link += "&date=" + moment(item.utc).format("YYYY-MM-DD HH:mm:ss.SSS");
           return (
             <Fragment>
               <EuiButtonIcon
-                iconType="visPie"
+                iconType="graphApp"
                 href={link}
-                aria-label="Event Pie Chart"
+                aria-label="Process Graph"
               />{pc}
             </Fragment>
           )
@@ -82,7 +77,7 @@ export class SysmonSearch extends Component {
         render: (descr, item) => {
           let link = chrome.addBasePath('/app/sysmon_search_r/process_list');
           link += "?host=" + item.pc;
-          link += "&date=" + moment(item.utc).format("YYYY-MM-DD")
+          link += "&date=" + moment(item.utc).format("YYYY-MM-DD HH:mm:ss.SSS")
           link += "&category=" + descr;
           if(descr=="other") return(<Fragment>{descr}</Fragment>)
           else return (<EuiLink href={link} >{descr}</EuiLink>)
@@ -100,7 +95,7 @@ export class SysmonSearch extends Component {
               <EuiButtonIcon
                 iconType="graphApp"
                 href={link}
-                aria-label="Process Graph"
+                aria-label="Overview Graph"
               />
               {image}
             </Fragment>
@@ -236,6 +231,7 @@ export class SysmonSearch extends Component {
       hidePerPageOptions: false,
     };
 
+    const utc = 0;
     return (
       <EuiPanel>
         <EuiFlexItem>
@@ -250,6 +246,7 @@ export class SysmonSearch extends Component {
                   isInvalid={this.state.startDate > this.state.endDate}
                   aria-label="Start date"
                   showTimeSelect
+                  utcOffset={utc}
                 />
               }
               endDateControl={
@@ -261,6 +258,7 @@ export class SysmonSearch extends Component {
                   isInvalid={this.state.startDate > this.state.endDate}
                   aria-label="End date"
                   showTimeSelect
+                  utcOffset={utc}
                 />
               }
             />

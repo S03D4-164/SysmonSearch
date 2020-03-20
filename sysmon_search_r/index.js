@@ -13,10 +13,6 @@ export default function (kibana) {
         description: 'An awesome Kibana plugin',
         main: 'plugins/sysmon_search_r/app',
       },
-      hacks: [
-        'plugins/sysmon_search_r/hack'
-      ],
-      //styleSheetPaths: [resolve(__dirname, 'public/app.scss'), resolve(__dirname, 'public/app.css')].find(p => existsSync(p)),
     },
 
     config(Joi) {

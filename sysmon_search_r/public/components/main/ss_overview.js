@@ -91,7 +91,7 @@ export class SysmonOverView extends Component {
     //console.log(this.state)
 
     return (
-      <div id="correlation" style={{minWidth:"1280px",margin:"0 auto"}}>
+      <div id="correlation" style={{maxWidth:"1280px",margin:"0 auto"}}>
         <EuiTitle size="s">
           <h3>{this.state.guid} on {this.state.host}@{this.state.date}</h3>
         </EuiTitle>

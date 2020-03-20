@@ -48,7 +48,8 @@ function add_child_info(cur, graph, keyword, hash) {
        tmp_node["color"] = defaultColor;
        tmp_node["borderWidth"] = 1;
     }
-    graph["nodes"].push(tmp_node);
+    if(graph["nodes"].some(e => e.id === tmp_node["id"])) console.log(e.id);
+    else graph["nodes"].push(tmp_node);
 
     var tmp_edge = {
       "from": cur.current.index,
@@ -86,7 +87,7 @@ function add_process_info(in_cur, graph, keyword, hash) {
 
     tmp_node.id = now_id;
     if (item.id == 1) {
-      tmp_node.image = imgProgram;//"../plugins/sysmon_search_visual/images/program.png";
+      tmp_node.image = imgProgram;
       tmp_node.info = {
         'CurrentDirectory': item.data.CurrentDirectory,
         'CommandLine': item.data.CommandLine,
@@ -98,7 +99,7 @@ function add_process_info(in_cur, graph, keyword, hash) {
       };
       tmp_node.eventid = 1;
     } else if (item.id == 11) {
-      tmp_node.image = imgFile;//"../plugins/sysmon_search_visual/images/file.png";
+      tmp_node.image = imgFile;
       tmp_node.label = item.data.TargetFilename;
       tmp_node.title = item.data.TargetFilename;
       tmp_node.info = {
@@ -108,7 +109,7 @@ function add_process_info(in_cur, graph, keyword, hash) {
       };
       tmp_node.eventid = 11;
     } else if ((item.id == 12) || (item.id == 13)) {
-      tmp_node.image = imgReg;//"../plugins/sysmon_search_visual/images/reg.png";
+      tmp_node.image = imgReg;
       tmp_node.label = item.data.TargetObject;
       tmp_node.title = item.data.TargetObject;
       tmp_node.info = {
@@ -120,10 +121,10 @@ function add_process_info(in_cur, graph, keyword, hash) {
       };
       tmp_node.eventid = 12;
     } else if (item.id == 3) {
-      tmp_node.image = imgNet;//"../plugins/sysmon_search_visual/images/net.png";
+      tmp_node.image = imgNet;
       if (item.type === 'alert') {
         // Set Alert Image
-        tmp_node.image = imgNet;//"../plugins/sysmon_search_visual/images/net.png";
+        tmp_node.image = imgNet;
       }
       if (item.data.DestinationHostname === undefined) {
         tmp_node.label = item.data.DestinationIp;
@@ -144,7 +145,7 @@ function add_process_info(in_cur, graph, keyword, hash) {
       };
       tmp_node.eventid = 3;
     } else if (item.id == 8) {
-      tmp_node.image = imgThread;//"../plugins/sysmon_search_visual/images/rthread.png";
+      tmp_node.image = imgThread;
       tmp_node.label = item.data.TargetImage;
       tmp_node.title = item.data.TargetImage;
       tmp_node.info = {
@@ -157,7 +158,7 @@ function add_process_info(in_cur, graph, keyword, hash) {
       tmp_node.eventid = 8;
       tmp_node.guid = item.data.SourceProcessGuid;
     } else if (item.id == 2) {
-      tmp_node.image = imgCreateTime;//"../plugins/sysmon_search_visual/images/file_create_time.png";
+      tmp_node.image = imgCreateTime;
       tmp_node.label = item.data.Image;
       tmp_node.title = item.data.Image;
       tmp_node.info = {
@@ -167,7 +168,7 @@ function add_process_info(in_cur, graph, keyword, hash) {
       };
       tmp_node.eventid = 2;
     } else if (item.id == 7) {
-      tmp_node.image = imgLoaded;//"../plugins/sysmon_search_visual/images/image_loaded.png";
+      tmp_node.image = imgLoaded;
       tmp_node.label = item.data.Image;
       tmp_node.title = item.data.Image;
       tmp_node.info = {
@@ -177,7 +178,7 @@ function add_process_info(in_cur, graph, keyword, hash) {
       };
       tmp_node.eventid = 7;
     } else if (item.id == 19) {
-      tmp_node.image = imgWmi;//"../plugins/sysmon_search_visual/images/wmi.png";
+      tmp_node.image = imgWmi;
       tmp_node.label = item.data.Name+":"+item.data.EventNamespace;
       tmp_node.title = item.data.Name+":"+item.data.EventNamespace;
       tmp_node.info = {
@@ -185,7 +186,7 @@ function add_process_info(in_cur, graph, keyword, hash) {
       };
       tmp_node.eventid = 19;
     } else if (item.id == 20) {
-      tmp_node.image = imgWmi;//"../plugins/sysmon_search_visual/images/wmi.png";
+      tmp_node.image = imgWmi;
       tmp_node.label = item.data.Name;
       tmp_node.title = item.data.Name;
       tmp_node.info = {
@@ -193,7 +194,7 @@ function add_process_info(in_cur, graph, keyword, hash) {
       };
       tmp_node.eventid = 20;
     } else if (item.id == 21) {
-      tmp_node.image = imgWmi;//"../plugins/sysmon_search_visual/images/wmi.png";
+      tmp_node.image = imgWmi
       tmp_node.label = item.data.Consumer;
       tmp_node.title = item.data.Consumer;
       tmp_node.info = {
@@ -225,7 +226,8 @@ function add_process_info(in_cur, graph, keyword, hash) {
        tmp_node["color"] = defaultColor;
        tmp_node["borderWidth"] = 1;
     }
-    graph["nodes"].push(tmp_node);
+    if(graph["nodes"].some(e => e.id === tmp_node["id"])) console.log(e.id);
+    else graph["nodes"].push(tmp_node);
 
     var tmp_edge = {
       "from": cur_id,
@@ -278,7 +280,8 @@ function createNetwork(top, keyword, hash, firstflg) {
        tmp_parent_node["borderWidth"] = 1;
     }
 
-    graph["nodes"].push(tmp_parent_node);
+    if(graph["nodes"].some(e => e.id === tmp_node["id"])) console.log(e.id);
+    else graph["nodes"].push(tmp_parent_node);
 
     var tmp_edge = {
       "from": top.parent.index,
@@ -317,7 +320,8 @@ function createNetwork(top, keyword, hash, firstflg) {
       tmp_node["color"] = defaultColor;
       tmp_node["borderWidth"] = 1;
     }
-    graph["nodes"].push(tmp_node);
+    if(graph["nodes"].some(e => e.id === tmp_node["id"])) console.log(e.id);
+    else graph["nodes"].push(tmp_node);
 
     graph = add_child_info(top, graph, keyword, hash);
     graph = add_process_info(top, graph, keyword, hash);
@@ -453,7 +457,7 @@ export class GraphOverView extends Component {
       configure:{
         enabled: false,
         //filter: 'layout',
-        container: this.configureRef,
+        //container: this.configureRef,
         showButton: false,
       },
       edges: {
@@ -504,7 +508,7 @@ export class GraphOverView extends Component {
           </EuiFlexItem>
         </EuiFlexGroup>
         <div>
-          <textarea rows="7" cols="150" readOnly
+          <textarea rows="7" cols="120" readOnly
             placeholder={placeholder}
             value={this.state.textarea}>
           </textarea>

@@ -1,4 +1,4 @@
-import * as d3 from './dist/d3';
+import * as d3 from './dist/d3.min';
 
 function segColor(c) {
         var color = [

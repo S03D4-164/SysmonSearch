@@ -172,6 +172,7 @@ export class SysmonEvents extends Component {
       hidePerPageOptions: false,
     };
 
+    const utc = 0;
     return (
       <EuiPanel>
         <EuiFlexGroup >
@@ -187,6 +188,7 @@ export class SysmonEvents extends Component {
                     isInvalid={this.state.startDate > this.state.endDate}
                     aria-label="Start date"
                     showTimeSelect
+                    utcOffset={utc}
                   />
                 }
                 endDateControl={
@@ -198,6 +200,7 @@ export class SysmonEvents extends Component {
                     isInvalid={this.state.startDate > this.state.endDate}
                     aria-label="End date"
                     showTimeSelect
+                    utcOffset={utc}
                   />
                 }
               />

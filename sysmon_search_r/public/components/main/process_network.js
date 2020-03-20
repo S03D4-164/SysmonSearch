@@ -41,7 +41,8 @@ function add_child_info(cur, graph, keyword, hash) {
       tmp_node["color"] = defaultColor;
       tmp_node["borderWidth"] = 1;
     }
-    graph["nodes"].push(tmp_node);
+    if(graph["nodes"].some(e => e.id === tmp_node["id"])) console.log(e.id);
+    else graph["nodes"].push(tmp_node);
 
     var tmp_edge = {
       "from": cur.current.index,
@@ -66,7 +67,9 @@ function add_child_info(cur, graph, keyword, hash) {
         "info": item.current.info
       };
       //if( n_item > 100) {}
+      if(graph["nodes"].some(e => e.id === tmp_node["id"])) console.log(e.id);
       graph["nodes"].push(tmp_node);
+
       var tmp_edge = {
         "from": item.current.index,
         "to": n_index,
@@ -105,7 +108,9 @@ function createNetwork(tops, keyword, hash, firstflg) {
       tmp_node["color"] = defaultColor;
       tmp_node["borderWidth"] = 1;
     }
-    graph["nodes"].push(tmp_node);
+    if(graph["nodes"].some(e => e.id === tmp_node["id"])) console.log(e.id);
+    else graph["nodes"].push(tmp_node);
+
     graph = add_child_info(top, graph, keyword, hash);
   }
   return graph;
@@ -255,7 +260,7 @@ export class GraphView extends React.Component {
           events={this.state.events}
           getNetwork={this.setNetwork}
         />
-        <textarea rows="7" cols="150" readOnly placeholder="click node." value={this.state.textarea}></textarea>
+        <textarea rows="7" cols="120" readOnly placeholder="click node." value={this.state.textarea}></textarea>
       </Fragment>
     )
   }
