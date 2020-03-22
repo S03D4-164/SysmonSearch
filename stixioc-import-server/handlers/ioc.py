@@ -17,7 +17,7 @@ from mixbox import idgen, namespaces
 from stix.core import STIXPackage as STIXPackage_v1
 from openioc2stix.translate import to_stix
 
-from base import BaseConvertHandler
+from .base import BaseConvertHandler
 import common
 
 class IoCConvertHandler(BaseConvertHandler):

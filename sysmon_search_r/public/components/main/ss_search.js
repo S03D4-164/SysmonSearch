@@ -1,6 +1,7 @@
 import React, {Component, Fragment} from 'react';
 import moment from 'moment';
 import chrome from 'ui/chrome';
+import {saveRules} from './search_rules';
 
 import {
   EuiBasicTable,
@@ -124,6 +125,27 @@ export class SysmonSearch extends Component {
     this.handleAddFields = this.handleAddFields.bind(this);
     this.handleRemoveFields = this.handleRemoveFields.bind(this);
     this.handleInputChange = this.handleInputChange.bind(this);
+  }
+
+  clickSave(){
+    console.log(this.state);
+    var data = {
+      fm_start_date: moment(this.state.startDate),
+      fm_end_date: moment(this.state.endDate),
+      search_conjunction: Number(this.state.conjunction),
+    };
+    const inputs = this.state.inputFields;
+    for (let index in inputs) {
+      if (inputs[index].item && inputs[index].value){
+        let id = index + 1;
+        let searchItem = "search_item_" + Number(id).toString();
+        data[searchItem] = inputs[index].item;
+        let searchValue = "search_value_" + Number(id).toString();
+        data[searchValue] = inputs[index].value;
+      }
+    }
+    console.log(data);
+    saveRules(data);
   }
 
   clickSearch(){
@@ -316,6 +338,13 @@ export class SysmonSearch extends Component {
               onClick={() => this.handleAddFields()}
             >ADD</EuiButton>
           </EuiFlexItem>
+
+          <EuiFlexItem grow={false}>
+            <EuiButton size="s"
+              onClick={() => this.clickSave() }
+            >SAVE</EuiButton>
+          </EuiFlexItem>
+
           <EuiFlexItem grow={false}>
             <EuiButton size="s"
               onClick={ () => this.clickSearch() }
