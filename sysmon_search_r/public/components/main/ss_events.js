@@ -71,6 +71,7 @@ export class SysmonEvents extends Component {
               event: "sysmon_search_r/event" + params,
               stats: "sysmon_search_r/stats" + params,
               process: "sysmon_search_r/process" + params,
+              visualize: "sysmon_search_r/visualize" + params,
             };
             items.push(item);
           });
@@ -115,11 +116,6 @@ export class SysmonEvents extends Component {
         name: 'Date',
         render: (date, item) => (
           <Fragment>
-            <EuiButtonIcon
-              href={item.stats} 
-              iconType="visBarVerticalStacked"
-              aria-label="Event Stats"
-            />
             {date}
           </Fragment>
         )
@@ -130,11 +126,6 @@ export class SysmonEvents extends Component {
         sortable: true,
         render: (pc, item) => (
           <Fragment>
-            <EuiButtonIcon
-              href={item.process} 
-              iconType="graphApp"
-              aria-label="Process Graph"
-            />
             {pc}
           </Fragment>
         )
@@ -145,14 +136,37 @@ export class SysmonEvents extends Component {
         sortable: true,
         render: (count, item) => (
           <Fragment>
-            <EuiButtonIcon
-              href={item.event}
-              iconType="visPie"
-              aria-label="Event Pie Chart"
-            />
             {count}
           </Fragment>
         )
+      },
+      {
+        field: 'visualize',
+        name: 'Visualize',
+        render: (visualize, item) => {
+         const summary = visualize + "&type=summary";
+         const stats = visualize + "&type=stats";
+         const process = visualize + "&type=process";
+         return (
+          <Fragment>
+            <EuiButtonIcon
+              href={summary}
+              iconType="visPie"
+              aria-label="Event Pie Chart"
+            />
+            <EuiButtonIcon
+              href={stats} 
+              iconType="visBarVerticalStacked"
+              aria-label="Event Stats"
+            />
+            <EuiButtonIcon
+              href={process} 
+              iconType="graphApp"
+              aria-label="Process Graph"
+            />
+          </Fragment>
+          )
+        }
       }
     ];
 
@@ -176,9 +190,9 @@ export class SysmonEvents extends Component {
     return (
       <EuiPanel>
         <EuiFlexGroup >
-          <EuiFlexItem style={{ minWidth: 400 }}>
+          <EuiFlexItem  style={{ minWidth: 500 }}>
             <EuiFormRow label="Date">
-              <EuiDatePickerRange
+              <EuiDatePickerRange style={{ minWidth: 500 }}
                 startDateControl={
                   <EuiDatePicker
                     selected={this.state.startDate}

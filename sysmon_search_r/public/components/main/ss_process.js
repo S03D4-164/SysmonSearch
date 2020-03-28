@@ -24,10 +24,12 @@ import {GraphView} from './process_network';
 export class SysmonProcess extends Component {
   constructor(props){
     super(props);
-    const params = qs.parse(this.props.location.search);
+    //const params = qs.parse(this.props.location.search);
     this.state = {
-      host: params.host,
-      date: params.date,
+      //host: params.host,
+      //date: params.date,
+      host: this.props.host,
+      date: this.props.date,
       tops:[],
       keyword:null,
       hash:null,
@@ -46,8 +48,10 @@ export class SysmonProcess extends Component {
     ]
 
     this.top = chrome.addBasePath('/app/sysmon_search_r');
-    this.stats = this.top + '/stats' + this.props.location.search;
-    this.summary = this.top + '/event' + this.props.location.search;
+    //this.stats = this.top + '/stats' + this.props.location.search;
+    //this.summary = this.top + '/event' + this.props.location.search;
+    this.stats = this.top + "/visualize&type=stats&date=" + this.props.date + "&host=" + this.props.host;
+    this.summary = this.top + "/visualize&type=summary&date=" + this.props.date + "&host=" + this.props.host;
 
     this.handleChange = this.handleChange.bind(this);
     this.handleChangeHash = this.handleChangeHash.bind(this);

@@ -256,7 +256,8 @@ export default function (server) {
     method: 'GET',
     async handler(req) {
       var params = req.params;
-      console.log(`get_alert params: ${params}`);
+      //console.log(`get_alert params: ${params}`);
+      console.log("get_alert params: "+ JSON.stringify(params));
       const {getAlert} = require('./search/alert_rule');
       const result = await getAlert(params);
       //const result = await sysmon_search_obj.get_alert_rule_file_list(params);

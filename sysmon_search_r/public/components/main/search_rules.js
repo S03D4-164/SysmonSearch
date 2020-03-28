@@ -64,9 +64,7 @@ function save_rules (keywords) {
       'kbn-xsrf': 'true',
       'Content-Type': 'application/json',
     },
-    body:JSON.stringify({
-      contents: rules
-    })
+    body:JSON.stringify(rules)
   })
   .then((response) => response.json())
   .then((responseJson) => {

@@ -17,18 +17,23 @@ import './ss_stats.css'
 export class SysmonStats extends Component {
   constructor(props){
     super(props);
-    const params = qs.parse(this.props.location.search);
+    //const params = qs.parse(this.props.location.search);
     this.state = {
-      host: params.host,
-      date: params.date,
+      //host: params.host,
+      //date: params.date,
+      host: this.props.host,
+      date: this.props.date,
       items:[],
       options:{},
       groups:[],
       category:[]
     };
     this.top = chrome.addBasePath('/app/sysmon_search_r');
-    this.summary = this.top + '/event' + this.props.location.search;
-    this.process = this.top + '/process' + this.props.location.search;
+    //this.summary = this.top + '/event' + this.props.location.search;
+    //this.process = this.top + '/process' + this.props.location.search;
+    this.summary = this.top + "/visualize&type=summary&date=" + this.props.date + "&host=" + this.props.host;
+    this.process = this.top + "/visualize&type=process&date=" + this.props.date + "&host=" + this.props.host;
+
   }
 
   componentDidMount(){

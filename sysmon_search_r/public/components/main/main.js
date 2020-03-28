@@ -15,6 +15,7 @@ import { SysmonProcess } from './ss_process';
 import { SysmonProcessList } from './ss_processlist';
 import { SysmonOverView } from './ss_overview';
 import { SysmonDetail } from './ss_detail';
+import { SysmonVisualize } from './ss_visualize';
 
 export class Main extends React.Component {
 
@@ -28,6 +29,7 @@ export class Main extends React.Component {
       <Router>
         <Switch>
           <Route exact path="/app/sysmon_search_r" component={SysmonSearchTabs} />
+          <Route exact path="/app/sysmon_search_r/visualize" component={SysmonVisualize} />
           <Route exact path="/app/sysmon_search_r/event" component={SysmonSummary} />
           <Route exact path="/app/sysmon_search_r/stats" component={SysmonStats} />
           <Route exact path="/app/sysmon_search_r/process" component={SysmonProcess} />

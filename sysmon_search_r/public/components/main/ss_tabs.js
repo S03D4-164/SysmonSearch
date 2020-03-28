@@ -9,6 +9,7 @@ import {
 
 import { SysmonEvents } from "./ss_events";
 import { SysmonSearch } from "./ss_search";
+import { SysmonAlert } from "./ss_alert";
 
 export class SysmonSearchTabs extends Component {
   constructor(props) {
@@ -33,8 +34,7 @@ export class SysmonSearchTabs extends Component {
         id: 'alert',
         name: 'Alert',
         content: (
-            <Fragment>
-            </Fragment>
+            <SysmonAlert />
         ),
       },
     ];
@@ -42,10 +42,14 @@ export class SysmonSearchTabs extends Component {
 
   render() {
     return (
+      <div id="tab" style={{maxWidth:"1280px",margin:"0 auto"}}>
+
       <EuiTabbedContent
         tabs={this.tabs}
         initialSelectedTab={this.tabs[0]}
       />
+
+      </div>
     );
   }
 }

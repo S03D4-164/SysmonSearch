@@ -2,7 +2,8 @@ function set_wildcard_value(search_items, key, params, num) {
   var match = {};
   if ("search_value_" + num in params
       && typeof params["search_value_" + num] !== "undefined") {
-    match[key] = "*" + str_escape(params["search_value_" + num].toLowerCase()) + "*";
+    //match[key] = "*" + str_escape(params["search_value_" + num].toLowerCase()) + "*";
+    match[key] = "*" + str_escape(params["search_value_" + num]) + "*";
     search_items.push({"wildcard": match});
   }
   return search_items;

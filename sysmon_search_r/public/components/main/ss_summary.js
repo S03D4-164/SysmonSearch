@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, {Component, Fragment} from 'react';
 import chrome from 'ui/chrome';
 
 import {
@@ -18,17 +18,23 @@ import {pieChart, segColor} from './pie_chart';
 export class SysmonSummary extends Component {
   constructor(props){
     super(props);
+    /*
     const params = qs.parse(this.props.location.search)
+    const host = this.props.host?this.props.host:params.host;
+    const date = this.props.date?this.props.date:params.date;
+    */
     this.state = {
-      host: params.host,
-      date: params.date,
+      host: this.props.host,
+      date: this.props.date,
       items:[],
       total:0
     };
     this.chartRef = React.createRef();
     this.top = chrome.addBasePath('/app/sysmon_search_r');
-    this.stats = this.top + "/stats" + this.props.location.search;
-    this.process = this.top + "/process" + this.props.location.search;
+    //this.stats = this.top + "/stats" + this.props.location.search;
+    //this.process = this.top + "/process" + this.props.location.search;
+    this.stats = this.top + "/visualize&type=stats&date=" + this.props.date + "&host=" + this.props.host;
+    this.process = this.top + "/visualize&type=process&date=" + this.props.date + "&host=" + this.props.host;
   }
 
   componentDidMount(){
@@ -103,21 +109,23 @@ export class SysmonSummary extends Component {
 
     return (
 
-      <div id="summary" style={{maxWidth:"1280px",margin:"0 auto"}}>
+        <Fragment>
 
         <EuiTitle size="s">
           <h3>Event Summary: {this.state.host}@{this.state.date}</h3>
         </EuiTitle>
 
-        <EuiPanel><EuiText size="m">
+        <EuiPanel>
+
+          <EuiText size="m">
 
           <EuiFlexGroup>
 
-            <EuiFlexItem grow={false}>
+            <EuiFlexItem grow={false} style={{marginLeft:"auto"}}>
               <div id="piechart" ref={cr => this.chartRef = cr}></div>
             </EuiFlexItem>
 
-            <EuiFlexItem grow={false}>
+            <EuiFlexItem grow={false} style={{marginRight:"auto"}}>
               <table className="legend">
                 <thead><tr>
                   <th>Type</th>
@@ -144,8 +152,11 @@ export class SysmonSummary extends Component {
           <EuiButton size="s" href={this.stats} iconType="visBarVerticalStacked">Stats</EuiButton>
           <EuiButton size="s" href={this.process} iconType="graphApp">Process</EuiButton>
       
-        </EuiText></EuiPanel>
-      </div>
+          </EuiText>
+
+        </EuiPanel>
+
+        </Fragment>
     )
   }
 };

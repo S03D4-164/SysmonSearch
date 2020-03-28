@@ -286,7 +286,10 @@ def search(client, query, get_size, search_after):
     if search_after != None:
         query["search_after"] = search_after
 
-    print("### SEARCH query=[%s] ######" % (json.dumps(query)))
+    print("### SEARCH index=[%s] query=[%s] ######" % (
+      setting.INDEX_NAME_ORG + "-*",
+      json.dumps(query, indent=2)
+    ))
     response = client.search(
         index = setting.INDEX_NAME_ORG + "-*",
         body = query
@@ -353,7 +356,7 @@ def registration(data, rule):
             continue
 
         obj = hit["_source"]
-        print(obj)
+        #print(obj)
         try :
             if "_index" in hit: new_obj['original_index'] = hit['_index']
             if "_type" in hit: new_obj['original_type'] = hit['_type']
