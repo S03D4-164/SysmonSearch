@@ -52,11 +52,15 @@ function save_rules (keywords) {
     }
 
   } else {
-    alert("no rule");
+    alert("Invalid rule.");
     return ;
   }
 
   console.log(rules);
+  if(rules.patterns.length===0){
+    alert("Pattern is empty.");
+    return;
+  }
   const api = chrome.addBasePath('/api/sysmon-search-plugin/save_alert_rules');
   fetch(api, {
     method:"POST",

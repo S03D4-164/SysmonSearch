@@ -9,6 +9,7 @@ import {
   EuiPanel,
   EuiSelect,
   EuiFieldText,
+  EuiFilePicker,
   EuiDatePicker,
   EuiDatePickerRange,
   EuiButton,
@@ -34,6 +35,7 @@ export class SysmonSearch extends Component {
       pageIndex: 0,
       pageSize: 100,
       showPerPageOptions: true,
+      file:null,
     };
 
     this.columns = [
@@ -125,9 +127,65 @@ export class SysmonSearch extends Component {
     this.handleAddFields = this.handleAddFields.bind(this);
     this.handleRemoveFields = this.handleRemoveFields.bind(this);
     this.handleInputChange = this.handleInputChange.bind(this);
+    this.setFile = this.setFile.bind(this);
+  }
+
+  setFile(result){
+    const file = JSON.parse(result);
+    console.log(file)
+    if((file.operator==="AND"||file.operator==="OR")&&file.patterns){
+      this.setState({
+        file:file,
+      });
+    }else{
+      alert("Invalid File.");
+    }
+  }
+
+  loadFile(file){
+    const setFile = this.setFile; 
+    console.log(file)
+    var reader = new FileReader();
+    reader.onload = function(){
+      if(reader.result) setFile(reader.result);
+    }
+    if(file.length===1)reader.readAsText(file[0]);
+  }
+
+  clickLoad(){
+    const file = this.state.file;
+    if(file===null){
+      alert("Please select a valid rule file.");
+      return;
+    }
+    const conjunction = (file.operator==='AND')?1:2;
+    var inputFields = [];
+    const dict = {
+      'IpAddress':1,
+      'Port':2,
+      'HostName':3,
+      'ProcessName':4,
+      'FileName':5,
+      'RegistryKey':6,
+      'RegistryValue':7,
+      'Hash':8
+    }
+    for(let index in file.patterns){
+      const field = {
+        item: dict[file.patterns[index].key],
+        value: file.patterns[index].value,
+      } 
+      inputFields.push(field);
+    }
+    this.setState({
+      inputFields:inputFields,
+      conjunction:conjunction,
+    });
   }
 
   clickSave(){
+    const res = confirm("Are you sure?");
+    if(res===false)return;
     console.log(this.state);
     var data = {
       fm_start_date: moment(this.state.startDate),
@@ -158,7 +216,7 @@ export class SysmonSearch extends Component {
     const inputs = this.state.inputFields;
     for (let index in inputs) {
       if (inputs[index].item && inputs[index].value){
-        let id = index + 1;
+        let id = Number(index) + 1;
         let searchItem = "search_item_" + Number(id).toString();
         data[searchItem] = inputs[index].item;
         let searchValue = "search_value_" + Number(id).toString();
@@ -323,9 +381,9 @@ export class SysmonSearch extends Component {
 
         <EuiFlexGroup >
 
-          <EuiFlexItem grow={false}>
+          <EuiFlexItem grow={false} style={{minWidth:300}}>
             <EuiFormRow display="columnCompressed" label="Conjunction" >
-              <EuiSelect name="conjunction" compressed
+              <EuiSelect name="conjunction" compressed style={{maxWidth:100}}
                 value={this.state.conjunction}
                 options={this.conjunctions}
                 onChange={this.handleChangeConjunction}
@@ -339,11 +397,6 @@ export class SysmonSearch extends Component {
             >ADD</EuiButton>
           </EuiFlexItem>
 
-          <EuiFlexItem grow={false}>
-            <EuiButton size="s"
-              onClick={() => this.clickSave() }
-            >SAVE</EuiButton>
-          </EuiFlexItem>
 
           <EuiFlexItem grow={false}>
             <EuiButton size="s"
@@ -353,6 +406,38 @@ export class SysmonSearch extends Component {
           <EuiFlexItem >
             <EuiText><h3>Total: {this.state.total.value}</h3></EuiText>
           </EuiFlexItem >
+        </EuiFlexGroup >
+
+        <EuiSpacer size="m" />
+
+        <EuiFlexGroup >
+          <EuiFlexItem grow={false}>
+          <EuiText>Detection Rule</EuiText>
+          </EuiFlexItem>
+          <EuiFlexItem grow={false}>
+            <EuiButton size="s" 
+              onClick={() => this.clickSave() }
+            >SAVE</EuiButton>
+          </EuiFlexItem>
+          <EuiFlexItem grow={false}>
+            <EuiButton size="s" 
+              onClick={() => this.clickLoad() }
+            >LOAD</EuiButton>
+          </EuiFlexItem >
+          <EuiFlexItem grow={false}>
+            <EuiFilePicker
+              display="default"
+              initialPromptText="Select saved json file"
+              onChange={file => {
+                this.loadFile(file);
+              }}
+            />
+          </EuiFlexItem >
+          <EuiFlexItem grow={false}>
+            <EuiButton size="s" 
+              onClick={() => this.clickSave() }
+            >DELETE</EuiButton>
+          </EuiFlexItem>
         </EuiFlexGroup >
 
         <EuiSpacer size="m"/>
