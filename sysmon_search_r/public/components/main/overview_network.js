@@ -3,7 +3,7 @@ import Graph from "./react-graph-vis";
 import imgProgram from "./images/program.png";
 import imgNet from "./images/net.png";
 import imgFile from "./images/file.png";
-import imgFileCreateTime from "./images/file_create_time.png";
+import imgCreateTime from "./images/file_create_time.png";
 import imgLoaded from "./images/image_loaded.png";
 import imgReg from "./images/reg.png";
 import imgRegCategory from "./images/reg_category.png";

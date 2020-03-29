@@ -14,6 +14,7 @@ import {
 
 const qs = require('query-string');
 import {pieChart, segColor} from './pie_chart';
+import {SysmonProcessList} from './ss_processlist';
 
 export class SysmonSummary extends Component {
   constructor(props){
@@ -27,7 +28,9 @@ export class SysmonSummary extends Component {
       host: this.props.host,
       date: this.props.date,
       items:[],
-      total:0
+      total:0,
+      category:this.props.category,
+      processList:null,
     };
     this.chartRef = React.createRef();
     this.top = chrome.addBasePath('/app/sysmon_search_r');
@@ -35,6 +38,10 @@ export class SysmonSummary extends Component {
     //this.process = this.top + "/process" + this.props.location.search;
     this.stats = this.top + "/visualize&type=stats&date=" + this.props.date + "&host=" + this.props.host;
     this.process = this.top + "/visualize&type=process&date=" + this.props.date + "&host=" + this.props.host;
+
+    this.setCategory = this.setCategory.bind(this);
+    //this.summaryLegend = this.summaryLegend.bind(this);
+
   }
 
   componentDidMount(){
@@ -56,7 +63,7 @@ export class SysmonSummary extends Component {
       console.log(JSON.stringify(responseJson));
       var item = responseJson["count"];
       var freqData = item;
-      pieChart(this.chartRef, freqData, false, 400);
+      pieChart(this.chartRef, freqData, false, 300);
       var items = [];
       var total = 0;
       for (let [key, value] of Object.entries(item)) {
@@ -76,7 +83,22 @@ export class SysmonSummary extends Component {
     });
   }
 
+  setCategory(category){
+    const processList = (
+      <SysmonProcessList
+        host={this.state.host}
+        date={this.state.date}
+        category={category}
+      />
+    )
+    this.setState({
+      category:category,
+      processList: processList,
+    });
+  }
+
   summaryLegend = (items, total, host, date) => {
+    const setCategory = this.setCategory;
     return items.map(function(item, i){
       if (item.value<=0) return;
       let percentage = item.value / total * 100;
@@ -94,8 +116,9 @@ export class SysmonSummary extends Component {
       return(
       <tr key={item.type}>
         <td>
-          <div className="square" style={style}></div>
-          <a href={processlist}>{item.type}</a>
+          <div className="square" style={style}>
+          </div>
+          <a onClick={()=>setCategory(item.type)}>{item.type}</a>
         </td>
         <td align="right">{item.value}</td>
         <td align="right">{percentage.toFixed(2)}%</td>
@@ -148,13 +171,11 @@ export class SysmonSummary extends Component {
             </EuiFlexItem>
           </EuiFlexGroup>
 
-          <EuiButton size="s" href={this.top} iconType="arrowLeft">Top</EuiButton>
-          <EuiButton size="s" href={this.stats} iconType="visBarVerticalStacked">Stats</EuiButton>
-          <EuiButton size="s" href={this.process} iconType="graphApp">Process</EuiButton>
-      
           </EuiText>
 
         </EuiPanel>
+
+        {this.state.processList}
 
         </Fragment>
     )

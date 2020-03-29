@@ -2,9 +2,6 @@ import React, { Component, Fragment } from 'react';
 
 import {
   EuiTabbedContent,
-  EuiTitle,
-  EuiText,
-  EuiSpacer,
 } from '@elastic/eui';
 
 import { SysmonSummary } from "./ss_summary";
@@ -18,14 +15,13 @@ export class SysmonVisualize extends Component {
   constructor(props) {
     super(props);
     const params = qs.parse(this.props.location.search);
-    let tabIndex = 0;
-    if (params.type==="stats")tabIndex = 1;
-    else if (params.type==="process")tabIndex = 2;
+    this.tabIndex = 0;
+    if (params.type==="stats")this.tabIndex = 1;
+    else if (params.type==="process")this.tabIndex = 2;
     this.state = {
       host: params.host,
       date: params.date,
       type: params.type,
-      tabIndex: tabIndex
     }
 
     this.tabs = [

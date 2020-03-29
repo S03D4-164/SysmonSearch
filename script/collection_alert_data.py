@@ -286,8 +286,10 @@ def search(client, query, get_size, search_after):
     if search_after != None:
         query["search_after"] = search_after
 
-    print("### SEARCH index=[%s] query=[%s] ######" % (
+    print("### SEARCH index=[%s] get_size=[%s] offset=[%s] query=[%s]" % (
       setting.INDEX_NAME_ORG + "-*",
+      get_size,
+      search_after,
       json.dumps(query, indent=2)
     ))
     response = client.search(
@@ -394,7 +396,9 @@ try :
 
         total = search(client, query, 0, None)
         total_size = total['hits']['total']['value']
-        print("### Total size [%s] ######" % (total_size))
+        print("### Total size [%s] / Max get size [%s] ######" % (
+          total_size, setting.MAX_GET_SIZE
+        ))
 
         if total_size > setting.MAX_GET_SIZE:
             roop_count = 0

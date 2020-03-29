@@ -381,9 +381,9 @@ export class SysmonSearch extends Component {
 
         <EuiFlexGroup >
 
-          <EuiFlexItem grow={false} style={{minWidth:300}}>
+          <EuiFlexItem grow={true} style={{maxWidth:300}}>
             <EuiFormRow display="columnCompressed" label="Conjunction" >
-              <EuiSelect name="conjunction" compressed style={{maxWidth:100}}
+              <EuiSelect name="conjunction" compressed 
                 value={this.state.conjunction}
                 options={this.conjunctions}
                 onChange={this.handleChangeConjunction}
@@ -399,33 +399,17 @@ export class SysmonSearch extends Component {
 
 
           <EuiFlexItem grow={false}>
-            <EuiButton size="s"
-              onClick={ () => this.clickSearch() }
-            >Search</EuiButton>
-          </EuiFlexItem>
-          <EuiFlexItem >
-            <EuiText><h3>Total: {this.state.total.value}</h3></EuiText>
-          </EuiFlexItem >
-        </EuiFlexGroup >
-
-        <EuiSpacer size="m" />
-
-        <EuiFlexGroup >
-          <EuiFlexItem grow={false}>
-          <EuiText>Detection Rule</EuiText>
-          </EuiFlexItem>
-          <EuiFlexItem grow={false}>
             <EuiButton size="s" 
               onClick={() => this.clickSave() }
-            >SAVE</EuiButton>
+            >Save as detection rule</EuiButton>
           </EuiFlexItem>
           <EuiFlexItem grow={false}>
             <EuiButton size="s" 
               onClick={() => this.clickLoad() }
-            >LOAD</EuiButton>
+            >Load rule file</EuiButton>
           </EuiFlexItem >
           <EuiFlexItem grow={false}>
-            <EuiFilePicker
+            <EuiFilePicker compressed
               display="default"
               initialPromptText="Select saved json file"
               onChange={file => {
@@ -434,11 +418,23 @@ export class SysmonSearch extends Component {
             />
           </EuiFlexItem >
           <EuiFlexItem grow={false}>
-            <EuiButton size="s" 
-              onClick={() => this.clickSave() }
-            >DELETE</EuiButton>
           </EuiFlexItem>
         </EuiFlexGroup >
+
+        <EuiSpacer size="m" />
+
+        <EuiFlexGroup >
+          <EuiFlexItem grow={false}>
+            <EuiButton fill 
+              iconType="search"
+              onClick={ () => this.clickSearch() }
+            >Search</EuiButton>
+          </EuiFlexItem>
+          <EuiFlexItem >
+            <EuiText><h3>Total: {this.state.total.value}</h3></EuiText>
+          </EuiFlexItem >
+        </EuiFlexGroup >
+
 
         <EuiSpacer size="m"/>
 

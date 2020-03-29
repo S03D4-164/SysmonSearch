@@ -111,10 +111,6 @@ export class SysmonStats extends Component {
             host={this.state.host}
           />
 
-          <EuiButton size="s" href={this.top} iconType="arrowLeft">Top</EuiButton>
-          <EuiButton size="s" href={this.summary} iconType="visPie">Summary</EuiButton>
-          <EuiButton size="s" href={this.process} iconType="graphApp">Process</EuiButton>
-
         </EuiPanel>
       </div>
     )

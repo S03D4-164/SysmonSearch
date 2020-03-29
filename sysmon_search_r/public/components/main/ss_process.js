@@ -24,12 +24,19 @@ import {GraphView} from './process_network';
 export class SysmonProcess extends Component {
   constructor(props){
     super(props);
-    //const params = qs.parse(this.props.location.search);
+    var host, date;
+    if(this.props.location){
+      const params = qs.parse(this.props.location.search);
+      host = params.host;
+      date = params.date;
+    }
+    if(this.props.host) host = this.props.host;
+    if(this.props.date) date = this.props.date;
     this.state = {
-      //host: params.host,
-      //date: params.date,
-      host: this.props.host,
-      date: this.props.date,
+      host: host,
+      date: date,
+      //host: this.props.host,
+      //date: this.props.date,
       tops:[],
       keyword:null,
       hash:null,
@@ -152,10 +159,6 @@ export class SysmonProcess extends Component {
           />
 
           <EuiSpacer />
-
-          <EuiButton size="s" href={this.top} iconType="arrowLeft">Top</EuiButton>
-          <EuiButton size="s" href={this.stats} iconType="visBarVerticalStacked">Stats</EuiButton>
-          <EuiButton size="s" href={this.summary} iconType="visPie">Summary</EuiButton>
 
         </EuiPanel>
       </div>

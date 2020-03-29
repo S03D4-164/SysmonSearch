@@ -10,21 +10,35 @@ import {
   EuiText,
   EuiPanel,
   EuiButton,
+  EuiButtonEmpty,
   EuiFlexGroup,
   EuiFlexItem,
   EuiFlexRow,
   EuiFormRow,
   EuiFieldText,
+  EuiSelect
 } from '@elastic/eui';
 
 export class SysmonProcessList extends React.Component {
   constructor(props){
     super(props);
-    const params = qs.parse(this.props.location.search);
+    var host, date, category;
+    if(this.props.location){
+      const params = qs.parse(this.props.location.search);
+      host = params.host;
+      date = params.date;
+      category = params.category;
+    }
+    if (this.props.host) host = this.props.host;
+    if (this.props.date) date = this.props.date;
+    if (this.props.category) category = this.props.category;
     this.state = {
-      host: params.host,
-      date: params.date,
-      category: params.category,
+      host: host,
+      date: date,
+      category: category,
+      //host: this.props.host,
+      //date: this.props.date,
+      //category: this.props.category,
       items:[],
       sortField: 'date',
       sortDirection: 'asc',
@@ -70,13 +84,22 @@ export class SysmonProcessList extends React.Component {
         <EuiLink href={item.link} >{disp}</EuiLink>
       )
     },
-  ];
+    ];
+
+    this.categoryOptions = [
+      {value:"create_process", text:"create_process"},
+      {value:"dns", text:"dns"}
+    ]
 
     this.handleChange = this.handleChange.bind(this);
     this.handleChangeHash = this.handleChangeHash.bind(this);
+    this.handleChangeCategory = this.handleChangeCategory.bind(this);
     this.filterList = this.filterList.bind(this);
     this.getItems = this.getItems.bind(this);
+    this.clickSearch = this.clickSearch.bind(this);
 
+    this.top = chrome.addBasePath('/app/sysmon_search_r');
+    //this.summary = this.top + "/visualize" + this.props.location.search;
   }
 
   handleChange (event) {
@@ -133,15 +156,24 @@ export class SysmonProcessList extends React.Component {
     this.getItems();
   }
 
+  componentDidUpdate(prevProps) {
+    if (this.props.category !== prevProps.category) {
+      this.getItems(this.props.category);
+    }
+  }
+
   clickSearch(){
     this.getItems();
   }
 
-  getItems(){
+  getItems(category){
+    if(!category)category=this.state.category
     let api = chrome.addBasePath('/api/sysmon-search-plugin/process_list');
     api += '/' + this.state.host;
-    api += '/' + this.state.category;
+    //api += '/' + this.state.category;
+    api += '/' + category;
     api += '/' + this.state.date;
+    console.log(api)
     const items = fetch(api, {
       method:"GET",
       headers: {
@@ -170,7 +202,11 @@ export class SysmonProcessList extends React.Component {
           };
           items.push(item);
         });
-        this.setState({items:items, total:items.length});
+        this.setState({
+          category:category,
+          items:items,
+          total:items.length
+        });
     })
     .catch((error) =>{
       console.error(error);
@@ -178,7 +214,15 @@ export class SysmonProcessList extends React.Component {
     return items;
   }
 
+  handleChangeCategory = event => {
+    const category = event.target.value;
+    //this.setState({ category: category });
+    this.getItems(category);
+  }
+
   render(){
+    if(!this.state.category)return(<div></div>);
+    //else console.log(this.state.category)
     const sorting = {
       sort: {
         field: this.state.sortField,
@@ -209,25 +253,28 @@ export class SysmonProcessList extends React.Component {
 <EuiTitle size="s">
 <h3>{this.state.category} on {this.state.host}@{this.state.date}</h3>
 </EuiTitle>
+
       <EuiPanel>
 
   <EuiFlexGroup >
     <EuiFlexItem>
       <EuiFormRow label="Keyword">
-      <EuiFieldText
+      <EuiFieldText compressed
       name="keyword"
       onChange={this.handleChange} />
       </EuiFormRow>
     </EuiFlexItem>
     <EuiFlexItem>
       <EuiFormRow label="Hash">
-      <EuiFieldText
+      <EuiFieldText compressed
       name="hash"
       onChange={this.handleChangeHash} />
       </EuiFormRow>
     </EuiFlexItem>
+    <EuiFlexItem>
+      <EuiText size="l"><h2>Total: {total}</h2></EuiText>
+    </EuiFlexItem>
   </EuiFlexGroup >
-<EuiText><h3>Total: {total}</h3></EuiText>
 
    <EuiInMemoryTable
       items={items}
