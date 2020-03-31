@@ -115,21 +115,50 @@ export class SysmonAlert extends Component {
         field: 'event_id',
         sortable: true,
         name: 'EventId',
+        render: (event, item) => {
+          var link = chrome.addBasePath('/app/sysmon_search_r/process_list');
+          link += "?host=" + item.computer_name;
+          link += "&date=" + moment(item.utc_time).format("YYYY-MM-DD HH:mm:ss.SSS");
+          link += "&category=" + item.description;
+          return (
+            <EuiLink href={link}>
+              {event} - {item.description}
+            </EuiLink>
+          )
+        }
       },
       {
         field: 'computer_name',
         name: 'Computer',
         sortable: true,
-        render: (pc, item) => (
-          <Fragment>
-            {pc}
-          </Fragment>
-        )
+        render: (pc, item) => {
+          console.log(item)
+          var link = chrome.addBasePath('/app/sysmon_search_r/process');
+          link += "?host=" + item.computer_name;
+          link += "&date=" + moment(item.utc_time).format("YYYY-MM-DD HH:mm:ss.SSS");
+          link += "&guid=" + item.process_guid;
+          return (
+            <EuiLink href={link}>
+              {pc}
+            </EuiLink>
+          )
+        }
       },
       {
         field: 'image',
         sortable: true,
         name: 'Process',
+        render: (process, item) => {
+          var link = chrome.addBasePath('/app/sysmon_search_r/process_overview');
+          link += "?host=" + item.computer_name;
+          link += "&date=" + moment(item.date).format("YYYY-MM-DD");
+          link += "&guid=" + item.process_guid;
+          return (
+            <EuiLink href={link}>
+              {process}
+            </EuiLink>
+          )
+        }
       },
       {
         field: 'rule_name',
