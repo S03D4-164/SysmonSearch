@@ -186,7 +186,8 @@ export class SysmonProcessList extends React.Component {
         console.log(responseJson);
         var items = [];
         responseJson.map(res => {
-          let link = "process_overview";
+          //let link = "process_overview";
+          let link = chrome.addBasePath('/app/sysmon_search_r/process_overview');
           link += "?host=" + this.state.host;
           link += "&date=" + this.state.date;
           let guid = res.guid?res.guid:res.info.SourceProcessGuid;
@@ -205,7 +206,10 @@ export class SysmonProcessList extends React.Component {
         this.setState({
           category:category,
           items:items,
-          total:items.length
+          total:items.length,
+          keyword:null,
+          hash:null,
+          filteredItems:[],
         });
     })
     .catch((error) =>{
@@ -221,8 +225,12 @@ export class SysmonProcessList extends React.Component {
   }
 
   render(){
-    if(!this.state.category)return(<div></div>);
-    //else console.log(this.state.category)
+    if(!this.state.category){
+      console.log("no category")
+      return(<div></div>);
+    } else {
+      console.log(this.state.category)
+    }
     const sorting = {
       sort: {
         field: this.state.sortField,
@@ -272,7 +280,7 @@ export class SysmonProcessList extends React.Component {
       </EuiFormRow>
     </EuiFlexItem>
     <EuiFlexItem>
-      <EuiText size="l"><h2>Total: {total}</h2></EuiText>
+      <EuiText ><h2>Total: {total}</h2></EuiText>
     </EuiFlexItem>
   </EuiFlexGroup >
 

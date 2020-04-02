@@ -63,15 +63,16 @@ export class SysmonEvents extends Component {
         var items = [];
         responseJson.map(res => {
           res.result.map(r  => {
+            var appPath = chrome.addBasePath('/app/sysmon_search_r/');
             let params = "?host=" + r.key + "&date=" + res.date;
             let item = {
               date: res.date,
               pc: r.key,
               count: r.doc_count,
-              event: "sysmon_search_r/event" + params,
-              stats: "sysmon_search_r/stats" + params,
-              process: "sysmon_search_r/process" + params,
-              visualize: "sysmon_search_r/visualize" + params,
+              event: appPath + "event" + params,
+              stats: appPath + "stats" + params,
+              process: appPath + "process" + params,
+              visualize: appPath + "visualize" + params,
             };
             items.push(item);
           });
@@ -174,7 +175,7 @@ export class SysmonEvents extends Component {
     const sorting = {
       sort: {
         field: "date",
-        direction: "asc",
+        direction: "desc",
       },
     };
     const { pageIndex, pageSize, totalItemCount } = this.state;

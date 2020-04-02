@@ -15,9 +15,9 @@ export class SysmonVisualize extends Component {
   constructor(props) {
     super(props);
     const params = qs.parse(this.props.location.search);
-    this.tabIndex = 0;
-    if (params.type==="stats")this.tabIndex = 1;
-    else if (params.type==="process")this.tabIndex = 2;
+    this.tabIndex = 1;
+    if (params.type==="stats")this.tabIndex = 2;
+    else if (params.type==="process")this.tabIndex = 3;
     this.state = {
       host: params.host,
       date: params.date,
@@ -25,6 +25,13 @@ export class SysmonVisualize extends Component {
     }
 
     this.tabs = [
+      {
+        id: 'top',
+        name: 'Top',
+        content: (
+          <SysmonSearchTabs/>
+        ),
+      },
       {
         id: 'summary',
         name: 'Summary',
@@ -44,13 +51,6 @@ export class SysmonVisualize extends Component {
         name: 'Process',
         content: (
           <SysmonProcess host={params.host} date={params.date}/>
-        ),
-      },
-      {
-        id: 'top',
-        name: 'Top',
-        content: (
-          <SysmonSearchTabs/>
         ),
       },
     ];

@@ -34,8 +34,6 @@ export class SysmonSummary extends Component {
     };
     this.chartRef = React.createRef();
     this.top = chrome.addBasePath('/app/sysmon_search_r');
-    //this.stats = this.top + "/stats" + this.props.location.search;
-    //this.process = this.top + "/process" + this.props.location.search;
     this.stats = this.top + "/visualize&type=stats&date=" + this.props.date + "&host=" + this.props.host;
     this.process = this.top + "/visualize&type=process&date=" + this.props.date + "&host=" + this.props.host;
 
@@ -59,7 +57,6 @@ export class SysmonSummary extends Component {
     })
     .then((response) => response.json())
     .then((responseJson) => {
-      //var items = responseJson;
       console.log(JSON.stringify(responseJson));
       var item = responseJson["count"];
       var freqData = item;
@@ -132,7 +129,7 @@ export class SysmonSummary extends Component {
 
     return (
 
-        <Fragment>
+        <div id="summary" style={{maxWidth:"1280px",margin:"0 auto"}}>                                        
 
         <EuiTitle size="s">
           <h3>Event Summary: {this.state.host}@{this.state.date}</h3>
@@ -177,7 +174,7 @@ export class SysmonSummary extends Component {
 
         {this.state.processList}
 
-        </Fragment>
+        </div>
     )
   }
 };
