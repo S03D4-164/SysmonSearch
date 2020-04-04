@@ -48,8 +48,8 @@ class IoCConvertHandler(BaseConvertHandler):
                     filename, content_type = file['filename'], file['content_type']
                     body = file['body']
 
-                    gen_log.debug('POST "%s" "%s" %d bytes', filename, content_type, len(body))
-                    gen_log.debug('POST file body:\n"%s"', body)
+                    gen_log.info('POST "%s" "%s" %d bytes', filename, content_type, len(body))
+                    gen_log.info('POST file body:\n"%s"', body)
 
                     stix_package = _get_stix_package(body)
                     if stix_package is not None:

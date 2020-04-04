@@ -4,7 +4,6 @@ import chrome from 'ui/chrome';
 import {saveRules} from './search_rules';
 
 import {
-  EuiBasicTable,
   EuiInMemoryTable,
   EuiPanel,
   EuiSelect,
@@ -35,7 +34,8 @@ export class SysmonSearch extends Component {
       pageIndex: 0,
       pageSize: 100,
       showPerPageOptions: true,
-      file:null,
+      file: null,
+      fileSuffix: null,
     };
 
     this.columns = [
@@ -106,17 +106,23 @@ export class SysmonSearch extends Component {
         }
       },
     ];
-
     this.options = [
       {value:0, text:"-"},
-      {value:1, text:"IP Address"},
+      {value:1, text:"IpAddress"},
       {value:2, text:"Port"},
       {value:3, text:"Hostname"},
-      {value:4, text:"Process Name"},
-      {value:5, text:"Registry Key"},
-      {value:6, text:"Registry Value"},
-      {value:7, text:"Hash"},
+      {value:4, text:"ProcessName"},
+      {value:5, text:"FileName"},
+      {value:6, text:"RegistryKey"},
+      {value:7, text:"RegistryValue"},
+      {value:8, text:"Hash"},
     ];
+    this.dict = {}
+    for (let index in this.options){
+      let key = this.options[index].text;
+      let value = this.options[index].value;
+      this.dict[key] = value;
+    }
 
     this.conjunctions = [
       {value:1, text:"AND"}, {value:2, text:"OR"}
@@ -128,51 +134,138 @@ export class SysmonSearch extends Component {
     this.handleRemoveFields = this.handleRemoveFields.bind(this);
     this.handleInputChange = this.handleInputChange.bind(this);
     this.setFile = this.setFile.bind(this);
+    this.clickLoadIoc = this.clickLoadIoc.bind(this);
+    this.callAnalyzeServer = this.callAnalyzeServer.bind(this);
   }
 
-  setFile(result){
-    const file = JSON.parse(result);
-    console.log(file)
-    if((file.operator==="AND"||file.operator==="OR")&&file.patterns){
-      this.setState({
-        file:file,
-      });
-    }else{
-      alert("Invalid File.");
-    }
+  setFile(result, suffix){
+    console.log(result);
+    this.setState({
+      file: result,
+      fileSuffix: suffix
+    });
   }
 
   loadFile(file){
+    if(file.length !== 1)return;
     const setFile = this.setFile; 
-    console.log(file)
+    const path = require('path');
+    const suffix = path.extname(file[0].name);
+    console.log(file, suffix)
     var reader = new FileReader();
     reader.onload = function(){
-      if(reader.result) setFile(reader.result);
+      if(reader.result) setFile(reader.result, suffix);
     }
-    if(file.length===1)reader.readAsText(file[0]);
+    reader.readAsText(file[0]);
+  }
+
+  callAnalyzeServer(url, file, contenttype) {
+    const optionsDict = this.dict;
+    if (confirm("Are you sure?")) {
+      const params = {
+        contents: file,
+        filename: "hoge",
+        contenttype: contenttype,
+        part_url: url
+      };
+      console.log("params:", params);
+      const api = chrome.addBasePath('/api/sysmon-search-plugin/import_search_keywords');
+      fetch(api, { method:"POST",
+        headers: {
+          'kbn-xsrf': 'true',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(params)
+      }).then((response) => response.json())
+      .then((responseJson) => {
+        console.log(JSON.stringify(responseJson));
+        function is_value_exist(dict, key) {
+          return (key in dict && dict.key !== "undefined" && dict.key !== null);
+        };
+        const json_data = responseJson;
+        if (is_value_exist(json_data, "fields")
+          && Array.isArray(json_data.fields)
+          && json_data.fields.length > 0
+        ) {
+          const patterns = json_data["fields"];
+          var inputFields = [];
+          for(let index in patterns){
+            const field = {
+              item: optionsDict[patterns[index].key],
+              value: patterns[index].value,
+            } 
+            inputFields.push(field);
+          }
+          console.log(inputFields)
+          this.setState({
+            inputFields:inputFields,
+          });   
+        } else {
+          alert("No Search Criteria");
+        }
+      })
+    }
+  }
+
+  clickLoadIoc(){
+    const file = this.state.file;
+    const suffix = this.state.fileSuffix;
+    if (suffix === ".xml") {
+      try {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(file, "application/xml");
+        console.log(doc);
+        if (doc.getElementsByTagName("parsererror").length > 0) {
+          console.log(doc.getElementsByTagName("parsererror")[0]);
+          alert("Invalid File.");
+          return;
+        }
+        const rootTagName = doc.firstChild.localName;
+        var url = "";
+        if (rootTagName === "STIX_Package") {// STIXv1
+          url = "/convert/stix/v1";
+          this.callAnalyzeServer(url, file, "application/xml");
+        } else if (rootTagName === "ioc") {// IoC
+          url = "/convert/ioc";
+          this.callAnalyzeServer(url, file, "application/xml");
+        } else {
+          alert("Invalid File.");
+          return;
+        }
+      } catch (e) {
+        console.log(e);
+        alert("Invalid File.");
+        return;
+      } 
+    } else if (suffix === ".json") { // STIXv2
+      const url = "/convert/stix/v2";
+      this.callAnalyzeServer(url, file, "application/json");
+    } else {
+      alert("Invalid File.");
+      return;
+    }
   }
 
   clickLoad(){
-    const file = this.state.file;
-    if(file===null){
+    if(this.state.file===null){
       alert("Please select a valid rule file.");
       return;
     }
+
+    const file = JSON.parse(this.state.file);
+    if((file.operator==="AND"||file.operator==="OR")&&file.patterns){
+      ;
+    } else {
+      console.log("Invalid file.");
+      return;
+    }
+
     const conjunction = (file.operator==='AND')?1:2;
     var inputFields = [];
-    const dict = {
-      'IpAddress':1,
-      'Port':2,
-      'HostName':3,
-      'ProcessName':4,
-      'FileName':5,
-      'RegistryKey':6,
-      'RegistryValue':7,
-      'Hash':8
-    }
+    const optionsDict = this.dict;
     for(let index in file.patterns){
       const field = {
-        item: dict[file.patterns[index].key],
+        item: optionsDict[file.patterns[index].key],
         value: file.patterns[index].value,
       } 
       inputFields.push(field);
@@ -418,7 +511,10 @@ export class SysmonSearch extends Component {
             />
           </EuiFlexItem >
           <EuiFlexItem grow={false}>
-          </EuiFlexItem>
+            <EuiButton size="s" 
+              onClick={() => this.clickLoadIoc() }
+            >Load IOC file</EuiButton>
+          </EuiFlexItem >
         </EuiFlexGroup >
 
         <EuiSpacer size="m" />

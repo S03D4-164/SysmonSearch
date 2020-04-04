@@ -34,7 +34,7 @@ class StixV1ConvertHandler(BaseConvertHandler):
                     gen_log.info('POST "%s" "%s" %d bytes', filename, content_type, len(body))
                     gen_log.info('POST file body:\n"%s"', body)
 
-                    stix_package = stix.parseString(body)
+                    stix_package = stix.parseString(body.decode())
 
                     patterns = common.get_search_items(stix_package)
                     msg = {'fields' : patterns}
