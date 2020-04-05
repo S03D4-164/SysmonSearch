@@ -109,6 +109,7 @@ export class SysmonStats extends Component {
             groups={this.state.groups}
             options={this.state.options}
             host={this.state.host}
+            date={this.state.date}
           />
 
         </EuiPanel>

@@ -22,6 +22,7 @@ import {
 export class SysmonProcessList extends React.Component {
   constructor(props){
     super(props);
+    //console.log(this.props)
     var host, date, category;
     if(this.props.location){
       const params = qs.parse(this.props.location.search);
@@ -60,7 +61,7 @@ export class SysmonProcessList extends React.Component {
     },
     {
       field: 'date',
-      name: 'Date',
+      name: 'UtcTime',
       sortable: true,
       width:"20%",
     },
@@ -157,22 +158,25 @@ export class SysmonProcessList extends React.Component {
   }
 
   componentDidUpdate(prevProps) {
-    if (this.props.category !== prevProps.category) {
-      this.getItems(this.props.category);
-    }
+    let update = false;
+    if (this.props.category !== prevProps.category) update = true;
+    if (this.props.date !== prevProps.date) update = true;
+    if (update) this.getItems(this.props.category, this.props.date);
   }
 
   clickSearch(){
     this.getItems();
   }
 
-  getItems(category){
-    if(!category)category=this.state.category
+  getItems(category, date){
+    if (!category) category = this.state.category
+    if (!date) date = this.state.category
     let api = chrome.addBasePath('/api/sysmon-search-plugin/process_list');
     api += '/' + this.state.host;
     //api += '/' + this.state.category;
     api += '/' + category;
-    api += '/' + this.state.date;
+    //api += '/' + this.state.date;
+    api += '/' + date;
     console.log(api)
     const items = fetch(api, {
       method:"GET",
@@ -205,6 +209,7 @@ export class SysmonProcessList extends React.Component {
         });
         this.setState({
           category:category,
+          date:date,
           items:items,
           total:items.length,
           keyword:null,
@@ -256,42 +261,41 @@ export class SysmonProcessList extends React.Component {
     const total = items.length;
 
     return (
+      <div id="processlist" style={{maxWidth:"1280px",margin:"0 auto"}}>
+        <EuiTitle size="s">
+          <h3>{this.state.category} on {this.state.host}@{this.state.date}</h3>
+        </EuiTitle>
 
-<div id="processlist" style={{maxWidth:"1280px",margin:"0 auto"}}>
-<EuiTitle size="s">
-<h3>{this.state.category} on {this.state.host}@{this.state.date}</h3>
-</EuiTitle>
+        <EuiPanel>
 
-      <EuiPanel>
+          <EuiFlexGroup >
+            <EuiFlexItem>
+              <EuiFormRow label="Keyword">
+              <EuiFieldText compressed
+              name="keyword"
+              onChange={this.handleChange} />
+              </EuiFormRow>
+            </EuiFlexItem>
+            <EuiFlexItem>
+              <EuiFormRow label="Hash">
+              <EuiFieldText compressed
+              name="hash"
+              onChange={this.handleChangeHash} />
+              </EuiFormRow>
+            </EuiFlexItem>
+            <EuiFlexItem>
+              <EuiText ><h2>Total: {total}</h2></EuiText>
+            </EuiFlexItem>
+          </EuiFlexGroup >
 
-  <EuiFlexGroup >
-    <EuiFlexItem>
-      <EuiFormRow label="Keyword">
-      <EuiFieldText compressed
-      name="keyword"
-      onChange={this.handleChange} />
-      </EuiFormRow>
-    </EuiFlexItem>
-    <EuiFlexItem>
-      <EuiFormRow label="Hash">
-      <EuiFieldText compressed
-      name="hash"
-      onChange={this.handleChangeHash} />
-      </EuiFormRow>
-    </EuiFlexItem>
-    <EuiFlexItem>
-      <EuiText ><h2>Total: {total}</h2></EuiText>
-    </EuiFlexItem>
-  </EuiFlexGroup >
-
-   <EuiInMemoryTable
-      items={items}
-      columns={this.columns}
-      sorting={sorting}
-      pagination={pagination}
-    />
-</EuiPanel>
-</div>
-  );
+          <EuiInMemoryTable
+              items={items}
+              columns={this.columns}
+              sorting={sorting}
+              pagination={pagination}
+            />
+        </EuiPanel>
+      </div>
+    );
   }
 };

@@ -40,7 +40,7 @@ export class SysmonSearch extends Component {
 
     this.columns = [
       {
-        field: 'utc', name: 'UTC Time', width:"20%", sortable:true,
+        field: 'utc', name: 'UtcTime', width:"20%", sortable:true,
         render: (utc, item) => {
           let link = chrome.addBasePath('/app/sysmon_search_r/stats');
           link += "?host=" + item.pc;
@@ -51,9 +51,6 @@ export class SysmonSearch extends Component {
             </Fragment>
           )
         }
-      },
-      {
-        field: 'event', name: 'Event ID', width:"10%", sortable:true
       },
       {
         field: 'pc', name: 'Hostname', width:"20%", sortable:true,
@@ -74,6 +71,9 @@ export class SysmonSearch extends Component {
       },
       {
         field: 'user', name: 'User', width:"10%", sortable:true
+      },
+      {
+        field: 'event', name: 'Event ID', width:"10%", sortable:true
       },
       {
         field: 'description', name: 'Description', width:"10%", sortable:true,
@@ -490,7 +490,6 @@ export class SysmonSearch extends Component {
             >ADD</EuiButton>
           </EuiFlexItem>
 
-
           <EuiFlexItem grow={false}>
             <EuiButton size="s" 
               onClick={() => this.clickSave() }
@@ -504,7 +503,7 @@ export class SysmonSearch extends Component {
           <EuiFlexItem grow={false}>
             <EuiFilePicker compressed
               display="default"
-              initialPromptText="Select saved json file"
+              initialPromptText="Select rule or IOC file"
               onChange={file => {
                 this.loadFile(file);
               }}
@@ -530,7 +529,6 @@ export class SysmonSearch extends Component {
             <EuiText><h3>Total: {this.state.total.value}</h3></EuiText>
           </EuiFlexItem >
         </EuiFlexGroup >
-
 
         <EuiSpacer size="m"/>
 

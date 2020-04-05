@@ -2,7 +2,7 @@ import { DataSet, Graph2d } from "./dist/vis-timeline/standalone";
 import './dist/vis-timeline/styles/vis-timeline-graph2d.css'
 //import vis from 'vis-timeline/dist/vis-timeline-graph2d.min'
 //import 'vis-timeline/dist/vis-timeline-graph2d.min.css'
-import React, { Component } from 'react'
+import React, { Component, Fragment } from 'react'
 import PropTypes from 'prop-types'
 import difference from 'lodash/difference'
 import intersection from 'lodash/intersection'
@@ -11,6 +11,8 @@ import assign from 'lodash/assign'
 import omit from 'lodash/omit'
 import keys from 'lodash/keys'
 import moment from 'moment'
+
+import {SysmonProcessList} from './ss_processlist';
 
 const noop = function() {}
 const events = [
@@ -44,19 +46,40 @@ export default class Timeline extends Component {
     super(props)
     this.state = {
       customTimes: [],
+      host: this.props.host,
+      date: this.props.date,
+      category: null,
     }
     this.chartRef = React.createRef();
-    console.log(props);
+    this.setCategory = this.setCategory.bind(this);
+
+    this.processList = function (host, date, category){
+      //console.log(category, host, date)
+      return (
+        <SysmonProcessList
+          host={host}
+          date={date}
+          category={category}
+        />
+     )
+    }
   }
 
   componentWillUnmount() {
     this.$el.destroy()
   }
 
+  setCategory(category, host, date){
+    this.setState({
+      host:host,
+      date:date,
+      category:category,
+    });
+  }
+
   componentDidMount() {
     const container = this.chartRef;
 
-    //var graph2d = new vis.Graph2d(container, undefined, this.props.options)
     var graph2d = new Graph2d(container, undefined, this.props.options)
     this.$el = graph2d;
 
@@ -103,22 +126,28 @@ export default class Timeline extends Component {
       return category_name;
     }
 
-    //events.forEach(event => {
-    //  this.$el.on(event, this.props[`${event}Handler`])
-    //})
+    // following are react-vis-timeline's default
+    /*
+    events.forEach(event => {
+      this.$el.on(event, this.props[`${event}Handler`])
+    })
+    */
 
     this.$el.on("rangechange", function() {
       graph2d.redraw();
     });
 
-    this.$el.on("contextmenu", function(event) {
+    const hostname = this.props.host;
+
+    const setCategory = this.setCategory
+    this.$el.on("click", function(event) {
       const click_date = moment(event.time).format("YYYY-MM-DD");
       const category = get_category_name(click_date, event);
-      if(category) alert(category);
+      setCategory(category, hostname, click_date)
+      //if(category) alert(category);
 　　　event.event.preventDefault();
     });
 
-    let hostname = this.props.host;
     this.$el.on("doubleClick", function(event) {
       var click_date = moment(event.time).format("YYYY-MM-DD");
       var category = get_category_name(click_date, event);
@@ -133,11 +162,13 @@ export default class Timeline extends Component {
     this.init()
   }
 
+
   componentDidUpdate() {
     this.init()
   }
 
-  shouldComponentUpdate(nextProps) {
+  //shouldComponentUpdate(nextProps) {
+  shouldComponentUpdate(nextProps, nextState) {
     const { items, groups, options, selection, customTimes } = this.props
 
     const itemsChange = items !== nextProps.items
@@ -146,7 +177,13 @@ export default class Timeline extends Component {
     const customTimesChange = customTimes !== nextProps.customTimes
     const selectionChange = selection !== nextProps.selection
 
+    const categoryChange = this.state.category !== nextState.category
+    const dateChange = this.state.date !== nextState.date
+    //console.log(categoryChange, dateChange)
+
     return (
+      dateChange ||
+      categoryChange ||
       itemsChange ||
       groupsChange ||
       optionsChange ||
@@ -228,13 +265,24 @@ export default class Timeline extends Component {
   }
 
   render() {
-    return <div ref={container => this.chartRef = container} />
+    const processList = this.processList(
+      this.state.host,
+      this.state.date,
+      this.state.category,
+    );
+    return (
+      <Fragment>
+        <div ref={container => this.chartRef = container} />
+        {processList}
+      </Fragment>
+    );
   }
 }
 
 Timeline.propTypes = assign(
   {
     host: PropTypes.string,
+    date: PropTypes.string,
     items: PropTypes.array,
     groups: PropTypes.array,
     options: PropTypes.object,
@@ -264,3 +312,4 @@ Timeline.defaultProps = assign(
   },
   eventDefaultProps
 )
+
