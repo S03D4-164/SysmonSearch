@@ -64,6 +64,7 @@ async function events(sysmon, hostname, date) {
            //"pipe",
            "wmi",
            "dns",
+           "file_delete",
            //"error",
            "other" 
     ];
@@ -102,6 +103,8 @@ async function events(sysmon, hostname, date) {
           cnt["wmi"] += event['doc_count'];
         } else if (event['key'] == 22) {
           cnt["dns"] += event['doc_count'];
+        } else if (event['key'] == 23) {
+          cnt["file_delete"] += event['doc_count'];
         //} else if (event['key'] == 255) {
         //  cnt["error"] += event['doc_count'];
         } else {

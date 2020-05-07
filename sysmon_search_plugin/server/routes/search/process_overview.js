@@ -115,6 +115,22 @@ async function make_process_infos(result, target_root, config) {
       };
       info_array[data.ProcessGuid].push(tmp);
 
+    } else if (winlog.event_id==23){//file_delete
+      if ((data.ProcessGuid in info_array) == false) {
+          info_array[data.ProcessGuid] = [];
+          info_create_file_array[data.ProcessGuid] = [];
+          info_create_file_time_array[data.ProcessGuid] = [];
+          info_net_array[data.ProcessGuid] = {};
+      }
+      var tmp = {
+          id: winlog.event_id,
+          data: data,
+          type: 'normal',
+          message: item.message,
+          _id: _id
+      };
+      info_array[data.ProcessGuid].push(tmp);
+
     } else if (winlog.event_id!=8){
       if ((data.ProcessGuid in info_array) == false) {
           info_array[data.ProcessGuid] = [];
@@ -197,7 +213,7 @@ async function sub_process_infos(sysmon, hostname, date, guid) {
                   "match": processGuid
                   //{"event_data.ProcessGuid.keyword": guid}
                 },{
-                  "terms": {[sysmon.event_id]: [11, 12, 13, 3, 2, 7, 19, 20, 21, 22]}
+                  "terms": {[sysmon.event_id]: [11, 12, 13, 3, 2, 7, 19, 20, 21, 22, 23]}
                   //"terms": {"winlog.event_id": [11, 12, 13, 3, 2, 7, 19, 20, 21]}
                 }]
               }

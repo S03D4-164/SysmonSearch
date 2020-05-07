@@ -34,6 +34,9 @@ var Utils = {
             case 22:
                 result = "dns";
                 break;
+            case 23:
+                result = "file_delete";
+                break;
             //case 5:
             //    result = "process_terminated";
             //    break;

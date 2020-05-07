@@ -14,6 +14,7 @@ async function getEventIdFromType(type){
   else if (type === 'pipe') return [17,18];
   else if (type === 'wmi') return [19,20,21];
   else if (type === 'dns') return [22];
+  else if (type === 'file_delete') return [23];
   else if (type === 'error') return [255];
   else return [];
 }
@@ -33,6 +34,7 @@ async function getTypeFromEventId(id){
   else if ([17,18].includes(id)) return 'pipe';
   else if ([19,20,21].includes(id)) return 'wmi';
   else if (id == 22) return 'dns';
+  else if (id == 23) return 'file_delete';
   else if (id == 255) return 'error';
   else return;
 }
@@ -82,7 +84,9 @@ async function processList(sysmon, hostname, eventtype, date, searchObj) {
   ];
   if(searchObj==null){
     if (date.length === 23) {
-      event_id[sysmon.event_id] = [1, 11, 12, 13, 3, 8, 2, 7, 19, 20, 21, 22];
+      event_id[sysmon.event_id] = [
+        1, 11, 12, 13, 3, 8, 2, 7, 19, 20, 21, 22, 23
+      ];
       //var date_dict = Utils.get_range_datetime(date);
       var date_dict = await getRangeDatetime(date);
       var query = {
@@ -247,7 +251,15 @@ async function processList(sysmon, hostname, eventtype, date, searchObj) {
             'QueryResults': data.QueryResults
           };
           break;
-  
+
+        case 'file_delete':
+          tmp['process'] = data.Image;
+          tmp['disp'] = data.TargetFilename;
+          tmp['info'] = {
+            'ProcessGuid': data.ProcessGuid,
+          };
+          break;
+    
         case 'wmi':
           if (hit.winlog.event_id == 19) {
             tmp['process'] = data.Name+":"+ data.EventNamespace;
