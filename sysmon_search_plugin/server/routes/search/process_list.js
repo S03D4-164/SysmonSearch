@@ -51,7 +51,7 @@ async function date_to_text(date) {
   return [y, m, d].join('-') + 'T' + [h, min, s].join(':') + 'Z';
 }
 
-async  function padding(n, d, p) {
+async function padding(n, d, p) {
   p = p || '0';
   return (p.repeat(d) + n).slice(-d);
 }
@@ -73,69 +73,54 @@ async function getRangeDatetime(date) {
 
 
 async function processList(sysmon, hostname, eventtype, date, searchObj) {
-  var host = {};
-  host[sysmon.computer_name] = hostname;
-  var event_id = {};
   var source = [
     "@timestamp",
     sysmon.map["RecordID"],
     sysmon.map["EventData"],
     sysmon.map["EventID"]
   ];
-  if(searchObj==null){
-    if (date.length === 23) {
-      event_id[sysmon.event_id] = [
-        1, 11, 12, 13, 3, 8, 2, 7, 19, 20, 21, 22, 23
-      ];
-      //var date_dict = Utils.get_range_datetime(date);
-      var date_dict = await getRangeDatetime(date);
-      var query = {
-        "bool": {
-          "must": [
-            {"match": host},
-            {"match": sysmon.channel},
-            {
-              "terms": event_id
-              //{"winlog.event_id": [1, 11, 12, 13, 3, 8, 2, 7, 19, 20, 21],}
-            },{
-              "range": {
-                "@timestamp": {
-                  "gte": date_dict["start_date"], 
-                  "lte": date_dict["end_date"]
-                }
-              }
-            }
-          ]
-        }
-      };
-      searchObj = {
-        "size": 10000,
-        "query": query,
-        "sort": [{"@timestamp": "asc"}],
-        "_source": source
-      };
-    } else if(eventtype){
-      //const event_id = await getEventIdFromType(eventtype);
-      event_id[sysmon.event_id] = await getEventIdFromType(eventtype);
-      var query = {
-        "bool": {
-          "must": [
-            {"match": host},
-            {"match": sysmon.channel},
-            {"terms": event_id},
-            {"match": {"@timestamp": date}}
-          ]
-        }
-      }
-      searchObj = {
-        "size": 10000,
-        "query": query,
-        "sort": [{"@timestamp": "asc"}],
-        "_source": source,
-      };
-    }
-  }
+  var host = {};
+  host[sysmon.computer_name] = hostname;
+  var event_id = {};
 
+  var query = {
+    "bool": {
+      "must": [
+        {"match": host},
+        {"match": sysmon.channel},
+      ]
+    }
+  };
+  // if date.length != 23 && eventtype, event_id = id of eventtype
+  if(searchObj == null){
+    var date_dict = null;
+    if (date.length === 23) {
+      date_dict = await getRangeDatetime(date);
+      if(date_dict){
+        var range = {
+          "@timestamp": {
+           "gte": date_dict["start_date"],
+           "lte": date_dict["end_date"]
+          }
+        }
+        event_id[sysmon.event_id] = [
+          1, 11, 12, 13, 3, 8, 2, 7, 19, 20, 21, 22, 23
+        ];
+        query["bool"]["must"].push({"terms": event_id});
+        query["bool"]["must"].push({"range": range});
+      }
+    } else if(eventtype){
+      event_id[sysmon.event_id] = await getEventIdFromType(eventtype);
+      query["bool"]["must"].push({"terms": event_id});
+      query["bool"]["must"].push({"match":{"@timestamp": date}});
+    }
+    searchObj = {
+      "size": 10000,
+      "query": query,
+      "sort": [{"@timestamp": "asc"}],
+      "_source": source
+    };
+  }
   const el_result = await sysmon.client.search({
     index: sysmon.index,
     //size: 1000,
@@ -153,19 +138,17 @@ async function processList(sysmon, hostname, eventtype, date, searchObj) {
       //console.log("hit: " + JSON.stringify(hit));
       let winlog = hit.winlog;
       let data = winlog.event_data;
-      // results.push( hit );
-      var tmp = {
+      var tmp = { // item for process list table
         "number": winlog.record_id,
         "image": data.Image,
         "guid": data.ProcessGuid,
         "date": data.UtcTime,
-        "_id": hits[index]._id
+        "_id": hits[index]._id,
+        "process": null,
+        "disp": null,
+        "info": {},
       };
-      // results.push(hit.event_data);
-      //tmp['type'] = Utils.eventid_to_decription(hit.winlog.event_id);
-      //tmp['type'] = await eventid_to_type(winlog.event_id);
       tmp['type'] = await getTypeFromEventId(winlog.event_id);
-
       switch (tmp['type']) {
         case 'create_process':
           tmp['process'] = data.ParentImage;

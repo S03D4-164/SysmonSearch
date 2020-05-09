@@ -58,13 +58,8 @@ async function find_root_process(cur, list, p_list, index) {
   }
 }
 
+/*
 async function get_datas(process_array, p_process_array) {
-  //async function get_datas(process_list) {
-  //var tmp = make_process_list(datas);
-
-  //var process_array = process_list[0];
-  //var p_process_array = process_list[1];
-
   var info = {
     'CurrentDirectory': '',
     'CommandLine': "root",
@@ -118,20 +113,23 @@ async function get_datas(process_array, p_process_array) {
 
   return process_tree;
 }
+*/
 
 async function make_process_list(el_result, networkInfo) {
-  var hits = el_result.hits.hits;
+  var process_array = {
+    //guid: {item}
+  };
+  var p_process_array = {
+    //parent_guid: [{item}]
+  };
+  const hits = el_result.hits.hits;
   //console.log("hits: " + JSON.stringify(hits));
-  var process_array = {};
-  var p_process_array = {};
-
   for (let index in hits) {
-    var item = hits[index]._source;
-    var data = item.winlog.event_data;
+    const item = hits[index]._source;
+    const data = item.winlog.event_data;
     //console.log(data);
-
-    var key = data.ProcessGuid;
-    var pkey = data.ParentProcessGuid;
+    const key = data.ProcessGuid;
+    const pkey = data.ParentProcessGuid;
 
     var net_info = {};
     if( key in networkInfo ) {
@@ -140,9 +138,8 @@ async function make_process_list(el_result, networkInfo) {
         net_info[tmp_port] = tmp_net_info[tmp_port].length;
       }
     }
-
     
-    var info = {
+    const tmp_info = {
       'CurrentDirectory': data.CurrentDirectory,
       'CommandLine': data.CommandLine,
       'Hashes': data.Hashes,
@@ -154,14 +151,10 @@ async function make_process_list(el_result, networkInfo) {
       'Image': data.Image
     };
 
-    item['index'] = (index + 1)*10000;
-    item['key'] = key;
-    item['pkey'] = pkey;
-
     var tmp = {
-       "index": item.index,
-       "key": item.key,
-       "pkey": item.pkey,
+       "index": (index + 1)*10000,
+       "key": key,
+       "pkey": pkey,
        "number": item.winlog.record_id,
        "level": data.IntegrityLevel,
        "curdir": data.CurrentDirectory,
@@ -169,7 +162,7 @@ async function make_process_list(el_result, networkInfo) {
        "cmd": data.CommandLine,
        "guid": data.ProcessGuid,
        "date": data.UtcTime,
-       "info": info,
+       "info": tmp_info,
        "_id": hits[index]._id
      };
      process_array[key] = tmp;
@@ -181,15 +174,65 @@ async function make_process_list(el_result, networkInfo) {
      }
   }
 
-  
-  //return [process_array, p_process_array]
+  //const process_tree = await get_datas(process_array, p_process_array)
+ 
+  const root_info = {
+    'CurrentDirectory': '',
+    'CommandLine': "root",
+    'ProcessGuid': "root",
+    'Hashes': '',
+    'ParentProcessGuid': '',
+    'ParentCommandLine': '',
+    'Net': {},
+    'Image': "root"
+  }
+  const system_root_obj = {
+    "index": 1,
+    "key": "root",
+    "pkey": "",
+    "number": -1,
+    "level": '',
+    "curdir": '',
+    "image": "root",
+    "guid": "root",
+    "date": '',
+    "info": root_info,
+  };
+  var system_root = {
+    'current': system_root_obj,
+    'parent': null,
+    'child': []// store root
+  };
+  //console.log("[system root] " + JSON.stringify(system_root, null, 2))
+  var process_tree = [];
 
-  const process_tree = await get_datas(process_array, p_process_array)
+  var index = 2;
+  for (var key_index in process_array) { // push roots to system_root child
+    var item = process_array[key_index];
+    var tmp = await find_root_process(
+      item, process_array, p_process_array, index
+    );
+    var root = {
+      'current': tmp,
+      'parent': null,
+      'child': []
+    }
+    //console.log("[find root process result] " + JSON.stringify(root, null, 2))
+
+    root = await make_process_tree(root, process_array, p_process_array);
+    system_root.child.push( root );
+
+    index += 1;
+  }
+
+  process_tree.push(system_root);
+
   return process_tree;
 }
 
 async function process(sysmon, hostname, date, searchObj) {
   var source = [
+    "@timestamp",
     sysmon.map["RecordID"],
     sysmon.map["EventData"],
     sysmon.map["EventID"],
@@ -198,8 +241,15 @@ async function process(sysmon, hostname, date, searchObj) {
   host[sysmon.computer_name] = hostname;
   var event_id = {};
   event_id[sysmon.event_id] = 1;
+  var query = {
+    "bool": {
+      "must": [
+        {"match": host},
+        {"match": sysmon.channel},
+      ]
+    }
+  };
   var netSearchObj = null;
-
   if(searchObj == null){ // not called from process overview
     var date_dict = null;
     if (date.length === 23) {
@@ -214,25 +264,9 @@ async function process(sysmon, hostname, date, searchObj) {
          "gte": date_dict["start_date"], "lte": date_dict["end_date"]
         }
       };
-      searchObj = {
-        "size": 10000,
-        "query": {
-          "bool": {
-            "must": [
-              {"match": host},
-              {"match": event_id},
-              {"match": sysmon.channel},
-              {
-                //"range": {"@timestamp": { "gte": date_dict["start_date"], "lte": date_dict["end_date"] }}
-                "range": range
-              }
-            ]
-          }
-        },
-        "sort": [{"@timestamp": "asc"}],
-        //"_source": ["record_number", "event_data"]
-        "_source": source
-      };
+      query["bool"]["must"].push({"match": event_id});
+      query["bool"]["must"].push({"range": range});
+
       var netevent_id = {};
       netevent_id[sysmon.event_id] = [3];
       netSearchObj = {
@@ -243,39 +277,23 @@ async function process(sysmon, hostname, date, searchObj) {
               {"match": host},
               {"match": sysmon.channel},
               {"terms": netevent_id},
-              {
-                //"range": {"@timestamp": { "gte": date_dict["start_date"], "lte": date_dict["end_date"] }}
-                "range": range
-              }
+              {"range": range}
             ]
           }
         },
         "sort": [{"@timestamp": "asc"}],
-        //"_source": ["record_number", "event_data", "event_id"]
         "_source": source
       };
-
     } else { //!date_dict
-      searchObj = {
-        "size": 10000,
-        "query": {
-          "bool": {
-            "must": [
-              {"match": host},
-              {"match": sysmon.channel},
-              {
-                "match": event_id
-                //{"winlog.event_id": 1}
-              },
-              {"match": {"@timestamp": date}}
-            ]
-          }
-        },
-        "sort": [{"@timestamp": "asc"}],
-        //"_source": ["record_number", "event_data"]
-        "_source": source
-      };
+      query["bool"]["must"].push({"match": event_id});
+      query["bool"]["must"].push({"match": {"@timestamp": date}});
     }
+    searchObj = {
+      "size": 10000,
+      "query": query,
+      "sort": [{"@timestamp": "asc"}],
+      "_source": source
+    };
   }
 
   console.log("[net search] " + JSON.stringify(netSearchObj, null, 2));
@@ -284,11 +302,9 @@ async function process(sysmon, hostname, date, searchObj) {
     sysmon, hostname, "net_access", date, netSearchObj
   )
   //console.log("[process list netDatas] "  + JSON.stringify(netDatas));
-
   var networkInfo = {
     //guid: {port:[ip]}
   };
-  //function get_net_datas(datas) {
   if(netDatas){
     for( let index in netDatas ) {
       var item = netDatas[ index ];
@@ -303,26 +319,21 @@ async function process(sysmon, hostname, date, searchObj) {
         networkInfo[ item.guid ][ item.port ].push( item.ip );
       }
     }
-    console.log("[networkInfo] " + JSON.stringify(networkInfo, null, 2));
-
-    console.log("[process search] " + JSON.stringify(searchObj, null, 2));
-    const el_result = await sysmon.client.search({
-      index: sysmon.index,
-      // size: 1000,
-      body: searchObj
-    });
-
-    //console.log(JSON.stringify(el_result, null, 2));
-
-     //const process_list = await make_process_list(el_result, networkInfo);
-     const process_tree = await make_process_list(el_result, networkInfo);
-    //console.log("process_list: " + JSON.stringify(process_list));
-    //const process_tree = await get_datas(process_list);
-
-    //console.log("[process_tree] " + JSON.stringify(process_tree, null, 2));
-    return process_tree;
   }
-  return;
+  console.log("[networkInfo] " + JSON.stringify(networkInfo, null, 2));
+
+  const el_result = await sysmon.client.search({
+    index: sysmon.index,
+    // size: 1000,
+    body: searchObj
+  });
+  console.log("[process search] " + JSON.stringify(searchObj, null, 2));
+  //console.log("[process search result] " + JSON.stringify(el_result, null, 2));
+
+  const process_tree = await make_process_list(el_result, networkInfo);
+
+  //console.log("[process_tree] " + JSON.stringify(process_tree, null, 2));
+  return process_tree;
 }
 
 module.exports = process;

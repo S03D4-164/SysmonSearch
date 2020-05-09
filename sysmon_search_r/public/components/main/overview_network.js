@@ -215,6 +215,17 @@ function add_process_info(in_cur, graph, keyword, hash) {
       };
       tmp_node.message = item.message;
       tmp_node.eventid = 22;
+
+    } else if (item.id == 23) {
+      tmp_node.image = imgFile;
+      tmp_node.label = item.data.TargetFilename;
+      tmp_node.title = item.data.TargetFilename;
+      tmp_node.info = {
+        "Image": item.data.Image,
+        "ProcessGuid": item.data.ProcessGuid,
+      };
+      tmp_node.message = item.message;
+      tmp_node.eventid = 23;
     }
 
     if (search(tmp_node.info, keyword, hash) || search(tmp_node.label, keyword, hash)) {

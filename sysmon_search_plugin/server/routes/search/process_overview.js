@@ -12,7 +12,7 @@ async function make_process_infos(result, target_root, config) {
   for (var index in hits) {
     var item = hits[index]._source;
     var _id = hits[index]._id;
-    console.log("[make process info item] " + JSON.stringify(item));
+    //console.log("[make process info item] " + JSON.stringify(item));
     var winlog = item.winlog;
     var data = winlog.event_data;
 
@@ -269,14 +269,13 @@ async function process_overview(sysmon, hostname, date, guid) {
   host[sysmon.computer_name] = hostname;
   var processGuid = {};
   processGuid[sysmon.map["ProcessGuid"]] = guid;
-  // search pc's create_process which has guid on date
+  // search pc's create_process events which has guid on date
   var query = {
     "bool": {
       "must": [
       {
         "bool":{
           "must": [
-            //{"match": {"winlog.event_id": 1}},
             {"match": {[sysmon.event_id]: 1}},
             {"match": host},
             {"match": sysmon.channel},
@@ -306,27 +305,43 @@ async function process_overview(sysmon, hostname, date, guid) {
   };
   const el_result = await process(sysmon, hostname, date, searchObj);
   console.log("[search process overview] " + JSON.stringify(searchObj, null, 2));
-
-  //return create_info(proc_result);
-
-  //function create_info(el_result, guid) {
+  //console.log("[search process overview result] " + JSON.stringify(el_result, null, 2));
+  
   // TARGET Process Chain( root )
   var guids = [];
   var target_root = null;
   for (var index in el_result) {
     var process_tree = el_result[index];
+    // if process_tree.current.guid = guid,
     target_root = await search_target(process_tree, guid);
     if (target_root != null) break;
   }
 
-  // Child Process GUIDS
+  // Child Process GUIDS (but not used from v1.0)
   guids = await get_guid(target_root, guids);
   console.log("[guids] " + guids)
   console.log("[target root] " + JSON.stringify(target_root, null, 2))
 
-  const search_result = await sub_process_infos(sysmon, hostname, date, guid);
-  const proc_info = await make_process_infos(search_result, target_root, sysmon.config);
-  return proc_info;
+  if (target_root){
+    const search_result = await sub_process_infos(sysmon, hostname, date, guid);
+    console.log("[process overview subprocess] " + JSON.stringify(search_result, null, 2));
+    const proc_info = await make_process_infos(search_result, target_root, sysmon.config);
+    console.log("[process overview proc_info] " + JSON.stringify(proc_info, null, 2));
+    return proc_info;
+    /*
+    proc_info = {
+      current:{ event of guid
+        infos:[{sub events}]
+      },
+      parent:{ parent event }
+      child:[]
+    }
+    */
+  }else{
+    const search_result = await sub_process_infos(sysmon, hostname, date, guid);
+    console.log("[process overview subprocess] " + JSON.stringify(search_result, null, 2));
+    return {};
+  }
 }
 
 
