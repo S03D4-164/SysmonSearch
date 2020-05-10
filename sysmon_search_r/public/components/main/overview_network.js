@@ -316,7 +316,8 @@ function createNetwork(top, keyword, hash, firstflg) {
       "guid": top.current.guid,
       "info": top.current.info,
       "eventid": 1,
-      "_id":  top.current._id
+      "_id":  top.current._id,
+      "message": top.current.message,
     };
 
     if (search(top.current.info, keyword, hash) || firstflg) {
@@ -402,10 +403,12 @@ export class GraphOverView extends Component {
       click: function(properties) {
         if (!properties.nodes.length) return;
         var nodeid = network.getNodeAt(properties.pointer.DOM);
+        //console.log(nodeid);
         if (nodeid) {
           network.selectNodes([nodeid], true);
           var node = network.body.data.nodes.get(nodeid);
           if (node && node.info) {
+            //console.log(node);
             const view_data_1 = [
               "CurrentDirectory", "CommandLine", "Hashes", "ParentProcessGuid", "ParentCommandLine", "ProcessGuid"
             ];

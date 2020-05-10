@@ -319,31 +319,79 @@ async function process_overview(sysmon, hostname, date, guid) {
 
   // Child Process GUIDS (but not used from v1.0)
   guids = await get_guid(target_root, guids);
-  console.log("[guids] " + guids)
+  //console.log("[guids] " + guids)
   console.log("[target root] " + JSON.stringify(target_root, null, 2))
 
+  const search_result = await sub_process_infos(sysmon, hostname, date, guid);
+  console.log("[process overview subprocess] " + JSON.stringify(search_result, null, 2));
+
   if (target_root){
-    const search_result = await sub_process_infos(sysmon, hostname, date, guid);
-    console.log("[process overview subprocess] " + JSON.stringify(search_result, null, 2));
     const proc_info = await make_process_infos(search_result, target_root, sysmon.config);
-    console.log("[process overview proc_info] " + JSON.stringify(proc_info, null, 2));
+    //console.log("[process overview proc_info] " + JSON.stringify(proc_info, null, 2));
     return proc_info;
     /*
     proc_info = {
-      current:{ event of guid
-        infos:[{sub events}]
+      current:{ create_process event of guid
+        infos:[{sub events of current guid process}]
       },
-      parent:{ parent event }
-      child:[]
+      parent:{parent create_process event},
+      child:[{process created by current}]
     }
     */
   }else{
-    const search_result = await sub_process_infos(sysmon, hostname, date, guid);
-    console.log("[process overview subprocess] " + JSON.stringify(search_result, null, 2));
-    return {};
+    target_root = await root_from_subproc(guid, search_result);
+    const proc_info = await make_process_infos(search_result, target_root, sysmon.config);
+    //console.log("[process overview proc_info] " + JSON.stringify(proc_info, null, 2));
+    return proc_info;
   }
 }
 
+async function root_from_subproc(guid, subproc){
+  const hits = subproc.hits.hits;
+  var images = [];
+  var guids = [];
+  for (let index in hits) {
+    const data = hits[index]._source.winlog.event_data;
+    
+    var image = null;
+    if(data.Image) image = data.Image
+    else if(data.SourceImage) image = data.SourceImage	
+    if (image) {
+      if (!images.includes(image)) images.push(image);
+    }
+
+    var id = null;  
+    if(data.ProcessGuid) id = data.ProcessGuid
+    else if(data.SourceProcessGuid) id = data.SourceProcessGuid	
+    if(id){
+      if (!guids.includes(id)) guids.push(id);
+    }
+  }
+  var message = "\nTop process not found. This information is generated from sub events.";
+  message += "\nProcessGuid: " + guid;
+  message += "\nImage: " + images[0];
+  if(!images.length==1){
+    message += "\n[warning] image is not unique: " + images.join();
+  }
+  if(!guids.length==1){
+    message += "\n[warning] guid is not unique: " + guids.join();
+  } else if(!guids[0]===guid){
+    message += "\n[warning] guid does not match: " + guid + " <-> "+ guids[0];
+  }
+  var current = {
+    "index": 1,
+    "key": guid,
+    "image":images[0],
+    "guid": guid,
+    "info":{
+      "Image":images[0],
+      "ProcessGuid":guid,
+    },
+    message: message,
+  };
+  const root = {"current":current};
+  return root;
+}
 
 async function get_guid(target, guids) {
   if (target != null && target.current != null && target.current.guid != null) {
