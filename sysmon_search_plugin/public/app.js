@@ -6,7 +6,7 @@ import {conf as config} from '../conf.js';
 
 // -------------------------------------------------------
 // Common
-import 'ui/autoload/styles';
+//import 'ui/autoload/styles';
 import './less/main.less';
 import * as vis_network from './dist/vis-network.min.js';
 //const vis_network = require('vis-network')
