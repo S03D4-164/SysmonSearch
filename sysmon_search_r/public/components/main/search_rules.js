@@ -21,7 +21,7 @@ function get_search_key_name(num) {
   return option_array[num_obj];
 };
 
-function save_rules (keywords) {
+function saveRules (keywords) {
   var rules = {};
   if (typeof keywords !== "undefined") {
     rules.operator = '';
@@ -78,6 +78,6 @@ function save_rules (keywords) {
   });
 };
 
-module.exports = {
-  saveRules: save_rules
+export {
+  saveRules
 };

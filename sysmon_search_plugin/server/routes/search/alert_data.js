@@ -111,4 +111,4 @@ async function alertData(sysmon, data) {
   return response;
 }
 
-module.exports = alertData;
+export default alertData;

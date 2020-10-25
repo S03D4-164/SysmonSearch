@@ -262,4 +262,4 @@ async function makeQuery(params, map) {
   return search_items_and_date_query;
 }
 
-module.exports = makeQuery;
+export default makeQuery;

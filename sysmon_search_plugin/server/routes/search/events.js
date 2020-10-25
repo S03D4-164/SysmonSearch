@@ -140,4 +140,4 @@ async function events(sysmon, hostname, date) {
   return;
 }
 
-module.exports = events;
+export default events;

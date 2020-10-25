@@ -63,4 +63,4 @@ async function importSearchKeywords(params) {
   return result;
 }
 
-module.exports = importSearchKeywords;
+export default importSearchKeywords;

@@ -325,4 +325,4 @@ async function get_guid(target, guids) {
   return guids;
 }
 
-module.exports = process_overview;
+export default process_overview;

@@ -92,4 +92,4 @@ async function smSearch(sysmon, params) {
   return res;
 }
 
-module.exports = smSearch;
+export default smSearch;

@@ -325,4 +325,4 @@ async function process(sysmon, hostname, date, searchObj) {
   return;
 }
 
-module.exports = process;
+export default process;

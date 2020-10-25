@@ -78,4 +78,4 @@ async function dashBoard(sysmon, data) {
   return results;
 }
 
-module.exports = dashBoard;
+export default dashBoard;

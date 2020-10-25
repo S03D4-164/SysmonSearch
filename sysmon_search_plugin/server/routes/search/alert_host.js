@@ -22,11 +22,11 @@ async function alertHost(sysmon, data) {
     index: 'sysmon-search-alert-*',
     // size: 1000,
     body: uniqueHostObj
-  };
+  });
 
   var unique_hosts = [];
   if(el_result.aggregations != null)unique_hosts = el_result.aggregations.unique_hosts.buckets;
   return unique_hosts;
 }
 
-module.exports = alertHost;
+export default alertHost;

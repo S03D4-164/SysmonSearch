@@ -274,4 +274,4 @@ async function processList(sysmon, hostname, eventtype, date, searchObj) {
   return;
 }
 
-module.exports = processList;
+export default processList;

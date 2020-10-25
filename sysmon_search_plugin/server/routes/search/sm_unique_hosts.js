@@ -32,4 +32,4 @@ async function sm_unique_hosts(sysmon, params) {
   return;
 }
 
-module.exports = sm_unique_hosts;
+export default sm_unique_hosts;

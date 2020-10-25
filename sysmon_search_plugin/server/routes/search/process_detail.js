@@ -212,4 +212,4 @@ async function processDetail(sysmon, hostname, date, guid) {
   return data;
 }
 
-module.exports = processDetail;
+export default processDetail;

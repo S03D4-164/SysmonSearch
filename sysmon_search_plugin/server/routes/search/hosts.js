@@ -94,4 +94,4 @@ async function searchHosts(sysmon, params) {
 
 }
 
-module.exports = searchHosts;
+export default searchHosts;

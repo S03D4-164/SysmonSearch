@@ -98,7 +98,7 @@ const deleteAlert = async function (params) {
 
 }
 
-module.exports = {
+export {
   saveAlert,
   getAlert,
   deleteAlert

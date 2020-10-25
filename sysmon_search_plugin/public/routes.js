@@ -69,4 +69,4 @@ uiRoutes
         controllerAs: 'ctrl'
     })
 
-module.exports = uiRoutes
+    export default uiRoutes
